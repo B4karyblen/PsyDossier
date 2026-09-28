@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { S10ExamenCliniqueData, UserRole } from '../../types';
-import { Save, ChevronRight, AlertTriangle, AlertCircle, CheckCircle2, Lock } from 'lucide-react';
+import { AlertTriangle, AlertCircle, CheckCircle2, Lock, Activity, Brain } from 'lucide-react';
+import { RubriqueFooterNav } from './RubriqueFooterNav';
 
 interface Props {
   data: S10ExamenCliniqueData;
@@ -8,6 +9,7 @@ interface Props {
   currentUserRole?: UserRole;
   onSave: (data: S10ExamenCliniqueData) => void;
   onNext: () => void;
+  onPrev?: () => void;
 }
 
 export const S10ExamenClinique: React.FC<Props> = ({
@@ -16,6 +18,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
   currentUserRole,
   onSave,
   onNext,
+  onPrev,
 }) => {
   const [formData, setFormData] = useState<S10ExamenCliniqueData>(data);
   const [activeTab, setActiveTab] = useState<'somatique' | 'psychiatrique'>('somatique');
@@ -28,6 +31,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
   const isPsychiatriqueReadOnly = isReadOnly || (currentUserRole === 'INFIRMIER');
 
   const constantes = formData.somatique.constantes || {};
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,46 +73,52 @@ export const S10ExamenClinique: React.FC<Props> = ({
   const isTachycardie = constantes.pouls && constantes.pouls > 100;
 
   return (
-    <div className="bg-white border border-[#D9E2E8] rounded-xl p-5 shadow-xs">
-      <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#E8EEF2]">
+    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#EDF2F7] gap-3">
         <div>
-          <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2 py-0.5 rounded">
-            S10 · CLINIQUE
-          </span>
-          <h2 className="text-base font-bold text-[#18243A] mt-1">
-            Examen clinique (Somatique & Psychiatrique)
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2.5 py-0.5 rounded-md border border-[#10B9A9]/20">
+              S10 · CLINIQUE
+            </span>
+            <span className="text-xs text-[#64748B]">Obligatoire pour validation</span>
+          </div>
+          <h2 className="text-lg font-extrabold text-[#18243A] tracking-tight mt-1">
+            Examen Clinique (Somatique & Psychiatrique)
           </h2>
-          <p className="text-xs text-[#64748B]">
+          <p className="text-xs text-[#64748B] mt-0.5">
             Constantes vitales somatiques et sémiologie psychiatrique structurée
           </p>
         </div>
 
         {/* Tab switcher */}
-        <div className="flex items-center p-1 bg-[#F1F5F7] rounded-lg">
+        <div className="flex items-center p-1 bg-[#F1F5F9] rounded-xl border border-[#CBD5E1] shrink-0 self-start sm:self-auto">
           <button
             type="button"
             onClick={() => setActiveTab('somatique')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               activeTab === 'somatique'
                 ? 'bg-white text-[#18243A] shadow-xs'
                 : 'text-[#64748B] hover:text-[#18243A]'
             }`}
           >
-            A. Somatique
+            <Activity className="w-3.5 h-3.5 text-[#10B9A9]" />
+            <span>A. Examen Somatique</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('psychiatrique')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               activeTab === 'psychiatrique'
                 ? 'bg-white text-[#18243A] shadow-xs'
                 : 'text-[#64748B] hover:text-[#18243A]'
             }`}
           >
-            B. Psychiatrique
+            <Brain className="w-3.5 h-3.5 text-[#07988D]" />
+            <span>B. Examen Psychiatrique</span>
           </button>
         </div>
       </div>
+
 
       {error && (
         <div className="mb-4 p-3 bg-[#FFE4E6] border border-[#F43F5E]/30 rounded-lg flex items-center gap-2 text-xs text-[#BE123C]">
@@ -686,33 +696,15 @@ export const S10ExamenClinique: React.FC<Props> = ({
         )}
 
         {/* Action buttons */}
-        <div className="flex items-center justify-between pt-4 border-t border-[#E8EEF2]">
-          <div className="text-[11px] text-[#64748B]">
-            Examen somatique et examen psychiatrique obligatoires avant validation finale
-          </div>
-
-          <div className="flex items-center gap-2">
-            {((activeTab === 'somatique' && !isSomatiqueReadOnly) || (activeTab === 'psychiatrique' && !isPsychiatriqueReadOnly)) && (
-              <button
-                type="submit"
-                className="px-4 py-2 text-xs font-semibold text-white bg-[#10B9A9] hover:bg-[#07988D] rounded-lg transition-colors flex items-center gap-1.5"
-              >
-                <Save className="w-3.5 h-3.5" />
-                Enregistrer S10
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={onNext}
-              className="px-3.5 py-2 text-xs font-semibold text-[#18243A] bg-[#F1F5F7] hover:bg-[#D9E2E8] rounded-lg transition-colors flex items-center gap-1.5"
-            >
-              Suivant (S11)
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
+        <RubriqueFooterNav
+          currentRubriqueId="s10"
+          isReadOnly={isSomatiqueReadOnly && isPsychiatriqueReadOnly}
+          isSaved={isSaved}
+          onPrev={onPrev}
+          onNext={onNext}
+        />
       </form>
     </div>
   );
 };
+

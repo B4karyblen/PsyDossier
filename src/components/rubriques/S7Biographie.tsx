@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { S7BiographieData, FratrieItem, ConjointItem, EnfantItem } from '../../types';
-import { Save, ChevronRight, Plus, Trash2, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, AlertCircle } from 'lucide-react';
+import { RubriqueFooterNav } from './RubriqueFooterNav';
 
 interface Props {
   data: S7BiographieData;
@@ -8,6 +9,7 @@ interface Props {
   isReadOnly: boolean;
   onSave: (data: S7BiographieData) => void;
   onNext: () => void;
+  onPrev?: () => void;
 }
 
 export const S7Biographie: React.FC<Props> = ({
@@ -16,7 +18,9 @@ export const S7Biographie: React.FC<Props> = ({
   isReadOnly,
   onSave,
   onNext,
+  onPrev,
 }) => {
+
   const [formData, setFormData] = useState<S7BiographieData>(data);
   const [isSaved, setIsSaved] = useState(false);
   const [newPositif, setNewPositif] = useState('');
@@ -135,20 +139,24 @@ export const S7Biographie: React.FC<Props> = ({
   const hasFratrieMismatch = declaredBroCount > 0 && listBroCount > 0 && declaredBroCount !== listBroCount;
 
   return (
-    <div className="bg-white border border-[#D9E2E8] rounded-xl p-5 shadow-xs">
-      <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#E8EEF2]">
+    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-6">
+      <div className="flex items-center justify-between pb-4 border-b border-[#EDF2F7]">
         <div>
-          <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2 py-0.5 rounded">
-            S7 · ANTÉCÉDENTS & DÉVELOPPEMENT
-          </span>
-          <h2 className="text-base font-bold text-[#18243A] mt-1">
-            Éléments de biographie (8 sections)
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2.5 py-0.5 rounded-md border border-[#10B9A9]/20">
+              S7 · DÉVELOPPEMENT
+            </span>
+            <span className="text-xs text-[#64748B]">8 sections de vie</span>
+          </div>
+          <h2 className="text-lg font-extrabold text-[#18243A] tracking-tight mt-1">
+            Éléments de Biographie Clinique
           </h2>
-          <p className="text-xs text-[#64748B]">
+          <p className="text-xs text-[#64748B] mt-0.5">
             Histoire de vie, ascendants, collatéraux, scolarité, parcours affectif et événements marquants
           </p>
         </div>
       </div>
+
 
       {isSaved && (
         <div className="mb-4 p-2.5 bg-[#DCFCE7] border border-[#10B981]/30 rounded-lg text-xs text-[#15803D] font-medium">
@@ -934,33 +942,15 @@ export const S7Biographie: React.FC<Props> = ({
         </div>
 
         {/* Action buttons */}
-        <div className="flex items-center justify-between pt-4 border-t border-[#E8EEF2]">
-          <div className="text-[11px] text-[#64748B]">
-            Éléments biographiques exhaustifs
-          </div>
-
-          <div className="flex items-center gap-2">
-            {!isReadOnly && (
-              <button
-                type="submit"
-                className="px-4 py-2 text-xs font-semibold text-white bg-[#10B9A9] hover:bg-[#07988D] rounded-lg transition-colors flex items-center gap-1.5"
-              >
-                <Save className="w-3.5 h-3.5" />
-                Enregistrer S7
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={onNext}
-              className="px-3.5 py-2 text-xs font-semibold text-[#18243A] bg-[#F1F5F7] hover:bg-[#D9E2E8] rounded-lg transition-colors flex items-center gap-1.5"
-            >
-              Suivant (S8)
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
+        <RubriqueFooterNav
+          currentRubriqueId="s7"
+          isReadOnly={isReadOnly}
+          isSaved={isSaved}
+          onPrev={onPrev}
+          onNext={onNext}
+        />
       </form>
     </div>
   );
 };
+

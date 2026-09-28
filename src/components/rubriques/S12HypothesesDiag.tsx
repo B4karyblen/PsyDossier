@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { S12HypothesesDiagData, HypotheseDiagnostiqueItem, ReferenceLists, UserRole } from '../../types';
-import { Save, ChevronRight, Plus, Trash2, AlertCircle, Lock } from 'lucide-react';
+import { Plus, Trash2, AlertCircle, Lock, BookOpen, Stethoscope, Sparkles } from 'lucide-react';
+import { RubriqueFooterNav } from './RubriqueFooterNav';
 
 interface Props {
   data: S12HypothesesDiagData;
@@ -8,6 +9,7 @@ interface Props {
   currentUserRole: UserRole;
   onSave: (data: S12HypothesesDiagData) => void;
   onNext: () => void;
+  onPrev?: () => void;
   referenceLists: ReferenceLists;
 }
 
@@ -17,6 +19,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
   currentUserRole,
   onSave,
   onNext,
+  onPrev,
   referenceLists,
 }) => {
   const [formData, setFormData] = useState<S12HypothesesDiagData>(data);
@@ -39,7 +42,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
     };
     setFormData({
       ...formData,
-      hypotheses: [...(formData.hypotheses || []), newItem]
+      hypotheses: [...(formData.hypotheses || []), newItem],
     });
   };
 
@@ -47,40 +50,39 @@ export const S12HypothesesDiag: React.FC<Props> = ({
     if (effectiveReadOnly) return;
     setFormData({
       ...formData,
-      hypotheses: formData.hypotheses.filter(h => h.id !== id)
+      hypotheses: formData.hypotheses.filter((h) => h.id !== id),
     });
   };
 
-  const updateHypothese = (id: string, updates: Partial<HypotheseDiagnostiqueItem>) => {
+  const updateHypothese = (id: string, partial: Partial<HypotheseDiagnostiqueItem>) => {
     if (effectiveReadOnly) return;
-    // Si on met 'Principale', les autres doivent passer en 'Différentielle'
-    if (updates.type === 'Principale') {
-      setFormData({
-        ...formData,
-        hypotheses: formData.hypotheses.map(h => {
-          if (h.id === id) return { ...h, ...updates };
-          return { ...h, type: 'Différentielle' };
-        })
-      });
-    } else {
-      setFormData({
-        ...formData,
-        hypotheses: formData.hypotheses.map(h => h.id === id ? { ...h, ...updates } : h)
-      });
-    }
+    setFormData({
+      ...formData,
+      hypotheses: formData.hypotheses.map((h) => (h.id === id ? { ...h, ...partial } : h)),
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (effectiveReadOnly) return;
+
     if (!formData.hypotheses || formData.hypotheses.length === 0) {
-      setError('Veuillez ajouter au moins une hypothèse diagnostique.');
+      setError('Au moins une hypothèse diagnostique doit être formalisée.');
       return;
     }
-    const hasPrincipale = formData.hypotheses.some(h => h.type === 'Principale');
+
+    const hasPrincipale = formData.hypotheses.some((h) => h.type === 'Principale');
     if (!hasPrincipale) {
-      setError('Une hypothèse diagnostique doit obligatoirement être désignée comme « Principale ».');
+      setError('Une hypothèse diagnostique Principale est obligatoire.');
       return;
     }
+
+    const emptyLibelle = formData.hypotheses.some((h) => !h.libelle.trim());
+    if (emptyLibelle) {
+      setError('Toutes les hypothèses doivent posséder un intitulé ou code CIM-10 / DSM-5.');
+      return;
+    }
+
     setError(null);
     onSave(formData);
     setIsSaved(true);
@@ -88,58 +90,61 @@ export const S12HypothesesDiag: React.FC<Props> = ({
   };
 
   return (
-    <div className="bg-white border border-[#D9E2E8] rounded-xl p-5 shadow-xs">
-      <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#E8EEF2]">
+    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-4 border-b border-[#EDF2F7]">
         <div>
-          <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2 py-0.5 rounded">
-            S12 · SYNTHÈSE DIAGNOSTIQUE
-          </span>
-          <h2 className="text-base font-bold text-[#18243A] mt-1 flex items-center gap-2">
-            <span>Hypothèses diagnostiques</span>
-            {!isPsychiatre && <Lock className="w-4 h-4 text-[#94A3B8]" />}
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2.5 py-0.5 rounded-md border border-[#10B9A9]/20">
+              S12 · SYNTHÈSE
+            </span>
+            <span className="text-xs text-[#64748B]">Obligatoire pour validation</span>
+          </div>
+          <h2 className="text-lg font-extrabold text-[#18243A] tracking-tight mt-1">
+            Hypothèses Diagnostiques (CIM-10 / DSM-5)
           </h2>
-          <p className="text-xs text-[#64748B]">
-            Règle BR-014 : Réservé exclusivement au médecin psychiatre responsable
+          <p className="text-xs text-[#64748B] mt-0.5">
+            Diagnostic principal et diagnostics différentiels argumentés (BR-014 : exclusivité Psychiatre)
           </p>
         </div>
-
-        {!isPsychiatre && (
-          <span className="text-xs font-semibold px-2.5 py-1 bg-[#FEF3C7] text-[#B45309] rounded-lg">
-            Consultation en lecture seule
-          </span>
-        )}
       </div>
 
+      {!isPsychiatre && (
+        <div className="p-3 bg-[#FEF3C7] border border-[#F59E0B]/30 text-[#B45309] rounded-xl text-xs font-semibold flex items-center gap-2">
+          <Lock className="w-4 h-4 shrink-0" />
+          <span>
+            Règle BR-014 : La formulation des hypothèses diagnostiques est réservée au Médecin Psychiatre (lecture seule pour {currentUserRole}).
+          </span>
+        </div>
+      )}
+
       {error && (
-        <div className="mb-4 p-3 bg-[#FFE4E6] border border-[#F43F5E]/30 rounded-lg flex items-center gap-2 text-xs text-[#BE123C]">
+        <div className="p-3.5 bg-[#FFE4E6] border border-[#F43F5E]/30 rounded-xl flex items-center gap-2.5 text-xs text-[#BE123C] font-medium">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      {isSaved && (
-        <div className="mb-4 p-2.5 bg-[#DCFCE7] border border-[#10B981]/30 rounded-lg text-xs text-[#15803D] font-medium">
-          Hypothèses diagnostiques enregistrées avec succès.
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Quick diagnosis presets from CIM-10 */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Quick CIM-10 Presets from Referentiels */}
         {!effectiveReadOnly && (
-          <div className="p-3 bg-[#F1F5F7] border border-[#D9E2E8] rounded-xl space-y-2">
-            <span className="text-[11px] font-bold text-[#18243A] uppercase tracking-wider block">
-              Suggestions diagnostiques fréquentes (CIM-10)
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {referenceLists.diagnosticClassifications.slice(0, 6).map((item) => (
+          <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#18243A] uppercase tracking-wider flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-[#10B9A9]" />
+                Nomenclatures CIM-10 Fréquentes (Cliquer pour insérer) :
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {referenceLists.diagnosticClassifications.slice(0, 10).map((preset) => (
                 <button
-                  key={item.code}
+                  key={preset.code}
                   type="button"
-                  onClick={() => addHypothese(item)}
-                  className="text-[11px] px-2 py-1 bg-white hover:bg-[#ECFBF9] text-[#18243A] hover:text-[#07988D] border border-[#D9E2E8] rounded-md transition-colors"
+                  onClick={() => addHypothese(preset)}
+                  className="px-2.5 py-1 text-[11px] font-semibold bg-white hover:bg-[#ECFBF9] text-[#18243A] hover:text-[#07988D] border border-[#CBD5E1] hover:border-[#10B9A9] rounded-lg transition-all cursor-pointer shadow-2xs"
                 >
-                  <span className="font-mono font-bold text-[#07988D] mr-1">{item.code}</span>
-                  <span>{item.label}</span>
+                  <span className="font-mono text-[10px] text-[#07988D] mr-1">[{preset.code}]</span>
+                  {preset.label}
                 </button>
               ))}
             </div>
@@ -147,16 +152,16 @@ export const S12HypothesesDiag: React.FC<Props> = ({
         )}
 
         {/* Hypotheses List */}
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-[#18243A]">
-              Hypothèses retenues ({formData.hypotheses?.length || 0})
-            </label>
+            <span className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+              Diagnostics Formalisés ({formData.hypotheses?.length || 0})
+            </span>
             {!effectiveReadOnly && (
               <button
                 type="button"
                 onClick={() => addHypothese()}
-                className="text-xs font-semibold text-white bg-[#10B9A9] hover:bg-[#07988D] px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
+                className="px-3 py-1.5 text-xs font-bold text-[#07988D] bg-[#ECFBF9] hover:bg-[#D9F7F3] border border-[#10B9A9]/30 rounded-xl transition-all flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Ajouter une hypothèse
@@ -168,27 +173,33 @@ export const S12HypothesesDiag: React.FC<Props> = ({
             formData.hypotheses.map((hyp, index) => (
               <div
                 key={hyp.id}
-                className={`p-4 rounded-xl border transition-all space-y-3 ${
+                className={`p-5 rounded-2xl border transition-all ${
                   hyp.type === 'Principale'
-                    ? 'border-[#10B9A9] bg-[#ECFBF9]/40'
-                    : 'border-[#D9E2E8] bg-white'
+                    ? 'bg-[#F0FDFA]/40 border-[#10B9A9]/50 shadow-xs'
+                    : 'bg-[#F8FAFC] border-[#E2E8F0]'
                 }`}
               >
-                <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#EDF2F7] gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#64748B]">#{index + 1}</span>
+                    <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-white border border-[#CBD5E1] text-[#18243A]">
+                      #{index + 1}
+                    </span>
                     <select
                       disabled={effectiveReadOnly}
                       value={hyp.type}
-                      onChange={(e) => updateHypothese(hyp.id, { type: e.target.value as 'Principale' | 'Différentielle' })}
-                      className={`text-xs font-bold rounded-lg px-2.5 py-1 border ${
+                      onChange={(e) =>
+                        updateHypothese(hyp.id, {
+                          type: e.target.value as 'Principale' | 'Différentielle',
+                        })
+                      }
+                      className={`text-xs font-bold rounded-lg px-2.5 py-1 border transition-colors ${
                         hyp.type === 'Principale'
-                          ? 'bg-[#10B9A9] text-white border-[#10B9A9]'
-                          : 'bg-[#F1F5F7] text-[#18243A] border-[#D9E2E8]'
+                          ? 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC]'
+                          : 'bg-white text-[#64748B] border-[#CBD5E1]'
                       }`}
                     >
-                      <option value="Principale">Principale (Prioritaire)</option>
-                      <option value="Différentielle">Différentielle</option>
+                      <option value="Principale">Hypothèse Principale</option>
+                      <option value="Différentielle">Diagnostic Différentiel</option>
                     </select>
                   </div>
 
@@ -196,104 +207,84 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                     <button
                       type="button"
                       onClick={() => removeHypothese(hyp.id)}
-                      className="text-xs text-[#BE123C] hover:bg-[#FFE4E6] px-2 py-1 rounded flex items-center gap-1"
+                      className="p-1.5 text-[#94A3B8] hover:text-[#BE123C] hover:bg-[#FFE4E6] rounded-lg transition-colors cursor-pointer"
+                      title="Supprimer cette hypothèse"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      Supprimer
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                   <div className="md:col-span-1">
-                    <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                    <label className="block text-xs font-semibold text-[#18243A] mb-1">
                       Code CIM-10 / DSM-5
                     </label>
                     <input
                       type="text"
                       disabled={effectiveReadOnly}
                       value={hyp.codeCimDsm || ''}
-                      onChange={(e) => updateHypothese(hyp.id, { codeCimDsm: e.target.value })}
-                      className="w-full bg-[#F8FAFC] border border-[#D9E2E8] font-mono text-xs rounded-lg px-3 py-1.5 uppercase"
+                      onChange={(e) => updateHypothese(hyp.id, { codeCimDsm: e.target.value.toUpperCase() })}
+                      className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-mono font-bold rounded-lg px-3 py-2 uppercase"
                       placeholder="Ex: F20.0"
                     />
                   </div>
 
                   <div className="md:col-span-3">
-                    <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
-                      Intitulé nosologique / Diagnostic <span className="text-[#F43F5E]">*</span>
+                    <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                      Libellé nosologique / Diagnostic <span className="text-[#F43F5E]">*</span>
                     </label>
                     <input
                       type="text"
                       disabled={effectiveReadOnly}
                       value={hyp.libelle}
                       onChange={(e) => updateHypothese(hyp.id, { libelle: e.target.value })}
-                      className="w-full bg-[#F8FAFC] border border-[#D9E2E8] text-xs font-semibold text-[#18243A] rounded-lg px-3 py-1.5"
-                      placeholder="Ex: Schizophrénie paranoïde ou Bouffée délirante aiguë polymorphe"
+                      className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-bold text-[#18243A] rounded-lg px-3 py-2"
+                      placeholder="Ex: Schizophrénie paranoïde"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
-                    Arguments cliniques & justification sémiologique
+                <div className="mt-3">
+                  <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                    Arguments cliniques & critères remplis
                   </label>
                   <textarea
                     rows={2}
                     disabled={effectiveReadOnly}
                     value={hyp.argumentsCliniques}
                     onChange={(e) => updateHypothese(hyp.id, { argumentsCliniques: e.target.value })}
-                    className="w-full bg-[#F8FAFC] border border-[#D9E2E8] text-xs rounded-lg p-2.5 focus:outline-none"
-                    placeholder="Critères remplis, durée des symptômes, évolution prévisible, arguments en faveur..."
+                    className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-medium rounded-lg p-3 focus:outline-none"
+                    placeholder="Critères remplis, durée des symptômes, évolution, arguments en faveur..."
                   />
                 </div>
               </div>
             ))
           ) : (
-            <div className="p-6 text-center bg-[#F8FAFC] border border-dashed border-[#D9E2E8] rounded-xl text-xs text-[#64748B]">
-              Aucune hypothèse diagnostique enregistrée.
+            <div className="p-8 text-center bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-2xl text-xs text-[#64748B] space-y-2">
+              <Stethoscope className="w-8 h-8 text-[#94A3B8] mx-auto" />
+              <p>Aucune hypothèse diagnostique formalisée pour le moment.</p>
               {!effectiveReadOnly && (
-                <div className="mt-2">
-                  <button
-                    type="button"
-                    onClick={() => addHypothese()}
-                    className="text-xs font-semibold text-[#07988D] underline"
-                  >
-                    Ajouter une première hypothèse
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => addHypothese()}
+                  className="px-3 py-1.5 text-xs font-bold text-[#07988D] bg-[#ECFBF9] hover:bg-[#D9F7F3] rounded-lg transition-colors cursor-pointer"
+                >
+                  + Ajouter une première hypothèse
+                </button>
               )}
             </div>
           )}
         </div>
 
-        {/* Action buttons */}
-        <div className="flex items-center justify-between pt-4 border-t border-[#E8EEF2]">
-          <div className="text-[11px] text-[#64748B]">
-            * Au moins une hypothèse Principale requise pour la validation
-          </div>
-
-          <div className="flex items-center gap-2">
-            {!effectiveReadOnly && (
-              <button
-                type="submit"
-                className="px-4 py-2 text-xs font-semibold text-white bg-[#10B9A9] hover:bg-[#07988D] rounded-lg transition-colors flex items-center gap-1.5"
-              >
-                <Save className="w-3.5 h-3.5" />
-                Enregistrer S12
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={onNext}
-              className="px-3.5 py-2 text-xs font-semibold text-[#18243A] bg-[#F1F5F7] hover:bg-[#D9E2E8] rounded-lg transition-colors flex items-center gap-1.5"
-            >
-              Suivant (S13)
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
+        {/* Footer Navigation */}
+        <RubriqueFooterNav
+          currentRubriqueId="s12"
+          isReadOnly={effectiveReadOnly}
+          isSaved={isSaved}
+          onPrev={onPrev}
+          onNext={onNext}
+        />
       </form>
     </div>
   );

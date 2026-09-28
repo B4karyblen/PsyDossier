@@ -34,6 +34,7 @@ import {
   INITIAL_REFERENCE_LISTS,
 } from './data/initialData';
 import { getRubriquePermission, RUBRIQUES_CONFIG } from './utils/rules';
+import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { PatientBanner } from './components/PatientBanner';
 import { RubriquesNav } from './components/RubriquesNav';
@@ -45,6 +46,7 @@ import { AuditLogView } from './components/AuditLogView';
 import { ReferentielsView } from './components/ReferentielsView';
 import { ClinicalDashboard } from './components/ClinicalDashboard';
 import { ArchiveModal } from './components/ArchiveModal';
+import { CommandPaletteModal } from './components/CommandPaletteModal';
 
 // Rubriques components
 import { S1Identification } from './components/rubriques/S1Identification';
@@ -125,7 +127,26 @@ export default function App() {
     }
   }, [referenceLists]);
 
+  // Sidebar layout state
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('psydossier_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('psydossier_sidebar_collapsed', String(isSidebarCollapsed));
+    } catch (e) {
+      // ignore
+    }
+  }, [isSidebarCollapsed]);
+
   // Modals state
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isNewPatientModalOpen, setIsNewPatientModalOpen] = useState(false);
   const [validationModalState, setValidationModalState] = useState<{ isOpen: boolean; mode: 'VALIDATION' | 'ADDENDUM' }>({
     isOpen: false,
@@ -136,6 +157,26 @@ export default function App() {
     mode: 'ARCHIVER',
   });
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
+  // Global keyboard shortcuts (Cmd+K, Ctrl+K, or '/')
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input or textarea (unless Cmd/Ctrl key combo)
+      const target = e.target as HTMLElement | null;
+      const isInput = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K' || e.key === 'p' || e.key === 'P')) {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      } else if (!isInput && e.key === '/') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Currently active dossier
   const activeDossier = dossiers.find((d) => d.id === activeDossierId) || null;
@@ -167,13 +208,13 @@ export default function App() {
   };
 
   // Open a dossier
-  const handleSelectDossier = (dossierId: string) => {
+  const handleSelectDossier = (dossierId: string, targetRubriqueId?: string) => {
     const target = dossiers.find((d) => d.id === dossierId);
     if (!target) return;
 
     setActiveDossierId(dossierId);
     setActiveView('DOSSIER');
-    setActiveRubriqueId('s1');
+    setActiveRubriqueId(targetRubriqueId || 's1');
 
     // Audit log (BR-016: traçabilité de chaque consultation de dossier)
     logAudit(
@@ -242,6 +283,15 @@ export default function App() {
     const currentIndex = RUBRIQUES_CONFIG.findIndex((r) => r.id === activeRubriqueId);
     if (currentIndex >= 0 && currentIndex < RUBRIQUES_CONFIG.length - 1) {
       setActiveRubriqueId(RUBRIQUES_CONFIG[currentIndex + 1].id);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Navigate to previous rubrique
+  const handlePrevRubrique = () => {
+    const currentIndex = RUBRIQUES_CONFIG.findIndex((r) => r.id === activeRubriqueId);
+    if (currentIndex > 0) {
+      setActiveRubriqueId(RUBRIQUES_CONFIG[currentIndex - 1].id);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -374,84 +424,112 @@ export default function App() {
   // Current permission for active rubrique
   const permission = activeDossier ? getRubriquePermission(currentUser.role, activeRubriqueId) : 'none';
   const isReadOnly = activeDossier ? activeDossier.statut === 'VALIDÉ' || activeDossier.statut === 'ARCHIVÉ' || permission === 'read' : true;
+  const activeRubriqueConfig = RUBRIQUES_CONFIG.find((r) => r.id === activeRubriqueId);
 
   return (
-    <div className="min-h-screen bg-[#F4F7F9] text-[#18243A] flex flex-col font-sans">
-      {/* 1. Header (Top Bar Contract) */}
-      <Header
-        currentUser={currentUser}
-        onSelectUser={setCurrentUser}
+    <div className="min-h-screen bg-[#F4F7F9] text-[#18243A] flex antialiased font-sans">
+      {/* 1. Sleek Modern Sidebar Navigation */}
+      <Sidebar
         activeView={activeView}
         onChangeView={(view) => {
           setActiveView(view);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
+        activeDossier={activeDossier}
+        activeRubriqueId={activeRubriqueId}
+        onSelectRubrique={(rubId) => {
+          setActiveRubriqueId(rubId);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        dossiersCount={dossiers.length}
+        auditCount={auditLogs.length}
         onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
-        hasActiveDossier={Boolean(activeDossier)}
-        activeDossierPatientName={
-          activeDossier ? `${activeDossier.s1Identification.nom} ${activeDossier.s1Identification.prenoms}` : undefined
-        }
-        onReturnToDossier={() => setActiveView('DOSSIER')}
+        onOpenQuickSearch={() => setIsCommandPaletteOpen(true)}
+        currentUser={currentUser}
+        onSelectUser={setCurrentUser}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
       />
 
-      {/* 2. Main Content View */}
-      <main className="flex-1">
-        {/* VIEW 0: TABLEAU DE BORD CLINIQUE (M4) */}
-        {activeView === 'DASHBOARD' && (
-          <ClinicalDashboard
-            dossiers={dossiers}
-            currentUser={currentUser}
-            onSelectDossier={handleSelectDossier}
-            onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
-          />
-        )}
+      {/* 2. Main Content Canvas */}
+      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
+        {/* Top Header (Breadcrumbs, Command Search & Quick Actions) */}
+        <Header
+          currentUser={currentUser}
+          onSelectUser={setCurrentUser}
+          activeView={activeView}
+          onChangeView={(view) => {
+            setActiveView(view);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
+          onOpenQuickSearch={() => setIsCommandPaletteOpen(true)}
+          onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
+          activeDossier={activeDossier}
+          activeRubriqueTitle={activeRubriqueConfig ? `${activeRubriqueConfig.code} : ${activeRubriqueConfig.titre}` : undefined}
+          onOpenExport={() => setIsExportModalOpen(true)}
+        />
 
-        {/* VIEW A: REGISTRE DES PATIENTS */}
-        {activeView === 'REGISTRE' && (
-          <PatientList
-            dossiers={dossiers}
-            onSelectDossier={handleSelectDossier}
-            onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
-            currentUserRole={currentUser.role}
-          />
-        )}
-
-        {/* VIEW B: JOURNAL D'AUDIT */}
-        {activeView === 'AUDIT' && (
-          <AuditLogView
-            logs={auditLogs}
-            onSelectDossier={(dossierId) => {
-              handleSelectDossier(dossierId);
-            }}
-          />
-        )}
-
-        {/* VIEW C: GESTION DES RÉFÉRENTIELS */}
-        {activeView === 'REFERENTIELS' && (
-          <ReferentielsView
-            referenceLists={referenceLists}
-            onUpdateReferenceLists={setReferenceLists}
-            currentUserRole={currentUser.role}
-          />
-        )}
-
-        {/* VIEW D: DOSSIER PATIENT (17 RUBRIQUES) */}
-        {activeView === 'DOSSIER' && activeDossier && (
-          <div className="flex flex-col">
-            {/* Sticky Patient Banner */}
-            <PatientBanner
-              dossier={activeDossier}
+        {/* 2. Main Content View */}
+        <main className="flex-1">
+          {/* VIEW 0: TABLEAU DE BORD CLINIQUE (M4) */}
+          {activeView === 'DASHBOARD' && (
+            <ClinicalDashboard
+              dossiers={dossiers}
               currentUser={currentUser}
-              onValidateDossier={() => setValidationModalState({ isOpen: true, mode: 'VALIDATION' })}
-              onOpenAddendumModal={() => setValidationModalState({ isOpen: true, mode: 'ADDENDUM' })}
-              onOpenExportModal={() => setIsExportModalOpen(true)}
-              onArchiveDossier={handleOpenArchiveModal}
-              onReactivateDossier={handleOpenReactivateModal}
-              onCloseDossier={() => setActiveView('REGISTRE')}
+              onSelectDossier={handleSelectDossier}
+              onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
             />
+          )}
 
-            {/* 2-Column Clinical Workspace */}
-            <div className="max-w-7xl mx-auto w-full px-4 lg:px-8 py-6 flex flex-col lg:flex-row gap-6">
+          {/* VIEW A: REGISTRE DES PATIENTS */}
+          {activeView === 'REGISTRE' && (
+            <PatientList
+              dossiers={dossiers}
+              onSelectDossier={handleSelectDossier}
+              onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
+              currentUserRole={currentUser.role}
+            />
+          )}
+
+          {/* VIEW B: JOURNAL D'AUDIT */}
+          {activeView === 'AUDIT' && (
+            <AuditLogView
+              logs={auditLogs}
+              onSelectDossier={(dossierId) => {
+                handleSelectDossier(dossierId);
+              }}
+            />
+          )}
+
+          {/* VIEW C: GESTION DES RÉFÉRENTIELS */}
+          {activeView === 'REFERENTIELS' && (
+            <ReferentielsView
+              referenceLists={referenceLists}
+              onUpdateReferenceLists={setReferenceLists}
+              currentUserRole={currentUser.role}
+            />
+          )}
+
+          {/* VIEW D: DOSSIER PATIENT (17 RUBRIQUES) */}
+          {activeView === 'DOSSIER' && activeDossier && (
+            <div className="flex flex-col">
+              {/* Sticky Patient Banner */}
+              <PatientBanner
+                dossier={activeDossier}
+                currentUser={currentUser}
+                onValidateDossier={() => setValidationModalState({ isOpen: true, mode: 'VALIDATION' })}
+                onOpenAddendumModal={() => setValidationModalState({ isOpen: true, mode: 'ADDENDUM' })}
+                onOpenExportModal={() => setIsExportModalOpen(true)}
+                onArchiveDossier={handleOpenArchiveModal}
+                onReactivateDossier={handleOpenReactivateModal}
+                onCloseDossier={() => setActiveView('REGISTRE')}
+              />
+
+              {/* 2-Column Clinical Workspace */}
+              <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6">
               {/* Left Column : 17 Rubriques Sidebar */}
               <RubriquesNav
                 dossier={activeDossier}
@@ -481,6 +559,7 @@ export default function App() {
                     isReadOnly={isReadOnly}
                     onSave={(data: S2ModalitesData) => handleUpdateRubrique('s2Modalites', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                   />
                 )}
 
@@ -490,6 +569,7 @@ export default function App() {
                     isReadOnly={isReadOnly}
                     onSave={(data: S3MotifData) => handleUpdateRubrique('s3Motif', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                   />
                 )}
 
@@ -499,6 +579,7 @@ export default function App() {
                     isReadOnly={isReadOnly}
                     onSave={(data: S4HistoireMaladieData) => handleUpdateRubrique('s4HistoireMaladie', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                   />
                 )}
 
@@ -508,6 +589,7 @@ export default function App() {
                     isReadOnly={isReadOnly}
                     onSave={(data: S5RepresentationData) => handleUpdateRubrique('s5Representation', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                   />
                 )}
 
@@ -518,6 +600,7 @@ export default function App() {
                     isReadOnly={isReadOnly}
                     onSave={(data: S6AntecedentsData) => handleUpdateRubrique('s6Antecedents', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                   />
                 )}
 
@@ -528,6 +611,7 @@ export default function App() {
                     isReadOnly={isReadOnly}
                     onSave={(data: S7BiographieData) => handleUpdateRubrique('s7Biographie', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                   />
                 )}
 
@@ -537,6 +621,7 @@ export default function App() {
                     isReadOnly={isReadOnly}
                     onSave={(data: S8EnqueteSocialeData) => handleUpdateRubrique('s8EnqueteSociale', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                   />
                 )}
 
@@ -547,6 +632,7 @@ export default function App() {
                     currentUserRole={currentUser.role}
                     onSave={(data: S9DemandeData) => handleUpdateRubrique('s9Demande', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                   />
                 )}
 
@@ -557,6 +643,7 @@ export default function App() {
                     currentUserRole={currentUser.role}
                     onSave={(data: S10ExamenCliniqueData) => handleUpdateRubrique('s10ExamenClinique', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                   />
                 )}
 
@@ -566,6 +653,7 @@ export default function App() {
                     isReadOnly={isReadOnly}
                     onSave={(data: S11ResumeSyndromiqueData) => handleUpdateRubrique('s11ResumeSyndromique', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                     referenceLists={referenceLists}
                   />
                 )}
@@ -577,6 +665,7 @@ export default function App() {
                     currentUserRole={currentUser.role}
                     onSave={(data: S12HypothesesDiagData) => handleUpdateRubrique('s12HypothesesDiag', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                     referenceLists={referenceLists}
                   />
                 )}
@@ -589,6 +678,7 @@ export default function App() {
                     currentUserName={currentUser.name}
                     onSave={(data: S13BilansData) => handleUpdateRubrique('s13Bilans', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                     referenceLists={referenceLists}
                   />
                 )}
@@ -601,6 +691,7 @@ export default function App() {
                     currentUserName={currentUser.name}
                     onSave={(data: S14PriseEnChargeData) => handleUpdateRubrique('s14PriseEnCharge', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                   />
                 )}
 
@@ -612,6 +703,7 @@ export default function App() {
                     currentUserName={currentUser.name}
                     onSave={(data: S15EvolutionData) => handleUpdateRubrique('s15Evolution', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                   />
                 )}
 
@@ -623,6 +715,7 @@ export default function App() {
                     currentUserName={currentUser.name}
                     onSave={(data: S16ProjetTherapeutiqueData) => handleUpdateRubrique('s16ProjetTherapeutique', data)}
                     onNext={handleNextRubrique}
+                    onPrev={handlePrevRubrique}
                   />
                 )}
 
@@ -632,6 +725,9 @@ export default function App() {
                     isReadOnly={isReadOnly}
                     currentUserRole={currentUser.role}
                     onSave={(data: S17PronosticData) => handleUpdateRubrique('s17Pronostic', data)}
+                    onPrevious={handlePrevRubrique}
+                    onOpenValidation={() => setValidationModalState({ isOpen: true, mode: 'VALIDATION' })}
+                    onOpenExport={() => setIsExportModalOpen(true)}
                   />
                 )}
               </div>
@@ -642,9 +738,9 @@ export default function App() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-[#D9E2E8] py-4 px-6 text-center text-xs text-[#64748B] no-print mt-auto">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="w-full max-w-[1920px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
-            PsyDossier © {new Date().getFullYear()} · Plan type de dossier patient en psychiatrie (17 rubriques)
+            PsyDossier EHR © {new Date().getFullYear()} · Plan type de dossier patient en psychiatrie (17 rubriques)
           </div>
           <div className="flex items-center gap-3 text-[11px]">
             <span>Session active : <strong className="text-[#18243A]">{currentUser.name}</strong></span>
@@ -653,6 +749,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+      </div>
 
       {/* Modals */}
       <NewPatientModal
@@ -698,6 +795,22 @@ export default function App() {
           onConfirmReactivate={handleConfirmReactivate}
         />
       )}
+
+      {/* Global Quick Actions Command Palette (Cmd+K / Ctrl+K / /) */}
+      <CommandPaletteModal
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        dossiers={dossiers}
+        onSelectDossier={(dossierId, targetRubriqueId) => {
+          handleSelectDossier(dossierId, targetRubriqueId);
+        }}
+        onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
+        onChangeView={(view) => {
+          setActiveView(view);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        activeDossierId={activeDossierId}
+      />
     </div>
   );
 }
