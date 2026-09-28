@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { S4HistoireMaladieData } from '../../types';
-import { Save, ChevronRight, AlertCircle } from 'lucide-react';
+import { AlertCircle, Clock, Zap, History, Sparkles } from 'lucide-react';
+import { RubriqueFooterNav } from './RubriqueFooterNav';
 
 interface Props {
   data: S4HistoireMaladieData;
   isReadOnly: boolean;
   onSave: (data: S4HistoireMaladieData) => void;
   onNext: () => void;
+  onPrev?: () => void;
 }
 
 const FACTEURS_OPTIONS = [
@@ -15,7 +17,7 @@ const FACTEURS_OPTIONS = [
   'Rupture sentimentale',
   'Échec',
   'Perte d’emploi',
-  'Autre'
+  'Autre',
 ];
 
 export const S4HistoireMaladie: React.FC<Props> = ({
@@ -23,6 +25,7 @@ export const S4HistoireMaladie: React.FC<Props> = ({
   isReadOnly,
   onSave,
   onNext,
+  onPrev,
 }) => {
   const [formData, setFormData] = useState<S4HistoireMaladieData>(data);
   const [error, setError] = useState<string | null>(null);
@@ -34,13 +37,14 @@ export const S4HistoireMaladie: React.FC<Props> = ({
     if (current.includes(facteur)) {
       setFormData({
         ...formData,
-        facteursDeclenchants: current.filter(f => f !== facteur),
-        facteursDeclenchantsAutrePrecision: facteur === 'Autre' ? '' : formData.facteursDeclenchantsAutrePrecision
+        facteursDeclenchants: current.filter((f) => f !== facteur),
+        facteursDeclenchantsAutrePrecision:
+          facteur === 'Autre' ? '' : formData.facteursDeclenchantsAutrePrecision,
       });
     } else {
       setFormData({
         ...formData,
-        facteursDeclenchants: [...current, facteur]
+        facteursDeclenchants: [...current, facteur],
       });
     }
   };
@@ -54,7 +58,10 @@ export const S4HistoireMaladie: React.FC<Props> = ({
         return;
       }
     }
-    if (formData.facteursDeclenchants.includes('Autre') && !formData.facteursDeclenchantsAutrePrecision?.trim()) {
+    if (
+      formData.facteursDeclenchants.includes('Autre') &&
+      !formData.facteursDeclenchantsAutrePrecision?.trim()
+    ) {
       setError('Veuillez préciser le facteur déclenchant « Autre » coché (BR-008).');
       return;
     }
@@ -65,232 +72,179 @@ export const S4HistoireMaladie: React.FC<Props> = ({
   };
 
   return (
-    <div className="bg-white border border-[#D9E2E8] rounded-xl p-5 shadow-xs">
-      <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#E8EEF2]">
+    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-4 border-b border-[#EDF2F7]">
         <div>
-          <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2 py-0.5 rounded">
-            S4 · ANAMNÈSE
-          </span>
-          <h2 className="text-base font-bold text-[#18243A] mt-1">
-            Histoire de la maladie
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2.5 py-0.5 rounded-md border border-[#10B9A9]/20">
+              S4 · ANAMNÈSE
+            </span>
+            <span className="text-xs text-[#64748B]">Chrono-clinique</span>
+          </div>
+          <h2 className="text-lg font-extrabold text-[#18243A] tracking-tight mt-1">
+            Histoire de la Maladie
           </h2>
-          <p className="text-xs text-[#64748B]">
-            Chronologie de l’épisode actuel, mode d’installation, facteurs déclenchants et itinéraire
+          <p className="text-xs text-[#64748B] mt-0.5">
+            Début des troubles, mode d'installation, facteurs déclenchants et évolution de l'épisode actuel
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-[#FFE4E6] border border-[#F43F5E]/30 rounded-lg flex items-center gap-2 text-xs text-[#BE123C]">
+        <div className="p-3.5 bg-[#FFE4E6] border border-[#F43F5E]/30 rounded-xl flex items-center gap-2.5 text-xs text-[#BE123C] font-medium">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      {isSaved && (
-        <div className="mb-4 p-2.5 bg-[#DCFCE7] border border-[#10B981]/30 rounded-lg text-xs text-[#15803D] font-medium">
-          Histoire de la maladie enregistrée avec succès.
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Row 1: Date de début et Mode d'installation (BR-007) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-[#18243A] mb-1">
-              Date ou période de début de l’épisode
-            </label>
-            <input
-              type="date"
-              disabled={isReadOnly}
-              value={formData.dateDebut || ''}
-              onChange={(e) => setFormData({ ...formData, dateDebut: e.target.value })}
-              className="w-full bg-[#F8FAFC] border border-[#D9E2E8] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
-            />
-            <span className="text-[11px] text-[#64748B] mt-0.5 block">
-              Ne peut pas être postérieure à la date du jour
-            </span>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Subcard 1: Début et Mode d'installation */}
+        <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-5 space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b border-[#EDF2F7]">
+            <Clock className="w-4 h-4 text-[#10B9A9]" />
+            <h3 className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+              Début & Mode d'Installation
+            </h3>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-[#18243A] mb-1">
-              Mode d'installation <span className="text-[#F43F5E]">*</span> (BR-007)
-            </label>
-            <div className="grid grid-cols-2 gap-2 mt-1">
-              {(['Brutal', 'Progressif'] as const).map((mode) => (
-                <label
-                  key={mode}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium cursor-pointer transition-colors ${
-                    formData.modeInstallation === mode
-                      ? 'border-[#10B9A9] bg-[#ECFBF9] text-[#07988D] font-bold'
-                      : 'border-[#D9E2E8] bg-[#F8FAFC] text-[#18243A] hover:bg-[#F1F5F7]'
-                  } ${isReadOnly ? 'cursor-not-allowed opacity-80' : ''}`}
-                >
-                  <input
-                    type="radio"
-                    name="modeInstallation"
-                    disabled={isReadOnly}
-                    checked={formData.modeInstallation === mode}
-                    onChange={() => setFormData({ ...formData, modeInstallation: mode })}
-                    className="text-[#10B9A9] focus:ring-[#10B9A9]"
-                  />
-                  <span>{mode}</span>
-                </label>
-              ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                Date de début des troubles actuels
+              </label>
+              <input
+                type="date"
+                disabled={isReadOnly}
+                value={formData.dateDebut || ''}
+                onChange={(e) => setFormData({ ...formData, dateDebut: e.target.value })}
+                className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg px-3 py-2 focus:outline-none tabular-nums"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                Mode d'installation <span className="text-[#F43F5E]">*</span>
+              </label>
+              <div className="flex gap-4 pt-1.5">
+                {(['Brutal', 'Progressif'] as const).map((mode) => (
+                  <label key={mode} className="flex items-center gap-2 text-xs font-semibold text-[#18243A] cursor-pointer">
+                    <input
+                      type="radio"
+                      name="modeInstallation"
+                      disabled={isReadOnly}
+                      checked={formData.modeInstallation === mode}
+                      onChange={() => setFormData({ ...formData, modeInstallation: mode })}
+                      className="text-[#10B9A9] focus:ring-[#10B9A9]"
+                    />
+                    <span>{mode}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Facteurs déclenchants (BR-008) */}
-        <div className="p-4 bg-[#F1F5F7] rounded-xl border border-[#D9E2E8] space-y-3">
-          <label className="block text-xs font-bold text-[#18243A]">
-            Facteurs déclenchants (Choix multiple - BR-008)
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {/* Subcard 2: Facteurs déclenchants */}
+        <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-5 space-y-3.5">
+          <div className="flex items-center gap-2 pb-2 border-b border-[#EDF2F7]">
+            <Zap className="w-4 h-4 text-[#10B9A9]" />
+            <label className="block text-xs font-bold text-[#18243A] uppercase tracking-wider">
+              Facteurs Déclenchants Potentiels (Cocher les options applicables)
+            </label>
+          </div>
+
+          <div className="flex flex-wrap gap-2.5">
             {FACTEURS_OPTIONS.map((facteur) => {
-              const checked = formData.facteursDeclenchants?.includes(facteur);
+              const selected = formData.facteursDeclenchants.includes(facteur);
               return (
-                <label
+                <button
                   key={facteur}
-                  className={`flex items-center gap-2 p-2 rounded-lg border text-xs cursor-pointer ${
-                    checked
-                      ? 'border-[#10B9A9] bg-white text-[#07988D] font-semibold'
-                      : 'border-[#D9E2E8] bg-white text-[#18243A] hover:bg-[#F8FAFC]'
+                  type="button"
+                  disabled={isReadOnly}
+                  onClick={() => toggleFacteur(facteur)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    selected
+                      ? 'bg-[#10B9A9] text-white shadow-xs'
+                      : 'bg-white text-[#18243A] border border-[#CBD5E1] hover:border-[#10B9A9]'
                   } ${isReadOnly ? 'cursor-not-allowed opacity-80' : ''}`}
                 >
-                  <input
-                    type="checkbox"
-                    disabled={isReadOnly}
-                    checked={checked}
-                    onChange={() => toggleFacteur(facteur)}
-                    className="rounded text-[#10B9A9] focus:ring-[#10B9A9]"
-                  />
-                  <span>{facteur}</span>
-                </label>
+                  {selected ? '✓ ' : '+ '} {facteur}
+                </button>
               );
             })}
           </div>
 
-          {formData.facteursDeclenchants?.includes('Autre') && (
+          {formData.facteursDeclenchants.includes('Autre') && (
             <div className="pt-2">
               <label className="block text-xs font-semibold text-[#18243A] mb-1">
-                Préciser le facteur « Autre » <span className="text-[#F43F5E]">*</span>
+                Précision pour le facteur « Autre » <span className="text-[#F43F5E]">*</span> (BR-008)
               </label>
               <input
                 type="text"
                 disabled={isReadOnly}
                 value={formData.facteursDeclenchantsAutrePrecision || ''}
-                onChange={(e) => setFormData({ ...formData, facteursDeclenchantsAutrePrecision: e.target.value })}
-                className="w-full bg-white border border-[#D9E2E8] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
-                placeholder="Ex: Conflit de terre, faillite, accouchement récent..."
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    facteursDeclenchantsAutrePrecision: e.target.value,
+                  })
+                }
+                className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
+                placeholder="Ex: Conflit foncier, sorcellerie perçue, maladie physique..."
               />
             </div>
           )}
         </div>
 
-        {/* Facteurs aggravants */}
-        <div>
-          <label className="block text-xs font-semibold text-[#18243A] mb-1">
-            Facteurs aggravants
-          </label>
-          <input
-            type="text"
-            disabled={isReadOnly}
-            value={formData.facteursAggravants || ''}
-            onChange={(e) => setFormData({ ...formData, facteursAggravants: e.target.value })}
-            className="w-full bg-[#F8FAFC] border border-[#D9E2E8] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
-            placeholder="Ex: Insomnie invincible, prise de toxiques, tensions relationnelles..."
-          />
-        </div>
+        {/* Subcard 3: Récit clinique & Évolution */}
+        <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-5 space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b border-[#EDF2F7]">
+            <History className="w-4 h-4 text-[#10B9A9]" />
+            <h3 className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+              Chronologie & Récit de l'Épisode
+            </h3>
+          </div>
 
-        {/* Itinéraire thérapeutique */}
-        <div>
-          <label className="block text-xs font-semibold text-[#18243A] mb-1">
-            Itinéraire thérapeutique (structures consultées, tradipraticiens, ordre chronologique)
-          </label>
-          <textarea
-            rows={3}
-            disabled={isReadOnly}
-            value={formData.itineraireTherapeutique || ''}
-            onChange={(e) => setFormData({ ...formData, itineraireTherapeutique: e.target.value })}
-            className="w-full bg-[#F8FAFC] border border-[#D9E2E8] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg p-3 focus:outline-none"
-            placeholder="Ex: 1. Guérisseur traditionnel (fumigations) ; 2. CSCOM de Daoudabougou ; 3. Orientation en psychiatrie..."
-          />
-        </div>
-
-        {/* Évolution avec / sans traitement */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-semibold text-[#18243A] mb-1">
-              Évolution avec traitement
+              Récit chronologique et itinéraire thérapeutique
             </label>
             <textarea
-              rows={2}
+              rows={5}
               disabled={isReadOnly}
-              value={formData.evolutionAvecTraitement || ''}
-              onChange={(e) => setFormData({ ...formData, evolutionAvecTraitement: e.target.value })}
-              className="w-full bg-[#F8FAFC] border border-[#D9E2E8] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg p-2.5 focus:outline-none"
-              placeholder="Réponse observée lors de traitements antérieurs..."
+              value={formData.itineraireTherapeutique || ''}
+              onChange={(e) => setFormData({ ...formData, itineraireTherapeutique: e.target.value })}
+              className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-xl p-3.5 focus:outline-none leading-relaxed"
+              placeholder="Décrire l'apparition des premiers signes, leur succession dans le temps, les modifications comportementales, les consultations ou thérapeutiques déjà essayées..."
             />
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-[#18243A] mb-1">
-              Évolution sans traitement
+              Retentissement socio-professionnel & familial
             </label>
-            <textarea
-              rows={2}
+            <input
+              type="text"
               disabled={isReadOnly}
-              value={formData.evolutionSansTraitement || ''}
-              onChange={(e) => setFormData({ ...formData, evolutionSansTraitement: e.target.value })}
-              className="w-full bg-[#F8FAFC] border border-[#D9E2E8] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg p-2.5 focus:outline-none"
-              placeholder="Aggravation, chronicisation, passages à l'acte..."
+              value={formData.retentissementSocioProfessionnel || ''}
+              onChange={(e) =>
+                setFormData({ ...formData, retentissementSocioProfessionnel: e.target.value })
+              }
+              className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
+              placeholder="Ex: Arrêt de travail, déscolarisation, rupture des liens familiaux..."
             />
           </div>
         </div>
 
-        {/* Retentissement socio-professionnel */}
-        <div>
-          <label className="block text-xs font-semibold text-[#18243A] mb-1">
-            Retentissement socio-professionnel
-          </label>
-          <input
-            type="text"
-            disabled={isReadOnly}
-            value={formData.retentissementSocioProfessionnel || ''}
-            onChange={(e) => setFormData({ ...formData, retentissementSocioProfessionnel: e.target.value })}
-            className="w-full bg-[#F8FAFC] border border-[#D9E2E8] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
-            placeholder="Ex: Arrêt de travail, déscolarisation, rupture des liens familiaux..."
-          />
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex items-center justify-between pt-4 border-t border-[#E8EEF2]">
-          <div className="text-[11px] text-[#64748B]">
-            * Mode d'installation obligatoire
-          </div>
-
-          <div className="flex items-center gap-2">
-            {!isReadOnly && (
-              <button
-                type="submit"
-                className="px-4 py-2 text-xs font-semibold text-white bg-[#10B9A9] hover:bg-[#07988D] rounded-lg transition-colors flex items-center gap-1.5"
-              >
-                <Save className="w-3.5 h-3.5" />
-                Enregistrer S4
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={onNext}
-              className="px-3.5 py-2 text-xs font-semibold text-[#18243A] bg-[#F1F5F7] hover:bg-[#D9E2E8] rounded-lg transition-colors flex items-center gap-1.5"
-            >
-              Suivant (S5)
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
+        {/* Footer Navigation */}
+        <RubriqueFooterNav
+          currentRubriqueId="s4"
+          isReadOnly={isReadOnly}
+          isSaved={isSaved}
+          onPrev={onPrev}
+          onNext={onNext}
+        />
       </form>
     </div>
   );

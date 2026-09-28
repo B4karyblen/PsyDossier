@@ -217,6 +217,7 @@ export interface S8EnqueteSocialeData {
 export interface S9DemandeData {
   demandeConsciente?: string;
   demandeInconsciente?: string; // Réservé PSYCHIATRE & PSYCHOLOGUE
+  demandeEntourage?: string;
 }
 
 // S10: Examen clinique
