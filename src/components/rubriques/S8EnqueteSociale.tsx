@@ -74,7 +74,7 @@ export const S8EnqueteSociale: React.FC<Props> = ({
 
           <div>
             <label className="block text-xs font-semibold text-[#18243A] mb-1">
-              Hétérodescription (Description du patient par l’entourage / famille)
+              Hétérodescription (Description du patient par l'entourage / famille)
             </label>
             <textarea
               rows={3}
@@ -83,6 +83,20 @@ export const S8EnqueteSociale: React.FC<Props> = ({
               onChange={(e) => setFormData({ ...formData, heterodescription: e.target.value })}
               className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg p-3 focus:outline-none"
               placeholder="Ex: Toujours dévoué, généreux, sans histoire, ou au contraire susceptible, isolé..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#18243A] mb-1">
+              Source de l'hétérodescription (Qui a fourni cette description ?)
+            </label>
+            <input
+              type="text"
+              disabled={isReadOnly}
+              value={formData.heterodescriptionSource || ''}
+              onChange={(e) => setFormData({ ...formData, heterodescriptionSource: e.target.value })}
+              className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg px-3 py-2.5 focus:outline-none"
+              placeholder="Ex: Épouse, mère, frère aîné, ami d'enfance..."
             />
           </div>
         </div>

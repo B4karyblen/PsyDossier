@@ -132,19 +132,19 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
           title="Afficher tous les patients actifs dans le Registre"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#64748B] uppercase tracking-wider group-hover:text-[#18243A]">
+            <span className="text-label text-[#64748B] group-hover:text-[#18243A]">
               Patients Actifs
             </span>
             <div className="w-8 h-8 rounded-xl bg-[#ECFBF9] text-[#10B9A9] flex items-center justify-center group-hover:bg-[#D9F7F3] transition-colors">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="font-mono text-3xl font-extrabold text-[#18243A] mt-2.5 tabular-nums tracking-tight">
+          <div className="text-display font-extrabold text-[#18243A] mt-2.5 tabular-nums tracking-tight">
             {activeDossiers.length}
           </div>
-          <div className="text-xs text-[#07988D] font-medium mt-1.5 flex items-center justify-between">
+          <div className="text-body-sm text-[#07988D] font-medium mt-1.5 flex items-center justify-between">
             <span>{valides.length} validés · {enCours.length} en cours</span>
-            <span className="text-xs group-hover:translate-x-0.5 transition-transform">→</span>
+            <span className="text-caption group-hover:translate-x-0.5 transition-transform">→</span>
           </div>
         </div>
 
@@ -155,19 +155,19 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
           title="Filtrer les patients sous soins sans consentement"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#64748B] uppercase tracking-wider group-hover:text-[#BE123C]">
+            <span className="text-label text-[#64748B] group-hover:text-[#BE123C]">
               Sans Consentement
             </span>
             <div className="w-8 h-8 rounded-xl bg-[#FFE4E6] text-[#BE123C] flex items-center justify-center group-hover:bg-[#FECDD3] transition-colors">
               <ShieldAlert className="w-4 h-4" />
             </div>
           </div>
-          <div className="font-mono text-3xl font-extrabold text-[#BE123C] mt-2.5 tabular-nums tracking-tight">
+          <div className="text-display font-extrabold text-[#BE123C] mt-2.5 tabular-nums tracking-tight">
             {sansConsentement.length}
           </div>
-          <div className="text-xs text-[#BE123C] font-semibold mt-1.5 flex items-center justify-between">
+          <div className="text-body-sm text-[#BE123C] font-semibold mt-1.5 flex items-center justify-between">
             <span>Régime médico-légal spécial</span>
-            <span className="text-xs group-hover:translate-x-0.5 transition-transform">→</span>
+            <span className="text-caption group-hover:translate-x-0.5 transition-transform">→</span>
           </div>
         </div>
 
@@ -178,19 +178,19 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
           title="Filtrer les patients en hospitalisation complète"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#64748B] uppercase tracking-wider group-hover:text-[#18243A]">
+            <span className="text-label text-[#64748B] group-hover:text-[#18243A]">
               Hospitalisations
             </span>
             <div className="w-8 h-8 rounded-xl bg-[#F1F5F9] text-[#18243A] flex items-center justify-center group-hover:bg-[#E2E8F0] transition-colors">
               <Building2 className="w-4 h-4" />
             </div>
           </div>
-          <div className="font-mono text-3xl font-extrabold text-[#18243A] mt-2.5 tabular-nums tracking-tight">
+          <div className="text-display font-extrabold text-[#18243A] mt-2.5 tabular-nums tracking-tight">
             {hospitalises.length}
           </div>
-          <div className="text-xs text-[#64748B] font-medium mt-1.5 flex items-center justify-between">
+          <div className="text-body-sm text-[#64748B] font-medium mt-1.5 flex items-center justify-between">
             <span>{ambulatoires.length} en ambulatoire</span>
-            <span className="text-xs group-hover:translate-x-0.5 transition-transform">→</span>
+            <span className="text-caption group-hover:translate-x-0.5 transition-transform">→</span>
           </div>
         </div>
 
@@ -201,19 +201,19 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
           title="Trier les patients par taux de complétude"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#64748B] uppercase tracking-wider group-hover:text-[#15803D]">
+            <span className="text-label text-[#64748B] group-hover:text-[#15803D]">
               Complétude Moyenne
             </span>
             <div className="w-8 h-8 rounded-xl bg-[#DCFCE7] text-[#15803D] flex items-center justify-center group-hover:bg-[#BBF7D0] transition-colors">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
-          <div className="font-mono text-3xl font-extrabold text-[#10B981] mt-2.5 tabular-nums tracking-tight">
+          <div className="text-display font-extrabold text-[#10B981] mt-2.5 tabular-nums tracking-tight">
             {avgCompleteness}%
           </div>
-          <div className="text-xs text-[#15803D] font-medium mt-1.5 flex items-center justify-between">
+          <div className="text-body-sm text-[#15803D] font-medium mt-1.5 flex items-center justify-between">
             <span>Sur 17 rubriques</span>
-            <span className="text-xs group-hover:translate-x-0.5 transition-transform">→</span>
+            <span className="text-caption group-hover:translate-x-0.5 transition-transform">→</span>
           </div>
         </div>
       </div>

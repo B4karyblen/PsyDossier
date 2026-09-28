@@ -1,16 +1,106 @@
 @import "tailwindcss";
 
+/* ── Manrope Font Family (self-hosted) ── */
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/Manrope-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/Manrope-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/Manrope-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/Manrope-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/Manrope-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/Manrope-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/Manrope-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/Manrope-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --color-primary: #10B9A9;
-  --color-primary-dark: #07988D;
-  --color-primary-darker: #0D6962;
-  --color-primary-light: #D9F7F3;
-  --color-primary-subtle: #ECFBF9;
+  /* ── Premium SaaS Type Scale (12 14 16 18 24 32) ── */
+  --text-display: 2rem;      /* 32px — Page titles, hero numbers */
+  --text-h1: 1.5rem;         /* 24px — Section headings */
+  --text-h2: 1.25rem;        /* 20px — Card titles, modal headers */
+  --text-h3: 1.125rem;       /* 18px — Sub-section headings */
+  --text-body: 1rem;         /* 16px — Body text, descriptions */
+  --text-body-sm: 0.875rem;  /* 14px — Secondary body, labels */
+  --text-caption: 0.75rem;   /* 12px — Captions, metadata, badges */
+  --text-mono: 0.8125rem;    /* 13px — Data, code, order numbers */
 
-  --color-navy: #18243A;
+  /* ── Letter Spacing ── */
+  --tracking-tight: -0.025em;
+  --tracking-snug: -0.015em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+
+  /* ── Line Heights ── */
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 1.75;
+
+  /* ── Primary: Slate-800 (dark canvas) ── */
+  --color-primary: #1E293B;
+  --color-primary-dark: #0F172A;
+  --color-primary-darker: #020617;
+  --color-primary-light: #334155;
+  --color-primary-subtle: #475569;
+
+  /* ── Secondary: Teal (accents, CTAs only) ── */
+  --color-secondary: #10B9A9;
+  --color-secondary-dark: #07988D;
+  --color-secondary-darker: #0D6962;
+  --color-secondary-light: #D9F7F3;
+  --color-secondary-subtle: #ECFBF9;
+
+  --color-navy: #1E293B;
   --color-navy-deep: #0F172A;
   --color-navy-muted: #334155;
 
@@ -45,15 +135,63 @@
 
   html {
     color-scheme: light;
+    scroll-behavior: smooth;
   }
 
   body {
     font-family: var(--font-sans);
+    font-size: var(--text-body);
+    font-weight: 400;
     background-color: #F4F7F9;
     color: #18243A;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    letter-spacing: -0.01em;
+    letter-spacing: var(--tracking-normal);
+    line-height: var(--leading-normal);
+  }
+
+  /* ── Accessible & Ethical Design System ── */
+
+  /* Clear focus rings (3-4px) for keyboard navigation */
+  :focus-visible {
+    outline: 3px solid #475569;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Skip link for keyboard users */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    z-index: 9999;
+    padding: 0.75rem 1.25rem;
+    background: #0F172A;
+    color: #FFFFFF;
+    font-weight: 700;
+    border-radius: 0 0 0.5rem 0.5rem;
+    transition: top 0.2s ease;
+  }
+  .skip-link:focus {
+    top: 0;
+  }
+
+  /* Minimum 44x44px touch targets */
+  button, a, [role="button"], input[type="checkbox"], input[type="radio"], select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Ensure inputs don't get overridden */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="search"],
+  textarea,
+  select {
+    min-height: auto;
   }
 
   /* Refined custom scrollbar */
@@ -65,11 +203,21 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
+    background: #475569;
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
+    background: #64748B;
+  }
+
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
@@ -107,10 +255,12 @@
   background-color: #FFFFFF;
   border: 1px solid #CBD5E1;
   color: #18243A;
-  font-size: 0.8125rem;
+  font-size: var(--text-body-sm);
   font-weight: 500;
+  letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-normal);
   border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.625rem 0.875rem;
   transition: all 0.15s ease-in-out;
   outline: none;
 }
@@ -125,6 +275,100 @@
   background-color: #F1F5F9;
   border-color: #E2E8F0;
   color: #64748B;
+  cursor: not-allowed;
+}
+
+/* ── Premium SaaS Typography Utilities ── */
+
+/* Display / Page titles */
+.text-display {
+  font-size: var(--text-display);
+  font-weight: 800;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+}
+
+/* H1 — Section headings */
+.text-h1 {
+  font-size: var(--text-h1);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+}
+
+/* H2 — Card titles, modal headers */
+.text-h2 {
+  font-size: var(--text-h2);
+  font-weight: 700;
+  letter-spacing: var(--tracking-snug);
+  line-height: var(--leading-snug);
+}
+
+/* H3 — Sub-section headings */
+.text-h3 {
+  font-size: var(--text-h3);
+  font-weight: 600;
+  letter-spacing: var(--tracking-snug);
+  line-height: var(--leading-snug);
+}
+
+/* Body — Default text */
+.text-body {
+  font-size: var(--text-body);
+  font-weight: 400;
+  letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-normal);
+}
+
+/* Body Small — Secondary text, labels */
+.text-body-sm {
+  font-size: var(--text-body-sm);
+  font-weight: 500;
+  letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-normal);
+}
+
+/* Caption — Metadata, badges, timestamps */
+.text-caption {
+  font-size: var(--text-caption);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  line-height: var(--leading-normal);
+}
+
+/* Mono — Data, codes, order numbers */
+.text-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-normal);
+}
+
+/* Label — Form labels, uppercase micro-labels */
+.text-label {
+  font-size: var(--text-caption);
+  font-weight: 700;
+  letter-spacing: var(--tracking-wider);
+  line-height: var(--leading-normal);
+  text-transform: uppercase;
+}
+
+/* Primary Button — Dark slate */
+.clinical-btn-primary {
+  background-color: #1E293B;
+  color: #FFFFFF;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+}
+.clinical-btn-primary:hover {
+  background-color: #0F172A;
+}
+.clinical-btn-primary:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 

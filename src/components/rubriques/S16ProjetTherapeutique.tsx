@@ -55,10 +55,16 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
     };
 
     const newVersion = formData.versionCourante + 1;
+    // Clear form fields for new version input (keep version history)
     const updated: S16ProjetTherapeutiqueData = {
       ...formData,
       versionCourante: newVersion,
       historiqueVersions: [archived, ...(formData.historiqueVersions || [])],
+      objectifsCourtTerme: '',
+      objectifsMoyenTerme: '',
+      moyensEtStrategies: '',
+      echeancesEtRevisions: '',
+      intervenants: [],
     };
 
     setFormData(updated);

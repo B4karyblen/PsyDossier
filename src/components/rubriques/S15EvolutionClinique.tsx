@@ -28,6 +28,11 @@ export const S15EvolutionClinique: React.FC<Props> = ({
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [rectifyingEntryId, setRectifyingEntryId] = useState<string | null>(null);
   const [rectificationText, setRectificationText] = useState('');
+  const [filterAuthor, setFilterAuthor] = useState('');
+  const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [filterDateTo, setFilterDateTo] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const entriesPerPage = 5;
 
   const canAddEntry = [
     'PSYCHIATRE',
@@ -87,11 +92,31 @@ export const S15EvolutionClinique: React.FC<Props> = ({
     setTimeout(() => setIsSaved(false), 2500);
   };
 
-  const sortedEntrees = [...(formData.entrees || [])].sort((a, b) => {
+  const filteredEntrees = (formData.entrees || []).filter((entree) => {
+    if (filterAuthor && !entree.auteurNom.toLowerCase().includes(filterAuthor.toLowerCase())) return false;
+    if (filterDateFrom) {
+      const from = new Date(filterDateFrom);
+      if (new Date(entree.dateHeure) < from) return false;
+    }
+    if (filterDateTo) {
+      const to = new Date(filterDateTo);
+      to.setHours(23, 59, 59, 999);
+      if (new Date(entree.dateHeure) > to) return false;
+    }
+    return true;
+  });
+
+  const sortedEntrees = [...filteredEntrees].sort((a, b) => {
     const timeA = new Date(a.dateHeure).getTime();
     const timeB = new Date(b.dateHeure).getTime();
     return sortOrder === 'desc' ? timeB - timeA : timeA - timeB;
   });
+
+  const totalPages = Math.max(1, Math.ceil(sortedEntrees.length / entriesPerPage));
+  const paginatedEntrees = sortedEntrees.slice(
+    (currentPage - 1) * entriesPerPage,
+    currentPage * entriesPerPage
+  );
 
   return (
     <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-6">
@@ -152,6 +177,41 @@ export const S15EvolutionClinique: React.FC<Props> = ({
 
       {/* Transmissions Timeline */}
       <div className="space-y-4">
+        {/* Filters */}
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="text"
+            placeholder="Filtrer par auteur..."
+            value={filterAuthor}
+            onChange={(e) => { setFilterAuthor(e.target.value); setCurrentPage(1); }}
+            className="text-xs bg-white border border-[#CBD5E1] rounded-lg px-3 py-2 focus:outline-none focus:border-[#10B9A9] w-40"
+          />
+          <input
+            type="date"
+            value={filterDateFrom}
+            onChange={(e) => { setFilterDateFrom(e.target.value); setCurrentPage(1); }}
+            className="text-xs bg-white border border-[#CBD5E1] rounded-lg px-3 py-2 focus:outline-none focus:border-[#10B9A9]"
+            title="Date de début"
+          />
+          <span className="text-xs text-[#64748B]">→</span>
+          <input
+            type="date"
+            value={filterDateTo}
+            onChange={(e) => { setFilterDateTo(e.target.value); setCurrentPage(1); }}
+            className="text-xs bg-white border border-[#CBD5E1] rounded-lg px-3 py-2 focus:outline-none focus:border-[#10B9A9]"
+            title="Date de fin"
+          />
+          {(filterAuthor || filterDateFrom || filterDateTo) && (
+            <button
+              type="button"
+              onClick={() => { setFilterAuthor(''); setFilterDateFrom(''); setFilterDateTo(''); setCurrentPage(1); }}
+              className="text-xs text-[#07988D] hover:underline cursor-pointer font-semibold"
+            >
+              Réinitialiser
+            </button>
+          )}
+        </div>
+
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
             Historique des Transmissions ({sortedEntrees.length})
@@ -161,13 +221,13 @@ export const S15EvolutionClinique: React.FC<Props> = ({
             onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
             className="text-xs text-[#07988D] hover:underline cursor-pointer font-semibold"
           >
-            {sortOrder === 'desc' ? 'Plus récentes d’abord ↓' : 'Plus anciennes d’abord ↑'}
+            {sortOrder === 'desc' ? "Plus récentes d'abord ↓" : "Plus anciennes d'abord ↑"}
           </button>
         </div>
 
-        {sortedEntrees.length > 0 ? (
+        {paginatedEntrees.length > 0 ? (
           <div className="space-y-3">
-            {sortedEntrees.map((entree) => {
+            {paginatedEntrees.map((entree) => {
               const dt = new Date(entree.dateHeure);
               return (
                 <div
@@ -241,7 +301,7 @@ export const S15EvolutionClinique: React.FC<Props> = ({
                         <button
                           type="button"
                           onClick={() => handleAddRectification(entree.id)}
-                          className="px-3.5 py-1.5 text-xs font-bold bg-[#10B9A9] text-white rounded-lg hover:bg-[#07988D] cursor-pointer"
+                          className="px-3.5 py-1.5 text-body-sm font-bold bg-[#1E293B] text-white rounded-lg hover:bg-[#0F172A] cursor-pointer"
                         >
                           Consigner addendum
                         </button>
@@ -255,6 +315,31 @@ export const S15EvolutionClinique: React.FC<Props> = ({
         ) : (
           <div className="p-8 text-center bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-xl text-xs text-[#64748B]">
             Aucune transmission consignée pour le moment.
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 text-xs font-semibold text-[#18243A] bg-white border border-[#CBD5E1] hover:bg-[#F8FAFC] rounded-lg disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
+              ← Précédent
+            </button>
+            <span className="text-xs text-[#64748B] font-medium">
+              Page {currentPage} / {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1.5 text-xs font-semibold text-[#18243A] bg-white border border-[#CBD5E1] hover:bg-[#F8FAFC] rounded-lg disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Suivant →
+            </button>
           </div>
         )}
       </div>

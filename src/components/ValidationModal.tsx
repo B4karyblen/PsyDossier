@@ -41,6 +41,11 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
   const handleValidationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validationChecks.canValidate || !confirmedCheckbox || !signataire.trim()) return;
+    // BR-014: Seul le PSYCHIATRE peut valider un dossier
+    if (currentUser.role !== 'PSYCHIATRE') {
+      alert('Seul un Médecin Psychiatre peut valider et verrouiller un dossier médical.');
+      return;
+    }
     onConfirmValidation(signataire.trim());
     onClose();
   };
@@ -61,22 +66,22 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
     <div className="fixed inset-0 z-50 bg-[#0F172A]/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
       <div className="clinical-card w-full max-w-xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200 border-[#CBD5E1] shadow-2xl">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#F8FAFC] via-white to-[#F0FDFA] border-b border-[#D9E2E8] px-6 sm:px-7 py-4.5 flex items-center justify-between">
+        <div className="bg-[#1E293B] border-b border-[#334155] px-6 sm:px-7 py-4.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {mode === 'VALIDATION' ? (
-              <div className="w-10 h-10 rounded-xl bg-[#DCFCE7] text-[#15803D] flex items-center justify-center border border-[#86EFAC] shadow-xs">
-                <CheckCircle2 className="w-5 h-5 text-[#15803D]" />
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shadow-xs">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-xl bg-[#ECFBF9] text-[#07988D] flex items-center justify-center border border-[#10B9A9]/20 shadow-xs">
-                <FilePlus2 className="w-5 h-5 text-[#07988D]" />
+              <div className="w-10 h-10 rounded-xl bg-[#10B9A9]/20 text-[#10B9A9] flex items-center justify-center border border-[#10B9A9]/30 shadow-xs">
+                <FilePlus2 className="w-5 h-5 text-[#10B9A9]" />
               </div>
             )}
             <div>
-              <h2 className="text-base sm:text-lg font-black text-[#18243A] tracking-tight">
-                {mode === 'VALIDATION' ? 'Validation & Verrouillage Clinique' : 'Consignation d’un Addendum'}
+              <h2 className="text-h2 font-black text-white tracking-tight">
+                {mode === 'VALIDATION' ? 'Validation & Verrouillage Clinique' : "Consignation d'un Addendum"}
               </h2>
-              <p className="text-xs text-[#64748B] font-medium">
+              <p className="text-body-sm text-slate-400 font-medium">
                 {dossier.s1Identification.numeroOrdre} · {dossier.s1Identification.nom} {dossier.s1Identification.prenoms}
               </p>
             </div>
@@ -230,7 +235,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
               <button
                 type="submit"
                 disabled={!validationChecks.canValidate || !confirmedCheckbox || !signataire.trim()}
-                className="px-5 py-2.5 text-xs font-black text-white bg-[#10B981] hover:bg-[#059669] disabled:opacity-40 disabled:cursor-not-allowed rounded-xl transition-all flex items-center gap-2 shadow-sm shadow-[#10B981]/25 cursor-pointer"
+                className="px-5 py-2.5 text-body-sm font-black text-white bg-[#1E293B] hover:bg-[#0F172A] disabled:opacity-40 disabled:cursor-not-allowed rounded-xl transition-all flex items-center gap-2 shadow-sm shadow-[#1E293B]/25 cursor-pointer"
               >
                 <Lock className="w-4 h-4" />
                 <span>Valider & Verrouiller le Dossier</span>

@@ -216,11 +216,11 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-[#0F172A]/50 backdrop-blur-sm flex items-start justify-center pt-16 sm:pt-24 px-4 overflow-y-auto no-print">
       <div
-        className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#CBD5E1] overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-150"
+        className="w-full max-w-2xl bg-[#1E293B] rounded-2xl shadow-2xl border border-[#334155] overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input Bar */}
-        <div className="flex items-center px-4 py-3.5 border-b border-[#E2E8F0] gap-3 bg-white">
+        <div className="flex items-center px-4 py-3.5 border-b border-[#334155] gap-3 bg-[#0F172A]">
           <Search className="w-5 h-5 text-[#10B9A9] shrink-0" />
           <input
             ref={inputRef}
@@ -232,24 +232,24 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
             }}
             onKeyDown={handleKeyDown}
             placeholder="Rechercher un patient, un N° d'ordre, une rubrique (S1..S17), ou une action..."
-            className="w-full text-sm font-medium text-[#18243A] placeholder-[#94A3B8] bg-transparent outline-none"
+            className="w-full text-body font-medium text-white placeholder-slate-500 bg-transparent outline-none"
           />
           {query ? (
             <button
               onClick={() => setQuery('')}
-              className="text-xs text-[#94A3B8] hover:text-[#18243A] p-1 rounded-md"
+              className="text-body-sm text-slate-400 hover:text-white p-1 rounded-md"
             >
               <X className="w-4 h-4" />
             </button>
           ) : (
-            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold text-[#64748B] bg-[#F1F5F9] px-2 py-0.5 rounded border border-[#E2E8F0]">
+            <span className="hidden sm:inline-flex items-center gap-1 text-caption font-semibold text-slate-400 bg-[#334155] px-2 py-0.5 rounded border border-[#475569]">
               ESC pour fermer
             </span>
           )}
         </div>
 
         {/* Results List */}
-        <div className="max-h-[380px] overflow-y-auto p-2 divide-y divide-[#F1F5F9]">
+        <div className="max-h-[380px] overflow-y-auto p-2 divide-y divide-[#334155]">
           {results.length > 0 ? (
             results.map((item, index) => {
               const isSelected = index === selectedIndex;
@@ -260,38 +260,38 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
                     isSelected
-                      ? 'bg-[#ECFBF9] text-[#07988D]'
-                      : 'hover:bg-[#F8FAFC] text-[#18243A]'
+                      ? 'bg-[#10B9A9]/15 text-[#10B9A9]'
+                      : 'hover:bg-[#334155] text-white'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
                       className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                         isSelected
-                          ? 'bg-[#D9F7F3] text-[#07988D]'
-                          : 'bg-[#F1F5F9] text-[#64748B]'
+                          ? 'bg-[#10B9A9]/20 text-[#10B9A9]'
+                          : 'bg-[#334155] text-slate-400'
                       }`}
                     >
                       {item.icon}
                     </div>
                     <div className="min-w-0">
-                      <div className="text-xs font-semibold truncate flex items-center gap-2">
+                      <div className="text-body-sm font-bold truncate flex items-center gap-2">
                         <span>{item.title}</span>
                         {item.badge && (
                           <span
-                            className={`text-[10px] font-medium px-1.5 py-0.2 rounded ${
+                            className={`text-caption font-medium px-1.5 py-0.2 rounded ${
                               item.badge === 'VALIDÉ'
-                                ? 'bg-[#DCFCE7] text-[#15803D]'
+                                ? 'bg-emerald-500/20 text-emerald-400'
                                 : item.badge === 'EN_COURS'
-                                ? 'bg-[#FEF3C7] text-[#B45309]'
-                                : 'bg-[#F1F5F9] text-[#64748B]'
+                                ? 'bg-amber-500/20 text-amber-400'
+                                : 'bg-[#334155] text-slate-400'
                             }`}
                           >
                             {item.badge}
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-[#64748B] truncate">
+                      <div className="text-caption text-slate-400 truncate">
                         {item.subtitle}
                       </div>
                     </div>
@@ -299,7 +299,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
 
                   <div className="flex items-center gap-1 shrink-0 ml-3">
                     {isSelected && (
-                      <span className="text-[11px] font-medium text-[#07988D] flex items-center gap-1">
+                      <span className="text-caption font-medium text-[#10B9A9] flex items-center gap-1">
                         Ouvrir <CornerDownLeft className="w-3 h-3" />
                       </span>
                     )}
@@ -308,20 +308,20 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
               );
             })
           ) : (
-            <div className="py-8 text-center text-xs text-[#64748B]">
+            <div className="py-8 text-center text-body-sm text-slate-400">
               Aucun résultat trouvé pour « {query} ».
             </div>
           )}
         </div>
 
         {/* Footer shortcuts */}
-        <div className="px-4 py-2.5 bg-[#F8FAFC] border-t border-[#E2E8F0] flex items-center justify-between text-[11px] text-[#64748B]">
+        <div className="px-4 py-2.5 bg-[#0F172A] border-t border-[#334155] flex items-center justify-between text-caption text-slate-400">
           <div className="flex items-center gap-3">
             <span>↑↓ pour naviguer</span>
             <span>↵ pour sélectionner</span>
             <span>ESC pour fermer</span>
           </div>
-          <span className="font-medium text-[#07988D]">PsyDossier Navigation Rapide</span>
+          <span className="font-bold text-[#10B9A9]">PsyDossier Navigation Rapide</span>
         </div>
       </div>
     </div>

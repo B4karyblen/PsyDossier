@@ -72,7 +72,9 @@ export function getRubriquePermission(role: UserRole, rubriqueId: string): 'writ
       return 'none';
 
     case 's10':
-      // Somatique: Infirmier & Psychiatre write; Psychologique: Somatique read, Psychiatrique write
+      // B2: Somatique — PSYCHIATRE & INFIRMIER write, PSYCHOLOGUE read
+      //      Psychiatrique — PSYCHIATRE & PSYCHOLOGUE write, INFIRMIER read
+      // Note: Component-level overrides handle the split; this returns the broadest permission
       if (['PSYCHIATRE', 'PSYCHOLOGUE', 'INFIRMIER'].includes(role)) return 'write';
       if (role === 'ASSISTANT_SOCIAL') return 'read';
       return 'none';

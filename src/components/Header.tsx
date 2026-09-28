@@ -43,10 +43,10 @@ export const Header: React.FC<HeaderProps> = ({
   // Compute breadcrumbs dynamically
   const renderBreadcrumbs = () => {
     return (
-      <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-xs text-[#64748B]">
+      <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-body-sm text-[#64748B]">
         <button
           onClick={() => onChangeView('DASHBOARD')}
-          className="hover:text-[#18243A] font-medium transition-colors cursor-pointer"
+          className="hover:text-[#1E293B] font-medium transition-colors cursor-pointer"
         >
           EHR
         </button>
@@ -54,40 +54,40 @@ export const Header: React.FC<HeaderProps> = ({
         <ChevronRight className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
 
         {activeView === 'DASHBOARD' && (
-          <span className="font-extrabold text-[#18243A]">Tableau de Bord</span>
+          <span className="text-h3 text-[#1E293B]">Tableau de Bord</span>
         )}
 
         {activeView === 'REGISTRE' && (
-          <span className="font-extrabold text-[#18243A]">Registre des Patients</span>
+          <span className="text-h3 text-[#1E293B]">Registre des Patients</span>
         )}
 
         {activeView === 'AUDIT' && (
-          <span className="font-extrabold text-[#18243A]">Journal d'Audit Médico-Légal</span>
+          <span className="text-h3 text-[#1E293B]">Journal d'Audit Médico-Légal</span>
         )}
 
         {activeView === 'REFERENTIELS' && (
-          <span className="font-extrabold text-[#18243A]">Nomenclatures & CIM-10</span>
+          <span className="text-h3 text-[#1E293B]">Nomenclatures & CIM-10</span>
         )}
 
         {activeView === 'DOSSIER' && activeDossier && (
           <>
             <button
               onClick={() => onChangeView('REGISTRE')}
-              className="hover:text-[#18243A] font-medium transition-colors cursor-pointer hidden sm:inline"
+              className="hover:text-[#1E293B] font-medium transition-colors cursor-pointer hidden sm:inline"
             >
               Registre
             </button>
             <ChevronRight className="w-3.5 h-3.5 text-[#94A3B8] shrink-0 hidden sm:inline" />
             <button
               onClick={() => onChangeView('DOSSIER')}
-              className="font-mono font-bold text-[#07988D] hover:underline cursor-pointer truncate max-w-[120px] sm:max-w-[180px]"
+              className="text-mono font-bold text-[#1E293B] hover:underline cursor-pointer truncate max-w-[120px] sm:max-w-[180px]"
             >
               {activeDossier.s1Identification.numeroOrdre}
             </button>
             {activeRubriqueTitle && (
               <>
                 <ChevronRight className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
-                <span className="font-extrabold text-[#18243A] truncate max-w-[130px] sm:max-w-[220px]">
+                <span className="text-h3 text-[#1E293B] truncate max-w-[130px] sm:max-w-[220px]">
                   {activeRubriqueTitle}
                 </span>
               </>
@@ -122,13 +122,13 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={onOpenQuickSearch}
-            className="w-full flex items-center justify-between px-3.5 py-1.5 bg-[#F8FAFC] hover:bg-[#F1F5F7] border border-[#CBD5E1] hover:border-[#10B9A9] rounded-xl text-xs text-[#64748B] transition-all cursor-pointer shadow-2xs group"
+            className="w-full flex items-center justify-between px-3.5 py-1.5 bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#CBD5E1] hover:border-[#1E293B] rounded-xl text-body-sm text-[#64748B] transition-all cursor-pointer shadow-2xs group"
           >
             <div className="flex items-center gap-2.5 truncate">
-              <Search className="w-3.5 h-3.5 text-[#94A3B8] group-hover:text-[#10B9A9] transition-colors shrink-0" />
+              <Search className="w-3.5 h-3.5 text-[#94A3B8] group-hover:text-[#1E293B] transition-colors shrink-0" />
               <span className="truncate font-medium">Rechercher patient, N° d'ordre, pathologie ou CIM...</span>
             </div>
-            <kbd className="font-mono text-[10px] font-bold bg-white text-[#475569] px-2 py-0.5 rounded-md border border-[#CBD5E1] shadow-2xs shrink-0 ml-2">
+            <kbd className="text-mono font-bold bg-white text-[#475569] px-2 py-0.5 rounded-md border border-[#CBD5E1] shadow-2xs shrink-0 ml-2">
               ⌘K
             </kbd>
           </button>
@@ -140,7 +140,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={onOpenQuickSearch}
-            className="md:hidden p-2 text-[#475569] hover:text-[#18243A] hover:bg-[#F1F5F7] rounded-xl transition-colors cursor-pointer"
+            className="md:hidden p-2 text-[#475569] hover:text-[#1E293B] hover:bg-[#F1F5F7] rounded-xl transition-colors cursor-pointer"
             title="Recherche (⌘K)"
           >
             <Search className="w-4 h-4" />
@@ -151,7 +151,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onOpenExport}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#18243A] bg-white border border-[#CBD5E1] hover:border-[#10B9A9] rounded-xl transition-all cursor-pointer shadow-2xs"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-body-sm font-bold text-[#1E293B] bg-white border border-[#CBD5E1] hover:border-[#1E293B] rounded-xl transition-all cursor-pointer shadow-2xs"
             >
               <Printer className="w-3.5 h-3.5 text-[#64748B]" />
               <span>Exporter / Imprimer</span>
@@ -162,7 +162,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={onOpenNewPatient}
-            className="clinical-btn-primary px-3 sm:px-3.5 py-1.5 text-xs flex items-center gap-1.5 shadow-sm shadow-[#10B9A9]/20 whitespace-nowrap cursor-pointer"
+            className="px-3 sm:px-3.5 py-1.5 text-body-sm font-bold text-white bg-[#1E293B] hover:bg-[#0F172A] rounded-xl transition-all flex items-center gap-1.5 shadow-sm shadow-[#1E293B]/20 whitespace-nowrap cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">Nouveau Patient</span>
@@ -170,8 +170,8 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Clinician Pill / Role Switcher */}
           <div className="relative">
-            <div className="flex items-center gap-2 bg-[#F8FAFC] border border-[#CBD5E1] hover:border-[#10B9A9] rounded-xl px-2.5 py-1 transition-colors">
-              <div className="w-6 h-6 rounded-lg bg-[#18243A] text-[#10B9A9] flex items-center justify-center text-[10px] font-black shrink-0">
+            <div className="flex items-center gap-2 bg-[#F8FAFC] border border-[#CBD5E1] hover:border-[#1E293B] rounded-xl px-2.5 py-1 transition-colors">
+              <div className="w-6 h-6 rounded-lg bg-[#1E293B] text-white flex items-center justify-center text-caption font-black shrink-0">
                 {currentUser.name
                   .split(' ')
                   .map((n) => n[0])
@@ -185,7 +185,7 @@ export const Header: React.FC<HeaderProps> = ({
                   const found = CLINICAL_USERS.find((u) => u.id === e.target.value);
                   if (found) onSelectUser(found);
                 }}
-                className="appearance-none bg-transparent text-[#18243A] text-xs font-bold pr-5 py-0.5 cursor-pointer focus:outline-none max-w-[120px] sm:max-w-[170px] truncate"
+                className="appearance-none bg-transparent text-[#1E293B] text-body-sm font-bold pr-5 py-0.5 cursor-pointer focus:outline-none max-w-[120px] sm:max-w-[170px] truncate"
               >
                 {CLINICAL_USERS.map((user) => (
                   <option key={user.id} value={user.id}>

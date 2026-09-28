@@ -267,7 +267,10 @@ export default function App() {
 
     setDossiers((prev) => prev.map((d) => (d.id === activeDossier.id ? updatedDossier : d)));
 
-    // Audit log
+    // Audit log with old/new values (BR-012)
+    const oldData = (activeDossier as any)[rubriqueKey];
+    const oldSummary = oldData ? JSON.stringify(oldData).slice(0, 120) : '(vide)';
+    const newSummary = JSON.stringify(updatedData).slice(0, 120);
     logAudit(
       'MODIFICATION',
       activeDossier.s1Identification.numeroOrdre,
@@ -276,6 +279,15 @@ export default function App() {
       activeRubriqueId,
       rubNom
     );
+    // Store old/new values in the last audit entry
+    setAuditLogs((prev) => {
+      if (prev.length === 0) return prev;
+      const last = prev[0];
+      if (last.action === 'MODIFICATION' && last.rubriqueId === activeRubriqueId) {
+        return [{ ...last, oldValueSummary: oldSummary, newValueSummary: newSummary }, ...prev.slice(1)];
+      }
+      return prev;
+    });
   };
 
   // Navigate to next rubrique
@@ -299,6 +311,12 @@ export default function App() {
   // Validation of dossier (F-21 & B3)
   const handleConfirmValidation = (signataire: string) => {
     if (!activeDossier) return;
+
+    // B3: Only EN_COURS can be validated (no skipping states)
+    if (activeDossier.statut !== 'EN_COURS') {
+      alert('Seul un dossier EN_COURS peut être validé.');
+      return;
+    }
 
     const now = new Date().toISOString();
     const updatedDossier: DossierPsychiatrique = {
@@ -368,6 +386,12 @@ export default function App() {
   const handleConfirmArchive = (motif: string) => {
     if (!activeDossier) return;
 
+    // B3: Only VALIDÉ dossiers can be archived (no skipping states)
+    if (activeDossier.statut !== 'VALIDÉ') {
+      alert('Seul un dossier VALIDÉ peut être archivé.');
+      return;
+    }
+
     const now = new Date().toISOString();
     const updatedDossier: DossierPsychiatrique = {
       ...activeDossier,
@@ -392,6 +416,12 @@ export default function App() {
 
   const handleConfirmReactivate = (motif: string) => {
     if (!activeDossier) return;
+
+    // B3: Only ARCHIVÉ dossiers can be reactivated
+    if (activeDossier.statut !== 'ARCHIVÉ') {
+      alert('Seul un dossier ARCHIVÉ peut être réactivé.');
+      return;
+    }
 
     const now = new Date().toISOString();
     const updatedDossier: DossierPsychiatrique = {
@@ -473,7 +503,7 @@ export default function App() {
         />
 
         {/* 2. Main Content View */}
-        <main className="flex-1">
+        <main id="main-content" className="flex-1" tabIndex={-1}>
           {/* VIEW 0: TABLEAU DE BORD CLINIQUE (M4) */}
           {activeView === 'DASHBOARD' && (
             <ClinicalDashboard

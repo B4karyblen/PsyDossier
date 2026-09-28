@@ -88,14 +88,14 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black text-[#18243A] tracking-tight">
-                  Journal d’Audit & Traçabilité Clinique
+                <h1 className="text-h1 sm:text-h1 font-black text-[#18243A] tracking-tight">
+                  Journal d'Audit & Traçabilité Clinique
                 </h1>
-                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#ECFBF9] text-[#07988D] border border-[#10B9A9]/30">
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded text-caption font-bold bg-[#ECFBF9] text-[#07988D] border border-[#10B9A9]/30">
                   <Lock className="w-3 h-3" /> Inaltérable
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-[#475569] font-medium mt-0.5">
+              <p className="text-body-sm sm:text-body-sm text-[#475569] font-medium mt-0.5">
                 Règles de conformité légale <strong className="text-[#18243A]">BR-012</strong> & <strong className="text-[#18243A]">BR-016</strong> · Journal médico-légal horodaté
               </p>
             </div>
@@ -107,29 +107,29 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
           <div className="px-3.5 py-2 bg-white rounded-xl border border-[#D9E2E8] shadow-xs flex items-center gap-2">
             <Activity className="w-3.5 h-3.5 text-[#10B9A9]" />
             <div className="text-left">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] block leading-none">Événements</span>
-              <span className="text-xs font-black font-mono text-[#18243A] leading-tight">{metrics.total}</span>
+              <span className="text-label text-[#64748B] block leading-none">Événements</span>
+              <span className="text-body-sm font-black font-mono text-[#18243A] leading-tight">{metrics.total}</span>
             </div>
           </div>
           <div className="px-3.5 py-2 bg-[#DCFCE7]/70 rounded-xl border border-[#86EFAC] shadow-xs flex items-center gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-[#15803D]" />
             <div className="text-left">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#15803D] block leading-none">Validations</span>
-              <span className="text-xs font-black font-mono text-[#15803D] leading-tight">{metrics.validations}</span>
+              <span className="text-label text-[#15803D] block leading-none">Validations</span>
+              <span className="text-body-sm font-black font-mono text-[#15803D] leading-tight">{metrics.validations}</span>
             </div>
           </div>
           <div className="px-3.5 py-2 bg-[#ECFBF9] rounded-xl border border-[#99F6E4] shadow-xs flex items-center gap-2">
             <Clock className="w-3.5 h-3.5 text-[#07988D]" />
             <div className="text-left">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#07988D] block leading-none">Mises à jour</span>
-              <span className="text-xs font-black font-mono text-[#07988D] leading-tight">{metrics.modifications}</span>
+              <span className="text-label text-[#07988D] block leading-none">Mises à jour</span>
+              <span className="text-body-sm font-black font-mono text-[#07988D] leading-tight">{metrics.modifications}</span>
             </div>
           </div>
           <div className="px-3.5 py-2 bg-white rounded-xl border border-[#D9E2E8] shadow-xs flex items-center gap-2">
             <Printer className="w-3.5 h-3.5 text-[#64748B]" />
             <div className="text-left">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] block leading-none">Exports</span>
-              <span className="text-xs font-black font-mono text-[#18243A] leading-tight">{metrics.exports}</span>
+              <span className="text-label text-[#64748B] block leading-none">Exports</span>
+              <span className="text-body-sm font-black font-mono text-[#18243A] leading-tight">{metrics.exports}</span>
             </div>
           </div>
         </div>
@@ -145,7 +145,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Rechercher par praticien, N° patient (PSY-...), libellé rubrique ou mot-clé..."
-              className="clinical-input pl-10 pr-4 text-xs font-medium"
+              className="clinical-input pl-10 pr-4 text-body-sm font-medium"
             />
           </div>
 
@@ -154,7 +154,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
               <select
                 value={actionFilter}
                 onChange={(e) => setActionFilter(e.target.value)}
-                className="clinical-input pr-8 text-xs font-semibold bg-white cursor-pointer"
+                className="clinical-input pr-8 text-body-sm font-semibold bg-white cursor-pointer"
               >
                 <option value="TOUTES">Toutes les actions ({logs.length})</option>
                 <option value="VALIDATION">Validation officielle</option>
@@ -175,7 +175,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                   setSearchTerm('');
                   setActionFilter('TOUTES');
                 }}
-                className="px-3 py-2 text-xs font-bold text-[#64748B] hover:text-[#18243A] bg-[#F1F5F7] hover:bg-[#E2E8F0] rounded-xl transition-colors cursor-pointer"
+                className="px-3 py-2 text-body-sm font-bold text-[#64748B] hover:text-[#18243A] bg-[#F1F5F7] hover:bg-[#E2E8F0] rounded-xl transition-colors cursor-pointer"
               >
                 Effacer
               </button>
@@ -185,7 +185,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
 
         {/* Quick filter pill buttons */}
         <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-[#E8EEF2]">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#94A3B8] mr-1">Raccourcis :</span>
+          <span className="text-label text-[#94A3B8] mr-1">Raccourcis :</span>
           {(['TOUTES', 'VALIDATION', 'MODIFICATION', 'ADDENDUM', 'EXPORT', 'ARCHIVAGE'] as const).map((act) => {
             const count = act === 'TOUTES' ? logs.length : logs.filter((l) => l.action === act).length;
             const isSelected = actionFilter === act;
@@ -194,14 +194,14 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                 key={act}
                 type="button"
                 onClick={() => setActionFilter(act)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg text-body-sm font-bold transition-all cursor-pointer ${
                   isSelected
                     ? 'bg-[#18243A] text-white shadow-xs'
                     : 'bg-[#F8FAFC] text-[#64748B] hover:bg-[#E8EEF2] hover:text-[#18243A] border border-[#E2E8F0]'
                 }`}
               >
                 {act === 'TOUTES' ? 'Tous' : act}
-                <span className={`ml-1.5 text-[10px] font-mono ${isSelected ? 'text-[#10B9A9]' : 'text-[#94A3B8]'}`}>
+                <span className={`ml-1.5 text-caption font-mono ${isSelected ? 'text-[#10B9A9]' : 'text-[#94A3B8]'}`}>
                   {count}
                 </span>
               </button>
@@ -213,9 +213,9 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
       {/* 3. Audit Log Entries Table */}
       <div className="clinical-card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
+          <table className="w-full text-left border-collapse text-body-sm">
             <thead>
-              <tr className="bg-[#F8FAFC] border-b border-[#D9E2E8] text-[11px] font-extrabold text-[#475569] uppercase tracking-wider">
+              <tr className="bg-[#F8FAFC] border-b border-[#D9E2E8] text-label text-[#475569]">
                 <th className="py-3.5 px-4 sm:px-6">Date & Horodatage</th>
                 <th className="py-3.5 px-4 sm:px-6">Praticien / Rôle</th>
                 <th className="py-3.5 px-4 sm:px-6">Patient Réf.</th>
@@ -232,15 +232,15 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                       <div className="w-10 h-10 rounded-full bg-[#F1F5F7] flex items-center justify-center mx-auto text-[#94A3B8]">
                         <Search className="w-5 h-5" />
                       </div>
-                      <p className="font-bold text-sm text-[#18243A]">Aucun événement ne correspond à ce filtre</p>
-                      <p className="text-xs text-[#64748B]">Modifiez votre recherche ou réinitialisez les filtres.</p>
+                      <p className="font-bold text-body text-[#18243A]">Aucun événement ne correspond à ce filtre</p>
+                      <p className="text-body-sm text-[#64748B]">Modifiez votre recherche ou réinitialisez les filtres.</p>
                       <button
                         type="button"
                         onClick={() => {
                           setSearchTerm('');
                           setActionFilter('TOUTES');
                         }}
-                        className="mt-2 px-3 py-1.5 text-xs font-bold text-[#07988D] bg-[#ECFBF9] hover:bg-[#D9F7F3] rounded-lg transition-colors cursor-pointer"
+                        className="mt-2 px-3 py-1.5 text-body-sm font-bold text-[#07988D] bg-[#ECFBF9] hover:bg-[#D9F7F3] rounded-lg transition-colors cursor-pointer"
                       >
                         Afficher tout le journal
                       </button>
@@ -255,12 +255,12 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                   return (
                     <tr key={log.id} className="hover:bg-[#F8FAFC]/80 transition-colors group">
                       {/* Timestamp */}
-                      <td className="py-3.5 px-4 sm:px-6 font-mono text-[11px] text-[#475569] whitespace-nowrap tabular-nums">
+                      <td className="py-3.5 px-4 sm:px-6 text-mono text-caption text-[#475569] whitespace-nowrap tabular-nums">
                         <div className="flex items-center gap-1.5 font-bold text-[#18243A]">
                           <Calendar className="w-3 h-3 text-[#94A3B8]" />
                           {dateObj.toLocaleDateString('fr-FR')}
                         </div>
-                        <div className="text-[10px] text-[#64748B] pl-4 flex items-center gap-1">
+                        <div className="text-caption text-[#64748B] pl-4 flex items-center gap-1">
                           {dateObj.toLocaleTimeString('fr-FR')}
                           {isRecent && (
                             <span className="w-1.5 h-1.5 rounded-full bg-[#10B9A9] animate-pulse" title="Récemment consigné" />
@@ -271,12 +271,12 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                       {/* User */}
                       <td className="py-3.5 px-4 sm:px-6 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-md bg-[#F1F5F7] text-[#18243A] flex items-center justify-center text-[10px] font-black border border-[#D9E2E8]">
+                          <div className="w-6 h-6 rounded-md bg-[#F1F5F7] text-[#18243A] flex items-center justify-center text-caption font-black border border-[#D9E2E8]">
                             {log.userName.charAt(0)}
                           </div>
                           <div>
                             <div className="font-bold text-[#18243A] leading-tight">{log.userName}</div>
-                            <div className="text-[10px] text-[#07988D] font-mono font-semibold">{log.userRole}</div>
+                            <div className="text-caption text-[#07988D] font-mono font-semibold">{log.userRole}</div>
                           </div>
                         </div>
                       </td>
@@ -286,7 +286,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                         <button
                           type="button"
                           onClick={() => onSelectDossier?.(log.dossierId)}
-                          className="font-mono text-xs font-bold text-[#18243A] hover:text-[#07988D] hover:underline flex items-center gap-1 group-hover:translate-x-0.5 transition-transform cursor-pointer"
+                          className="text-mono font-bold text-[#18243A] hover:text-[#07988D] hover:underline flex items-center gap-1 group-hover:translate-x-0.5 transition-transform cursor-pointer"
                           title="Ouvrir le dossier patient"
                         >
                           <span>{log.patientNumeroOrdre}</span>
@@ -296,15 +296,15 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
 
                       {/* Action */}
                       <td className="py-3.5 px-4 sm:px-6 whitespace-nowrap">
-                        <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black tracking-wide border shadow-2xs ${getActionBadge(log.action)}`}>
+                        <span className={`px-2.5 py-0.5 rounded-md text-caption font-black tracking-wide border shadow-2xs ${getActionBadge(log.action)}`}>
                           {log.action}
                         </span>
                       </td>
 
                       {/* Rubrique */}
-                      <td className="py-3.5 px-4 sm:px-6 text-[#475569] font-medium whitespace-nowrap text-xs">
+                      <td className="py-3.5 px-4 sm:px-6 text-[#475569] font-medium whitespace-nowrap text-body-sm">
                         {log.rubriqueNom ? (
-                          <span className="px-2 py-0.5 rounded bg-[#F1F5F7] border border-[#E2E8F0] text-[11px] font-semibold text-[#18243A]">
+                          <span className="px-2 py-0.5 rounded bg-[#F1F5F7] border border-[#E2E8F0] text-body-sm font-semibold text-[#18243A]">
                             {log.rubriqueNom}
                           </span>
                         ) : (
@@ -313,7 +313,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                       </td>
 
                       {/* Details */}
-                      <td className="py-3.5 px-4 sm:px-6 text-[#18243A] font-medium max-w-lg text-xs leading-relaxed">
+                      <td className="py-3.5 px-4 sm:px-6 text-[#18243A] font-medium max-w-lg text-body-sm leading-relaxed">
                         {log.details}
                       </td>
                     </tr>

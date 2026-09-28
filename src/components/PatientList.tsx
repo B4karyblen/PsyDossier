@@ -118,14 +118,15 @@ export const PatientList: React.FC<PatientListProps> = ({
         if (trancheAgeFilter === '31_50' && (age < 31 || age > 50)) return false;
         if (trancheAgeFilter === 'SENIOR' && age <= 50) return false;
 
-        // Search term
+        // Search term (accent-insensitive per PRD F-03)
         if (searchTerm.trim()) {
-          const query = searchTerm.toLowerCase();
-          const num = d.s1Identification.numeroOrdre.toLowerCase();
-          const nom = d.s1Identification.nom.toLowerCase();
-          const prenoms = d.s1Identification.prenoms.toLowerCase();
-          const prof = (d.s1Identification.profession || '').toLowerCase();
-          const diag = (d.s12HypothesesDiag.hypotheses || []).map((h) => h.libelle.toLowerCase()).join(' ');
+          const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          const query = normalize(searchTerm.trim());
+          const num = normalize(d.s1Identification.numeroOrdre);
+          const nom = normalize(d.s1Identification.nom);
+          const prenoms = normalize(d.s1Identification.prenoms);
+          const prof = normalize(d.s1Identification.profession || '');
+          const diag = (d.s12HypothesesDiag.hypotheses || []).map((h) => normalize(h.libelle)).join(' ');
 
           if (
             !num.includes(query) &&
@@ -391,7 +392,7 @@ export const PatientList: React.FC<PatientListProps> = ({
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[10px] font-extrabold text-[#64748B] uppercase tracking-wider">
+                  <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-label text-[#64748B]">
                     <th className="py-3 px-4">N° d'Ordre</th>
                     <th className="py-3 px-4">Patient</th>
                     <th className="py-3 px-4">Âge / Sexe</th>
@@ -402,7 +403,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                     <th className="py-3 px-4 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#EDF2F7] text-xs">
+                <tbody className="divide-y divide-[#EDF2F7] text-body-sm">
                   {paginatedDossiers.map((dossier) => {
                     const stats = calculateDossierStats(dossier);
                     const diagPrincipal = dossier.s12HypothesesDiag.hypotheses?.find(
@@ -428,7 +429,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                           <div className="font-bold text-[#18243A] group-hover:text-[#07988D] transition-colors">
                             {dossier.s1Identification.nom} {dossier.s1Identification.prenoms}
                           </div>
-                          <div className="text-[11px] text-[#475569] truncate max-w-xs mt-0.5">
+                          <div className="text-caption text-[#475569] truncate max-w-xs mt-0.5">
                             {diagPrincipal ? (
                               <span className="text-[#07988D] font-medium">
                                 {diagPrincipal.codeCimDsm ? `[${diagPrincipal.codeCimDsm}] ` : ''}
@@ -446,7 +447,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                         {/* Âge / Sexe */}
                         <td className="py-3.5 px-4 text-[#18243A]">
                           <div className="tabular-nums font-semibold">{dossier.s1Identification.age} ans</div>
-                          <div className="text-[11px] text-[#64748B]">{dossier.s1Identification.sexe}</div>
+                          <div className="text-caption text-[#64748B]">{dossier.s1Identification.sexe}</div>
                         </td>
 
                         {/* Modalité & Orientation */}
@@ -454,7 +455,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                           <div className="text-[#18243A] font-medium">
                             {dossier.s2Modalites.modalite}
                           </div>
-                          <div className="text-[11px] text-[#64748B]">
+                          <div className="text-caption text-[#64748B]">
                             {dossier.s14PriseEnCharge.orientation
                               ? `Orientation : ${dossier.s14PriseEnCharge.orientation}`
                               : 'Orientation non définie'}
@@ -464,24 +465,24 @@ export const PatientList: React.FC<PatientListProps> = ({
                         {/* Statut */}
                         <td className="py-3.5 px-4">
                           {dossier.statut === 'VALIDÉ' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#DCFCE7] text-[#15803D]">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-caption font-bold bg-[#DCFCE7] text-[#15803D]">
                               <CheckCircle2 className="w-3 h-3" />
                               Validé
                             </span>
                           )}
                           {dossier.statut === 'EN_COURS' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FEF3C7] text-[#B45309]">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-caption font-bold bg-[#FEF3C7] text-[#B45309]">
                               <Clock className="w-3 h-3" />
                               En cours
                             </span>
                           )}
                           {dossier.statut === 'BROUILLON' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#F1F5F9] text-[#64748B]">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-caption font-bold bg-[#F1F5F9] text-[#64748B]">
                               Brouillon
                             </span>
                           )}
                           {dossier.statut === 'ARCHIVÉ' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFE4E6] text-[#BE123C]">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-caption font-bold bg-[#FFE4E6] text-[#BE123C]">
                               <Archive className="w-3 h-3" />
                               Archivé
                             </span>
@@ -503,17 +504,17 @@ export const PatientList: React.FC<PatientListProps> = ({
                                 style={{ width: `${stats.percentage}%` }}
                               />
                             </div>
-                            <span className="font-mono text-xs font-bold text-[#18243A] tabular-nums">
+                            <span className="text-mono font-bold text-[#18243A] tabular-nums">
                               {stats.percentage}%
                             </span>
                           </div>
-                          <div className="text-[10px] text-[#64748B] mt-0.5">
+                          <div className="text-caption text-[#64748B] mt-0.5">
                             {stats.completeCount} complètes · {stats.partialCount} part.
                           </div>
                         </td>
 
                         {/* Dernière mise à jour */}
-                        <td className="py-3.5 px-4 text-[#64748B] text-[11px] tabular-nums">
+                        <td className="py-3.5 px-4 text-[#64748B] text-caption tabular-nums">
                           <div className="font-medium text-[#18243A]">
                             {updatedDate.toLocaleDateString('fr-FR', {
                               day: '2-digit',

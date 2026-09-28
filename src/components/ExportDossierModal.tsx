@@ -53,10 +53,10 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
         {/* Header - Screen only */}
         <div className="bg-gradient-to-r from-[#F8FAFC] via-white to-[#F0FDFA] border-b border-[#D9E2E8] px-6 sm:px-7 py-4 flex items-center justify-between no-print shrink-0">
           <div>
-            <h2 className="text-base sm:text-lg font-black text-[#18243A] tracking-tight">
+            <h2 className="text-h2 font-black text-white tracking-tight">
               Exportation & Impression Clinique
             </h2>
-            <p className="text-xs text-[#64748B] font-medium">
+            <p className="text-body-sm text-slate-400 font-medium">
               Standard 17 Rubriques · Document officiel sous secret médical (Art. 226-13)
             </p>
           </div>
@@ -70,7 +70,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="text-[#94A3B8] hover:text-[#18243A] p-2 rounded-xl hover:bg-[#F1F5F7] transition-colors cursor-pointer"
+              className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-[#334155] transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -80,7 +80,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
         {/* Rubrique selection bar - Screen only */}
         <div className="p-4 sm:px-7 bg-[#F1F5F7] border-b border-[#D9E2E8] text-xs no-print shrink-0 space-y-2.5">
           <div className="flex items-center justify-between">
-            <span className="font-extrabold text-[#18243A]">
+            <span className="font-extrabold text-white">
               Rubriques à inclure dans l'export officiel ({selectedRubriques.length} / {RUBRIQUES_CONFIG.length}) :
             </span>
             <button
@@ -100,8 +100,8 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
                   onClick={() => toggleRubrique(r.id)}
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-mono border transition-all flex items-center gap-1.5 cursor-pointer ${
                     checked
-                      ? 'bg-white text-[#07988D] border-[#10B9A9] font-bold shadow-2xs'
-                      : 'bg-[#F8FAFC] text-[#94A3B8] border-[#E2E8F0] hover:border-[#CBD5E1]'
+                      ? 'bg-[#1E293B] text-white border-[#1E293B] font-bold shadow-2xs'
+                      : 'bg-[#334155] text-slate-400 border-[#475569] hover:border-[#10B9A9]/50'
                   }`}
                 >
                   {checked ? <CheckSquare className="w-3.5 h-3.5 text-[#10B9A9]" /> : <Square className="w-3.5 h-3.5 text-[#94A3B8]" />}
@@ -397,6 +397,146 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
                   <strong>{dossier.s17Pronostic.longTerme.appreciation || 'Non évalué'}</strong>
                 </div>
               </div>
+            </section>
+          )}
+
+          {/* S7: Biographie */}
+          {selectedRubriques.includes('s7') && (
+            <section className="space-y-1.5 border-b border-[#E8EEF2] pb-3">
+              <h3 className="font-bold text-[#07988D] text-xs uppercase tracking-wide">
+                S7. Éléments de Biographie
+              </h3>
+              {dossier.s7Biographie.ascendants?.pere && (
+                <p><strong>Père :</strong> {dossier.s7Biographie.ascendants.pere.nom} {dossier.s7Biographie.ascendants.pere.profession ? `(${dossier.s7Biographie.ascendants.pere.profession})` : ''}</p>
+              )}
+              {dossier.s7Biographie.ascendants?.mere && (
+                <p><strong>Mère :</strong> {dossier.s7Biographie.ascendants.mere.nom} {dossier.s7Biographie.ascendants.mere.profession ? `(${dossier.s7Biographie.ascendants.mere.profession})` : ''}</p>
+              )}
+              {dossier.s7Biographie.conceptionGrossesseAccouchement && (
+                <p><strong>Conception, grossesse, accouchement :</strong> {dossier.s7Biographie.conceptionGrossesseAccouchement}</p>
+              )}
+              {dossier.s7Biographie.scolarite?.niveauAtteint && (
+                <p><strong>Scolarité :</strong> Niveau {dossier.s7Biographie.scolarite.niveauAtteint}</p>
+              )}
+              {dossier.s7Biographie.developpementSexuelEtSentimentale?.premierRapportConditionsVecu && (
+                <p><strong>Développement sexuel :</strong> {dossier.s7Biographie.developpementSexuelEtSentimentale.premierRapportConditionsVecu}</p>
+              )}
+              {dossier.s7Biographie.evenementsMarquants?.positifs?.length > 0 && (
+                <p><strong>Événements positifs :</strong> {dossier.s7Biographie.evenementsMarquants.positifs.join(', ')}</p>
+              )}
+              {dossier.s7Biographie.evenementsMarquants?.negatifs?.length > 0 && (
+                <p><strong>Événements négatifs :</strong> {dossier.s7Biographie.evenementsMarquants.negatifs.join(', ')}</p>
+              )}
+            </section>
+          )}
+
+          {/* S8: Enquête sociale */}
+          {selectedRubriques.includes('s8') && (
+            <section className="space-y-1.5 border-b border-[#E8EEF2] pb-3">
+              <h3 className="font-bold text-[#07988D] text-xs uppercase tracking-wide">
+                S8. Enquête Sociale
+              </h3>
+              {dossier.s8EnqueteSociale.autodescription && (
+                <p><strong>Autodescription :</strong> {dossier.s8EnqueteSociale.autodescription}</p>
+              )}
+              {dossier.s8EnqueteSociale.heterodescription && (
+                <p><strong>Hétérodescription :</strong> {dossier.s8EnqueteSociale.heterodescription}</p>
+              )}
+              {dossier.s8EnqueteSociale.heterodescriptionSource && (
+                <p><strong>Source :</strong> {dossier.s8EnqueteSociale.heterodescriptionSource}</p>
+              )}
+              {dossier.s8EnqueteSociale.relationsSociales && (
+                <p><strong>Relations sociales :</strong> {dossier.s8EnqueteSociale.relationsSociales}</p>
+              )}
+              {dossier.s8EnqueteSociale.loisirs && (
+                <p><strong>Loisirs :</strong> {dossier.s8EnqueteSociale.loisirs}</p>
+              )}
+            </section>
+          )}
+
+          {/* S9: Demande */}
+          {selectedRubriques.includes('s9') && (
+            <section className="space-y-1.5 border-b border-[#E8EEF2] pb-3">
+              <h3 className="font-bold text-[#07988D] text-xs uppercase tracking-wide">
+                S9. Demande du Patient
+              </h3>
+              {dossier.s9Demande.demandeConsciente && (
+                <p><strong>Demande consciente :</strong> {dossier.s9Demande.demandeConsciente}</p>
+              )}
+              {dossier.s9Demande.demandeInconsciente && (
+                <p><strong>Demande inconsciente :</strong> {dossier.s9Demande.demandeInconsciente}</p>
+              )}
+            </section>
+          )}
+
+          {/* S13: Bilans paracliniques */}
+          {selectedRubriques.includes('s13') && (
+            <section className="space-y-1.5 border-b border-[#E8EEF2] pb-3">
+              <h3 className="font-bold text-[#07988D] text-xs uppercase tracking-wide">
+                S13. Bilans Paracliniques
+              </h3>
+              {dossier.s13Bilans.bilans?.length > 0 ? (
+                <div className="space-y-2">
+                  {dossier.s13Bilans.bilans.map((b) => (
+                    <div key={b.id} className="p-2 bg-[#F8FAFC] rounded border border-[#E8EEF2]">
+                      <div className="flex items-center justify-between">
+                        <strong>{b.type}</strong>
+                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${b.statut === 'Prescrit' ? 'bg-[#DBEAFE] text-[#1D4ED8]' : b.statut === 'Réalisé' ? 'bg-[#FEF3C7] text-[#B45309]' : 'bg-[#D1FAE5] text-[#065F46]'}`}>
+                          {b.statut}
+                        </span>
+                      </div>
+                      {b.resultat && <p className="text-[11px] text-[#64748B] mt-1">{b.resultat}</p>}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[#64748B]">Aucun bilan prescrit</p>
+              )}
+            </section>
+          )}
+
+          {/* S15: Évolution clinique */}
+          {selectedRubriques.includes('s15') && (
+            <section className="space-y-1.5 border-b border-[#E8EEF2] pb-3">
+              <h3 className="font-bold text-[#07988D] text-xs uppercase tracking-wide">
+                S15. Évolution Clinique
+              </h3>
+              {dossier.s15Evolution.entrees?.length > 0 ? (
+                <div className="space-y-2">
+                  {dossier.s15Evolution.entrees.slice(0, 10).map((e) => (
+                    <div key={e.id} className="p-2 bg-[#F8FAFC] rounded border border-[#E8EEF2]">
+                      <div className="flex items-center justify-between text-[11px] text-[#64748B]">
+                        <span><strong>{e.auteurNom}</strong> ({e.auteurRole})</span>
+                        <span>{new Date(e.dateHeure).toLocaleDateString('fr-FR')}</span>
+                      </div>
+                      <p className="text-[11px] mt-1">{e.note}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[#64748B]">Aucune transmission consignée</p>
+              )}
+            </section>
+          )}
+
+          {/* S16: Projet thérapeutique */}
+          {selectedRubriques.includes('s16') && (
+            <section className="space-y-1.5 border-b border-[#E8EEF2] pb-3">
+              <h3 className="font-bold text-[#07988D] text-xs uppercase tracking-wide">
+                S16. Projet Thérapeutique
+              </h3>
+              {dossier.s16ProjetTherapeutique.objectifsCourtTerme && (
+                <p><strong>Objectifs court terme :</strong> {dossier.s16ProjetTherapeutique.objectifsCourtTerme}</p>
+              )}
+              {dossier.s16ProjetTherapeutique.objectifsMoyenTerme && (
+                <p><strong>Objectifs moyen terme :</strong> {dossier.s16ProjetTherapeutique.objectifsMoyenTerme}</p>
+              )}
+              {dossier.s16ProjetTherapeutique.moyensEtStrategies && (
+                <p><strong>Moyens & stratégies :</strong> {dossier.s16ProjetTherapeutique.moyensEtStrategies}</p>
+              )}
+              {dossier.s16ProjetTherapeutique.intervenants && (
+                <p><strong>Intervenants :</strong> {dossier.s16ProjetTherapeutique.intervenants}</p>
+              )}
             </section>
           )}
 

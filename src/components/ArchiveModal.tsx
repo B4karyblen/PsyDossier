@@ -47,22 +47,22 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
     <div className="fixed inset-0 z-50 bg-[#0F172A]/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="clinical-card w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200 border-[#CBD5E1] shadow-2xl">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#F8FAFC] via-white to-[#F0FDFA] border-b border-[#D9E2E8] px-6 sm:px-7 py-4.5 flex items-center justify-between">
+        <div className="bg-[#1E293B] border-b border-[#334155] px-6 sm:px-7 py-4.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {mode === 'ARCHIVER' ? (
-              <div className="w-10 h-10 rounded-xl bg-[#FFE4E6] text-[#BE123C] flex items-center justify-center border border-[#FECDD3] shadow-xs">
-                <Archive className="w-5 h-5 text-[#BE123C]" />
+              <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/30 shadow-xs">
+                <Archive className="w-5 h-5 text-rose-400" />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-xl bg-[#DCFCE7] text-[#15803D] flex items-center justify-center border border-[#86EFAC] shadow-xs">
-                <RefreshCw className="w-5 h-5 text-[#15803D]" />
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shadow-xs">
+                <RefreshCw className="w-5 h-5 text-emerald-400" />
               </div>
             )}
             <div>
-              <h2 className="text-base sm:text-lg font-black text-[#18243A] tracking-tight">
+              <h2 className="text-h2 font-black text-white tracking-tight">
                 {mode === 'ARCHIVER' ? 'Archivage du Dossier Patient' : 'Réactivation du Dossier'}
               </h2>
-              <p className="text-xs text-[#64748B] font-medium">
+              <p className="text-body-sm text-slate-400 font-medium">
                 {dossier.s1Identification.numeroOrdre} · {dossier.s1Identification.nom} {dossier.s1Identification.prenoms}
               </p>
             </div>
@@ -70,7 +70,7 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-[#94A3B8] hover:text-[#18243A] p-2 rounded-xl hover:bg-[#F1F5F7] transition-colors cursor-pointer"
+            className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-[#334155] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

@@ -69,6 +69,10 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
 
   const removeItem = (category: 'religions' | 'ethnies' | 'situationsMatrimoniales' | 'typesBilans' | 'syndromesFrequents', val: string) => {
     if (!isAdmin) return;
+    const confirmed = window.confirm(
+      `Supprimer "${val}" de la liste ?\n\nAttention : si cette valeur est utilisée dans des dossiers existants, elle y restera mais ne sera plus disponible pour les nouvelles sélections.`
+    );
+    if (!confirmed) return;
     const updated = {
       ...referenceLists,
       [category]: referenceLists[category].filter((item) => item !== val),
@@ -78,6 +82,11 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
 
   const removeCimItem = (code: string) => {
     if (!isAdmin) return;
+    const item = referenceLists.diagnosticClassifications.find((c) => c.code === code);
+    const confirmed = window.confirm(
+      `Supprimer [${code}] ${item?.label || ''} de la classification ?\n\nAttention : si ce code est utilisé dans des dossiers existants, il y restera mais ne sera plus disponible pour les nouvelles sélections.`
+    );
+    if (!confirmed) return;
     const updated = {
       ...referenceLists,
       diagnosticClassifications: referenceLists.diagnosticClassifications.filter((item) => item.code !== code),
@@ -164,7 +173,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
       </div>
 
       {isSaved && (
-        <div className="p-3 bg-[#DCFCE7] border border-[#86EFAC] rounded-xl text-xs text-[#15803D] font-bold flex items-center gap-2 animate-in fade-in duration-200">
+        <div className="p-3 bg-[#DCFCE7] border border-[#86EFAC] rounded-xl text-body-sm text-[#15803D] font-bold flex items-center gap-2 animate-in fade-in duration-200">
           <CheckCircle2 className="w-4 h-4 text-[#15803D]" />
           Référentiel mis à jour et synchronisé avec succès.
         </div>
@@ -187,7 +196,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               setActiveTab(tab.id as any);
               setSearchTerm('');
             }}
-            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
+            className={`px-3.5 py-2 text-body-sm font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
               activeTab === tab.id
                 ? 'bg-white text-[#07988D] shadow-xs border border-[#D9E2E8]'
                 : 'text-[#64748B] hover:text-[#18243A] hover:bg-white/50'
@@ -195,7 +204,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
           >
             <span>{tab.label}</span>
             <span
-              className={`px-1.5 py-0.2 rounded text-[10px] font-mono font-bold ${
+              className={`px-1.5 py-0.2 rounded text-caption font-mono font-bold ${
                 activeTab === tab.id ? 'bg-[#ECFBF9] text-[#07988D]' : 'bg-[#E2E8F0] text-[#64748B]'
               }`}
             >
@@ -210,7 +219,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
         {/* Category Header + Search Filter */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8EEF2]">
           <div>
-            <h2 className="text-base font-extrabold text-[#18243A]">
+            <h2 className="text-h2 font-extrabold text-[#18243A]">
               {activeTab === 'syndromes' && 'Nomenclature des Syndromes Psychiatriques Fréquents'}
               {activeTab === 'cim' && 'Nomenclature CIM-10 / DSM-5'}
               {activeTab === 'bilans' && 'Référentiel des Bilans Paracliniques Types'}
@@ -218,7 +227,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {activeTab === 'religions' && 'Référentiel des Confessions Religieuses'}
               {activeTab === 'matrimoniales' && 'Référentiel des Statuts Matrimoniaux'}
             </h2>
-            <p className="text-xs text-[#64748B] mt-0.5">
+            <p className="text-body-sm text-[#64748B] mt-0.5">
               Éléments disponibles dans les sélecteurs de saisie des rubriques correspondantes
             </p>
           </div>
@@ -230,7 +239,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Filtrer la liste..."
-              className="clinical-input pl-8 py-1.5 text-xs font-medium"
+              className="clinical-input pl-8 py-1.5 text-body-sm font-medium"
             />
           </div>
         </div>
@@ -242,7 +251,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredSyndromes.map((s) => (
                 <div
                   key={s}
-                  className="clinical-subcard p-3 flex items-center justify-between text-xs font-semibold hover:border-[#10B9A9]/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-[#10B9A9]/40 transition-colors group"
                 >
                   <span className="text-[#18243A]">{s}</span>
                   {isAdmin && (
@@ -272,7 +281,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   type="button"
                   onClick={() => handleAddItem('syndromesFrequents')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-xs flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter au référentiel
@@ -289,10 +298,10 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredCim.map((item) => (
                 <div
                   key={item.code}
-                  className="clinical-subcard p-3.5 flex items-start justify-between text-xs hover:border-[#10B9A9]/40 transition-colors group"
+                  className="clinical-subcard p-3.5 flex items-start justify-between text-body-sm hover:border-[#10B9A9]/40 transition-colors group"
                 >
                   <div className="flex items-start gap-2.5">
-                    <span className="font-mono font-black text-[#07988D] bg-[#ECFBF9] px-2 py-0.5 rounded border border-[#10B9A9]/30 shrink-0">
+                    <span className="text-mono font-black text-[#07988D] bg-[#ECFBF9] px-2 py-0.5 rounded border border-[#10B9A9]/30 shrink-0">
                       {item.code}
                     </span>
                     <span className="font-bold text-[#18243A] leading-snug">{item.label}</span>
@@ -318,20 +327,20 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   value={newCimCode}
                   onChange={(e) => setNewCimCode(e.target.value)}
                   placeholder="Code CIM (ex: F33.1)"
-                  className="clinical-input font-mono text-xs uppercase"
+                  className="clinical-input text-mono uppercase"
                 />
                 <input
                   type="text"
                   value={newCimLabel}
                   onChange={(e) => setNewCimLabel(e.target.value)}
                   placeholder="Libellé nosologique complet..."
-                  className="clinical-input text-xs sm:col-span-1"
+                  className="clinical-input text-body-sm sm:col-span-1"
                 />
                 <button
                   type="button"
                   onClick={handleAddCim}
                   disabled={!newCimCode.trim() || !newCimLabel.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-xs flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter le code
@@ -348,7 +357,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredBilans.map((b) => (
                 <div
                   key={b}
-                  className="clinical-subcard p-3 flex items-center justify-between text-xs font-semibold hover:border-[#10B9A9]/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-[#10B9A9]/40 transition-colors group"
                 >
                   <span className="text-[#18243A]">{b}</span>
                   {isAdmin && (
@@ -371,13 +380,13 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   value={newItemText}
                   onChange={(e) => setNewItemText(e.target.value)}
                   placeholder="Ex: TDM Cérébral sans injection, Bilan thyroïdien (TSH, T4L)..."
-                  className="clinical-input flex-1 text-xs"
+                  className="clinical-input flex-1 text-body-sm"
                 />
                 <button
                   type="button"
                   onClick={() => handleAddItem('typesBilans')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-xs flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter le bilan
@@ -394,7 +403,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredEthnies.map((e) => (
                 <div
                   key={e}
-                  className="clinical-subcard p-3 flex items-center justify-between text-xs font-semibold hover:border-[#10B9A9]/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-[#10B9A9]/40 transition-colors group"
                 >
                   <span className="text-[#18243A]">{e}</span>
                   {isAdmin && (
@@ -417,13 +426,13 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   value={newItemText}
                   onChange={(e) => setNewItemText(e.target.value)}
                   placeholder="Intitulé du groupe ethnique..."
-                  className="clinical-input flex-1 text-xs"
+                  className="clinical-input flex-1 text-body-sm"
                 />
                 <button
                   type="button"
                   onClick={() => handleAddItem('ethnies')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-xs flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter
@@ -440,7 +449,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredReligions.map((r) => (
                 <div
                   key={r}
-                  className="clinical-subcard p-3 flex items-center justify-between text-xs font-semibold hover:border-[#10B9A9]/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-[#10B9A9]/40 transition-colors group"
                 >
                   <span className="text-[#18243A]">{r}</span>
                   {isAdmin && (
@@ -463,13 +472,13 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   value={newItemText}
                   onChange={(e) => setNewItemText(e.target.value)}
                   placeholder="Intitulé de la confession..."
-                  className="clinical-input flex-1 text-xs"
+                  className="clinical-input flex-1 text-body-sm"
                 />
                 <button
                   type="button"
                   onClick={() => handleAddItem('religions')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-xs flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter
@@ -486,7 +495,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredMatrimoniales.map((m) => (
                 <div
                   key={m}
-                  className="clinical-subcard p-3 flex items-center justify-between text-xs font-semibold hover:border-[#10B9A9]/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-[#10B9A9]/40 transition-colors group"
                 >
                   <span className="text-[#18243A]">{m}</span>
                   {isAdmin && (
@@ -509,13 +518,13 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   value={newItemText}
                   onChange={(e) => setNewItemText(e.target.value)}
                   placeholder="Intitulé de la situation (ex: Concubinage, Marié(e) polygame)..."
-                  className="clinical-input flex-1 text-xs"
+                  className="clinical-input flex-1 text-body-sm"
                 />
                 <button
                   type="button"
                   onClick={() => handleAddItem('situationsMatrimoniales')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-xs flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter

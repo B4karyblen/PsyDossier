@@ -30,18 +30,18 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
   ).length;
 
   return (
-    <aside className="w-full lg:w-72 shrink-0 bg-white border border-[#E2E8F0] rounded-2xl p-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.03)] h-fit self-start sticky top-18 no-print">
+    <aside className="w-full lg:w-72 shrink-0 bg-[#1E293B] border border-[#334155] rounded-2xl p-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.15)] h-fit self-start sticky top-18 no-print">
       {/* Title & Micro Progress */}
-      <div className="pb-3 mb-3 border-b border-[#EDF2F7]">
+      <div className="pb-3 mb-3 border-b border-[#334155]">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+          <h2 className="text-label text-slate-400">
             Plan Type (17 Rubriques)
           </h2>
-          <span className="font-mono text-[11px] font-bold text-[#07988D] bg-[#ECFBF9] px-2 py-0.5 rounded-md border border-[#10B9A9]/20">
+          <span className="text-mono text-caption font-bold text-[#10B9A9] bg-[#10B9A9]/10 px-2 py-0.5 rounded-md border border-[#10B9A9]/20">
             {completedCount} / 17
           </span>
         </div>
-        <p className="text-[11px] text-[#64748B] mt-1">
+        <p className="text-caption text-slate-500 mt-1">
           Dossier psychiatrique structuré de référence
         </p>
       </div>
@@ -50,7 +50,7 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
       <div className="space-y-4 max-h-[calc(100vh-210px)] overflow-y-auto pr-1">
         {blocks.map((block) => (
           <div key={block.title} className="space-y-1">
-            <div className="px-2 py-1 text-[10px] font-extrabold text-[#64748B] uppercase tracking-wider flex items-center justify-between">
+            <div className="px-2 py-1 text-label text-slate-500 flex items-center justify-between">
               <span>{block.title}</span>
             </div>
 
@@ -66,22 +66,22 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
                   <button
                     key={rubrique.id}
                     onClick={() => onSelectRubrique(rubrique.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-left transition-all cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-body-sm font-medium text-left transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-[#ECFBF9] text-[#07988D] font-bold border-l-4 border-[#10B9A9] shadow-xs'
+                        ? 'bg-[#10B9A9]/15 text-[#10B9A9] font-bold border-l-4 border-[#10B9A9] shadow-xs'
                         : isHidden
-                        ? 'text-[#94A3B8] hover:bg-[#F8FAFC]'
-                        : 'text-[#18243A] hover:bg-[#F8FAFC]'
+                        ? 'text-slate-600 hover:bg-[#334155]'
+                        : 'text-slate-300 hover:text-white hover:bg-[#334155]'
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate min-w-0">
                       <span
-                        className={`font-mono text-[11px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ${
+                        className={`text-mono text-caption font-bold px-1.5 py-0.5 rounded-md shrink-0 ${
                           isActive
-                            ? 'bg-[#D9F7F3] text-[#07988D]'
+                            ? 'bg-[#10B9A9]/20 text-[#10B9A9]'
                             : isHidden
-                            ? 'bg-[#F1F5F9] text-[#94A3B8]'
-                            : 'bg-[#F1F5F9] text-[#64748B]'
+                            ? 'bg-[#334155] text-slate-600'
+                            : 'bg-[#334155] text-slate-400'
                         }`}
                       >
                         {rubrique.code}
@@ -92,17 +92,17 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
                     <div className="flex items-center gap-1.5 shrink-0 ml-1.5">
                       {isHidden ? (
                         <span title="Accès restreint pour votre rôle clinique">
-                          <EyeOff className="w-3.5 h-3.5 text-[#94A3B8]" />
+                          <EyeOff className="w-3.5 h-3.5 text-slate-600" />
                         </span>
                       ) : isReadOnly ? (
                         <span title="Lecture seule pour votre profil">
-                          <Lock className="w-3 h-3 text-[#94A3B8]" />
+                          <Lock className="w-3 h-3 text-slate-500" />
                         </span>
                       ) : null}
 
                       {!isHidden && completeness === 'COMPLETE' && (
                         <span
-                          className="w-4 h-4 rounded-full bg-[#DCFCE7] flex items-center justify-center text-[#15803D]"
+                          className="w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400"
                           title="Rubrique complète"
                         >
                           <Check className="w-2.5 h-2.5 stroke-[3]" />
@@ -110,7 +110,7 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
                       )}
                       {!isHidden && completeness === 'PARTIELLE' && (
                         <span
-                          className="w-4 h-4 rounded-full bg-[#FEF3C7] flex items-center justify-center text-[#B45309]"
+                          className="w-4 h-4 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400"
                           title="Rubrique en cours de saisie"
                         >
                           <Clock className="w-2.5 h-2.5" />
@@ -118,7 +118,7 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
                       )}
                       {!isHidden && completeness === 'NON_COMMENCEE' && (
                         <span
-                          className="w-4 h-4 rounded-full bg-[#F1F5F9] flex items-center justify-center text-[#CBD5E1]"
+                          className="w-4 h-4 rounded-full bg-[#334155] flex items-center justify-center text-slate-500"
                           title="Non commencée"
                         >
                           <Circle className="w-2 h-2" />
