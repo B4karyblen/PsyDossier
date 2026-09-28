@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --color-primary: #10B9A9;
+  --color-primary-dark: #07988D;
+  --color-primary-light: #D9F7F3;
+  --color-primary-subtle: #ECFBF9;
+
+  --color-navy: #18243A;
+  --color-navy-deep: #111827;
+
+  --color-app-bg: #F4F7F9;
+  --color-surface: #FFFFFF;
+  --color-surface-secondary: #F1F5F7;
+  --color-surface-input: #F8FAFC;
+
+  --color-border-standard: #D9E2E8;
+  --color-border-light: #E8EEF2;
+
+  --color-text-primary: #18243A;
+  --color-text-secondary: #64748B;
+  --color-text-muted: #94A3B8;
+
+  --color-clinical-success: #10B981;
+  --color-clinical-warning: #F59E0B;
+  --color-clinical-danger: #F43F5E;
+  --color-clinical-purple: #A855F7;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: #F4F7F9;
+    color: #18243A;
+  }
+}
+
+/* Custom clinical print styling */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+}

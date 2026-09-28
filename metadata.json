@@ -1,0 +1,6 @@
+{
+  "name": "PsyDossier — Dossier Patient en Psychiatrie",
+  "description": "Application SaaS clinique et médicale de gestion, consultation et suivi du dossier patient en psychiatrie selon le plan de référence en 17 rubriques.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
