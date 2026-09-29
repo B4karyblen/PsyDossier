@@ -43,27 +43,27 @@ export const S2Modalites: React.FC<Props> = ({
   };
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-6">
+    <div className="clinical-card p-6 sm:p-7 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-[#EDF2F7]">
+      <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2.5 py-0.5 rounded-md border border-[#10B9A9]/20">
+            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
               S2 · ADMINISTRATIF
             </span>
-            <span className="text-xs text-[#64748B]">Obligatoire pour validation</span>
+            <span className="text-xs text-ink-500">Obligatoire pour validation</span>
           </div>
-          <h2 className="text-lg font-extrabold text-[#18243A] tracking-tight mt-1">
+          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
             Modalités de Consultation
           </h2>
-          <p className="text-xs text-[#64748B] mt-0.5">
+          <p className="text-xs text-ink-500 mt-0.5">
             Cadre médico-légal d'admission et de consentement aux soins (BR-004, BR-005, BR-006)
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="p-3.5 bg-[#FFE4E6] border border-[#F43F5E]/30 rounded-xl flex items-center gap-2.5 text-xs text-[#BE123C] font-medium">
+        <div className="p-3.5 bg-rose-100 border border-rose-500/30 rounded-xl flex items-center gap-2.5 text-xs text-rose-700 font-medium">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -71,9 +71,9 @@ export const S2Modalites: React.FC<Props> = ({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Main Option selector cards */}
-        <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-5 space-y-3.5">
-          <label className="block text-xs font-bold text-[#18243A] uppercase tracking-wider">
-            Régime d’admission légal <span className="text-[#F43F5E]">*</span>
+        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-3.5">
+          <label className="block text-sm font-bold text-ink-900">
+            Régime d’admission légal <span className="text-rose-500">*</span>
           </label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
             {[
@@ -97,8 +97,8 @@ export const S2Modalites: React.FC<Props> = ({
                 key={option.id}
                 className={`relative flex flex-col p-4 rounded-xl border cursor-pointer transition-all ${
                   formData.modalite === option.id
-                    ? 'border-[#10B9A9] bg-white ring-2 ring-[#10B9A9]/20 shadow-xs'
-                    : 'border-[#CBD5E1] bg-white hover:border-[#10B9A9]/50'
+                    ? 'border-brand-500 bg-white ring-2 ring-brand-500/20 shadow-xs'
+                    : 'border-ink-200 bg-white hover:border-brand-500/50'
                 } ${isReadOnly ? 'cursor-not-allowed opacity-80' : ''}`}
               >
                 <div className="flex items-center gap-2.5">
@@ -121,11 +121,11 @@ export const S2Modalites: React.FC<Props> = ({
                             : undefined,
                       })
                     }
-                    className="text-[#10B9A9] focus:ring-[#10B9A9] w-4 h-4"
+                    className="text-brand-600 focus:ring-brand-500 w-4 h-4"
                   />
-                  <span className="text-xs font-bold text-[#18243A]">{option.title}</span>
+                  <span className="text-xs font-bold text-ink-900">{option.title}</span>
                 </div>
-                <span className="text-[11px] text-[#64748B] mt-1.5 pl-6 font-medium">
+                <span className="text-[11px] text-ink-500 mt-1.5 pl-6 font-medium">
                   {option.desc}
                 </span>
               </label>
@@ -135,16 +135,16 @@ export const S2Modalites: React.FC<Props> = ({
 
         {/* Conditionnel : Adressé par un tiers */}
         {formData.modalite === 'Adressé par un tiers' && (
-          <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-5 space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-[#EDF2F7]">
-              <UserCheck className="w-4 h-4 text-[#10B9A9]" />
-              <h3 className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+          <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
+              <UserCheck className="w-4 h-4 text-brand-600" />
+              <h3 className="text-sm font-bold text-ink-900">
                 Précisions sur le tiers orienteur
               </h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                <label className="block text-xs font-semibold text-ink-900 mb-1">
                   Type de prescripteur / tiers
                 </label>
                 <select
@@ -156,7 +156,7 @@ export const S2Modalites: React.FC<Props> = ({
                       adresseParTiersType: e.target.value as any,
                     })
                   }
-                  className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-[#18243A] text-xs font-semibold rounded-lg px-3 py-2 focus:outline-none"
+                  className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-semibold rounded-lg px-3 py-2 focus:outline-none"
                 >
                   <option value="Médecin traitant">Médecin traitant</option>
                   <option value="Centre de santé">Centre de santé / CSREF</option>
@@ -166,8 +166,8 @@ export const S2Modalites: React.FC<Props> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#18243A] mb-1">
-                  Identité / Précisions sur le tiers <span className="text-[#F43F5E]">*</span>
+                <label className="block text-xs font-semibold text-ink-900 mb-1">
+                  Identité / Précisions sur le tiers <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -176,7 +176,7 @@ export const S2Modalites: React.FC<Props> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, adresseParTiersPrecision: e.target.value })
                   }
-                  className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
+                  className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
                   placeholder="Ex: Dr. Traoré (CSREF Commune IV) ou Frère aîné"
                 />
               </div>
@@ -186,18 +186,18 @@ export const S2Modalites: React.FC<Props> = ({
 
         {/* Conditionnel : Soins sans consentement */}
         {formData.modalite === 'Soins sans consentement' && (
-          <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-5 space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-[#FECDD3]">
-              <ShieldAlert className="w-4 h-4 text-[#BE123C]" />
-              <h3 className="text-xs font-bold text-[#BE123C] uppercase tracking-wider">
+          <div className="bg-rose-50 border border-rose-200 rounded-xl p-5 space-y-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-rose-200">
+              <ShieldAlert className="w-4 h-4 text-rose-700" />
+              <h3 className="text-xs font-bold text-rose-700 uppercase tracking-wider">
                 Régime Médico-Légal de Soins Sans Consentement (Vigilance)
               </h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-[#18243A] mb-1">
-                  Sous-type légal <span className="text-[#F43F5E]">*</span>
+                <label className="block text-xs font-semibold text-ink-900 mb-1">
+                  Sous-type légal <span className="text-rose-500">*</span>
                 </label>
                 <select
                   disabled={isReadOnly}
@@ -208,7 +208,7 @@ export const S2Modalites: React.FC<Props> = ({
                       soinsSansConsentementType: e.target.value as SoinsSansConsentementType,
                     })
                   }
-                  className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-[#18243A] text-xs font-semibold rounded-lg px-3 py-2 focus:outline-none"
+                  className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-semibold rounded-lg px-3 py-2 focus:outline-none"
                 >
                   <option value="À la demande d'un tiers">À la demande d'un tiers (famille, tuteur)</option>
                   <option value="À la demande d'un représentant de l'État">
@@ -218,7 +218,7 @@ export const S2Modalites: React.FC<Props> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                <label className="block text-xs font-semibold text-ink-900 mb-1">
                   Identité du demandeur officiel
                 </label>
                 <input
@@ -228,13 +228,13 @@ export const S2Modalites: React.FC<Props> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, soinsSansConsentementDemandeur: e.target.value })
                   }
-                  className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
+                  className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
                   placeholder="Ex: Procureur, Préfet, Commissaire ou Tuteur légal"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                <label className="block text-xs font-semibold text-ink-900 mb-1">
                   Date de la décision ou du certificat médical initial
                 </label>
                 <input
@@ -244,7 +244,7 @@ export const S2Modalites: React.FC<Props> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, dateDecisionOuCertificat: e.target.value })
                   }
-                  className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg px-3 py-2 focus:outline-none tabular-nums"
+                  className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-lg px-3 py-2 focus:outline-none tabular-nums"
                 />
               </div>
             </div>
@@ -252,8 +252,8 @@ export const S2Modalites: React.FC<Props> = ({
         )}
 
         {/* Observations générales */}
-        <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-5 space-y-2">
-          <label className="block text-xs font-semibold text-[#18243A]">
+        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-2">
+          <label className="block text-xs font-semibold text-ink-900">
             Observations sur les circonstances d'arrivée / accompagnement
           </label>
           <textarea
@@ -261,7 +261,7 @@ export const S2Modalites: React.FC<Props> = ({
             disabled={isReadOnly}
             value={formData.observationsModalite || ''}
             onChange={(e) => setFormData({ ...formData, observationsModalite: e.target.value })}
-            className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-[#18243A] text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
+            className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
             placeholder="Ex: Arrivé calme / agité, accompagné par ses parents et son oncle..."
           />
         </div>

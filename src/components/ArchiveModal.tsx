@@ -44,10 +44,10 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0F172A]/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="clinical-card w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200 border-[#CBD5E1] shadow-2xl">
+    <div className="fixed inset-0 z-50 bg-ink-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="clinical-card w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200 !rounded-3xl !border-ink-150 shadow-[var(--shadow-float)]">
         {/* Header */}
-        <div className="bg-[#1E293B] border-b border-[#334155] px-6 sm:px-7 py-4.5 flex items-center justify-between">
+        <div className="bg-ink-800 border-b border-ink-700 px-6 sm:px-7 py-4.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {mode === 'ARCHIVER' ? (
               <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/30 shadow-xs">
@@ -59,7 +59,7 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
               </div>
             )}
             <div>
-              <h2 className="text-h2 font-black text-white tracking-tight">
+              <h2 className="text-h2 font-extrabold text-white tracking-tight">
                 {mode === 'ARCHIVER' ? 'Archivage du Dossier Patient' : 'Réactivation du Dossier'}
               </h2>
               <p className="text-body-sm text-slate-400 font-medium">
@@ -68,9 +68,10 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
             </div>
           </div>
           <button
+            aria-label="Fermer"
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-[#334155] transition-colors cursor-pointer"
+            className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-ink-700 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -78,15 +79,15 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 sm:p-7 space-y-4.5 text-xs">
           {mode === 'ARCHIVER' ? (
-            <div className="p-3.5 bg-[#FFE4E6]/60 border border-[#F43F5E]/30 rounded-xl text-[#BE123C] flex items-start gap-2.5">
-              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-[#BE123C]" />
+            <div className="p-3.5 bg-rose-100/60 border border-rose-500/30 rounded-xl text-rose-700 flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-700" />
               <span className="leading-relaxed font-medium">
                 Le dossier sera placé en archivage logique (BR-017). Il demeurera traçable et consultable en lecture seule via le filtre des archives.
               </span>
             </div>
           ) : (
-            <div className="p-3.5 bg-[#DCFCE7]/60 border border-[#86EFAC] rounded-xl text-[#15803D] flex items-start gap-2.5">
-              <RefreshCw className="w-4 h-4 shrink-0 mt-0.5 text-[#15803D]" />
+            <div className="p-3.5 bg-emerald-100/60 border border-emerald-300 rounded-xl text-emerald-700 flex items-start gap-2.5">
+              <RefreshCw className="w-4 h-4 shrink-0 mt-0.5 text-emerald-700" />
               <span className="leading-relaxed font-medium">
                 Le dossier sera rouvert et réintégré dans le registre actif avec le statut « En cours » pour une nouvelle prise en charge.
               </span>
@@ -94,14 +95,14 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
           )}
 
           {error && (
-            <div className="p-3 bg-[#FFE4E6] text-[#BE123C] font-bold rounded-xl border border-[#F43F5E]/30">
+            <div className="p-3 bg-rose-100 text-rose-700 font-bold rounded-xl border border-rose-500/30">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block font-bold text-[#18243A] mb-1">
-              Catégorie de motif <span className="text-[#F43F5E]">*</span>
+            <label className="block font-bold text-ink-900 mb-1">
+              Catégorie de motif <span className="text-rose-500">*</span>
             </label>
             <select
               value={motifSelect}
@@ -128,7 +129,7 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
           </div>
 
           <div>
-            <label className="block font-bold text-[#18243A] mb-1">
+            <label className="block font-bold text-ink-900 mb-1">
               Précisions & justification clinique
             </label>
             <textarea
@@ -140,21 +141,21 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
             />
           </div>
 
-          <div className="flex items-center justify-between pt-3 border-t border-[#E8EEF2]">
+          <div className="flex items-center justify-between pt-3 border-t border-ink-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 text-xs font-bold text-[#64748B] hover:text-[#18243A] bg-[#F1F5F7] hover:bg-[#E2E8F0] rounded-xl transition-colors cursor-pointer"
+              className="px-4 py-2.5 text-xs font-bold text-ink-500 hover:text-ink-900 bg-ink-100 hover:bg-ink-150 rounded-xl transition-colors cursor-pointer"
             >
               Annuler
             </button>
 
             <button
               type="submit"
-              className={`px-5 py-2.5 text-xs font-black text-white rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-sm ${
+              className={`px-5 py-2.5 text-xs font-extrabold text-white rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-sm ${
                 mode === 'ARCHIVER'
-                  ? 'bg-[#E11D48] hover:bg-[#BE123C] shadow-[#E11D48]/25'
-                  : 'clinical-btn-primary shadow-[#10B9A9]/20'
+                  ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/25'
+                  : 'clinical-btn-primary shadow-brand-500/20'
               }`}
             >
               {mode === 'ARCHIVER' ? (

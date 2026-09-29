@@ -6,3 +6,8 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Local database and Windows release
+data/
+release/
+.cache/

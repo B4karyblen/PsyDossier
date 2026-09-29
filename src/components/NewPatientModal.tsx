@@ -219,27 +219,28 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0F172A]/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="clinical-card w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200 border-[#CBD5E1] shadow-2xl">
+    <div className="fixed inset-0 z-50 bg-ink-950/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className="clinical-card w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200 !rounded-3xl !border-ink-150 shadow-[var(--shadow-float)]">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#F8FAFC] via-white to-[#F0FDFA] border-b border-[#D9E2E8] px-6 sm:px-7 py-4.5 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-ink-25 via-white to-brand-50 border-b border-ink-150 px-6 sm:px-7 py-4.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#ECFBF9] text-[#07988D] flex items-center justify-center border border-[#10B9A9]/20 shadow-xs">
-              <UserPlus className="w-5 h-5 text-[#07988D]" />
+            <div className="w-10 h-10 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center border border-brand-500/20 shadow-xs">
+              <UserPlus className="w-5 h-5 text-brand-700" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-black text-[#18243A] tracking-tight">
+              <h2 className="text-base sm:text-lg font-extrabold text-ink-900 tracking-tight">
                 Admission & Création de Patient
               </h2>
-              <p className="text-xs text-[#64748B] font-medium">
+              <p className="text-xs text-ink-500 font-medium">
                 Génération immédiate du N° d'ordre et ouverture du dossier médical (S1 / S2)
               </p>
             </div>
           </div>
           <button
+            aria-label="Fermer"
             type="button"
             onClick={onClose}
-            className="text-[#94A3B8] hover:text-[#18243A] p-2 rounded-xl hover:bg-[#F1F5F7] transition-colors cursor-pointer"
+            className="text-ink-400 hover:text-ink-900 p-2 rounded-xl hover:bg-ink-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -247,13 +248,13 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
 
         {/* Duplicate warning (B5) */}
         {potentialDuplicate && (
-          <div className="mx-6 sm:mx-7 mt-5 p-4 bg-[#FEF3C7] border border-[#F59E0B]/40 rounded-2xl flex items-start gap-3.5 shadow-xs">
-            <AlertTriangle className="w-5 h-5 text-[#B45309] shrink-0 mt-0.5" />
+          <div className="mx-6 sm:mx-7 mt-5 p-4 bg-amber-100 border border-amber-500/40 rounded-2xl flex items-start gap-3.5 shadow-xs">
+            <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
             <div className="text-xs space-y-1.5 flex-1">
-              <span className="font-extrabold text-[#B45309] block text-sm">
+              <span className="font-extrabold text-amber-700 block text-sm">
                 Doublon potentiel détecté dans le registre
               </span>
-              <p className="text-[#92400E] leading-relaxed">
+              <p className="text-amber-800 leading-relaxed">
                 Un patient nommé <strong className="underline">{potentialDuplicate.s1Identification.nom} {potentialDuplicate.s1Identification.prenoms}</strong> ({potentialDuplicate.s1Identification.age} ans) existe déjà sous le numéro <strong className="font-mono">{potentialDuplicate.s1Identification.numeroOrdre}</strong>.
               </p>
               <div className="pt-1.5 flex flex-wrap gap-2.5 items-center">
@@ -263,12 +264,12 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
                     onClose();
                     onSelectExistingDossier(potentialDuplicate.id);
                   }}
-                  className="px-3 py-1.5 bg-white text-[#B45309] border border-[#F59E0B] font-extrabold rounded-lg text-xs hover:bg-[#FEF3C7] shadow-2xs cursor-pointer flex items-center gap-1.5"
+                  className="px-3 py-1.5 bg-white text-amber-700 border border-amber-500 font-extrabold rounded-lg text-xs hover:bg-amber-100 shadow-2xs cursor-pointer flex items-center gap-1.5"
                 >
                   <span>Ouvrir le dossier existant</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
-                <span className="text-[11px] text-[#92400E] font-medium">
+                <span className="text-[11px] text-amber-800 font-medium">
                   ou poursuivre la création d'un nouveau dossier distinct ci-dessous.
                 </span>
               </div>
@@ -277,7 +278,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
         )}
 
         {error && (
-          <div className="mx-6 sm:mx-7 mt-5 p-3.5 bg-[#FFE4E6] border border-[#F43F5E]/30 rounded-xl text-xs text-[#BE123C] font-bold flex items-center gap-2">
+          <div className="mx-6 sm:mx-7 mt-5 p-3.5 bg-rose-100 border border-rose-500/30 rounded-xl text-xs text-rose-700 font-bold flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -287,31 +288,31 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 sm:p-7 space-y-5 max-h-[calc(88vh-130px)] overflow-y-auto">
           {/* Subcard 1: Identité fondamentale */}
           <div className="clinical-subcard p-4 sm:p-5 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E8EEF2]">
-              <span className="text-xs font-black uppercase tracking-wider text-[#18243A]">
+            <div className="flex items-center justify-between pb-2 border-b border-ink-100">
+              <span className="text-sm font-bold text-ink-900">
                 1. Identification & N° d'Ordre Médical
               </span>
-              <span className="text-[10px] font-mono font-bold text-[#07988D] bg-[#ECFBF9] px-2 py-0.5 rounded border border-[#10B9A9]/20">
+              <span className="text-[10px] font-mono font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-500/20">
                 BR-001 Attribué
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label className="block text-xs font-bold text-[#18243A] mb-1">
+                <label className="block text-xs font-bold text-ink-900 mb-1">
                   N° Ordre Patient
                 </label>
                 <input
                   type="text"
                   readOnly
                   value={autoNumeroOrdre}
-                  className="clinical-input bg-[#F1F5F7] font-mono text-xs font-bold cursor-not-allowed text-[#07988D]"
+                  className="clinical-input bg-ink-100 font-mono text-xs font-bold cursor-not-allowed text-brand-700"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#18243A] mb-1">
-                  Nom de famille <span className="text-[#F43F5E]">*</span>
+                <label className="block text-xs font-bold text-ink-900 mb-1">
+                  Nom de famille <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -324,8 +325,8 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#18243A] mb-1">
-                  Prénoms <span className="text-[#F43F5E]">*</span>
+                <label className="block text-xs font-bold text-ink-900 mb-1">
+                  Prénoms <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -340,8 +341,8 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label className="block text-xs font-bold text-[#18243A] mb-1">
-                  Âge (années) <span className="text-[#F43F5E]">*</span>
+                <label className="block text-xs font-bold text-ink-900 mb-1">
+                  Âge (années) <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -356,8 +357,8 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#18243A] mb-1">
-                  Sexe biologique <span className="text-[#F43F5E]">*</span>
+                <label className="block text-xs font-bold text-ink-900 mb-1">
+                  Sexe biologique <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={sexe}
@@ -370,7 +371,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#18243A] mb-1">
+                <label className="block text-xs font-bold text-ink-900 mb-1">
                   Date de naissance (si connue)
                 </label>
                 <input
@@ -385,11 +386,11 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
 
           {/* Subcard 2: Modalités de consultation (S2) */}
           <div className="clinical-subcard p-4 sm:p-5 space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E8EEF2]">
-              <span className="text-xs font-black uppercase tracking-wider text-[#18243A]">
-                2. Modalité de Consultation Initiale <span className="text-[#F43F5E]">*</span>
+            <div className="flex items-center justify-between pb-2 border-b border-ink-100">
+              <span className="text-sm font-bold text-ink-900">
+                2. Modalité de Consultation Initiale <span className="text-rose-500">*</span>
               </span>
-              <span className="text-[10px] font-bold text-[#64748B]">Règle BR-004</span>
+              <span className="text-[10px] font-bold text-ink-500">Règle BR-004</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -408,18 +409,18 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
                     onClick={() => setModalite(m.id)}
                     className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                       isSelected
-                        ? 'border-[#10B9A9] bg-[#ECFBF9]/60 shadow-xs ring-1 ring-[#10B9A9]'
-                        : 'border-[#D9E2E8] bg-white hover:border-[#CBD5E1]'
+                        ? 'border-brand-500 bg-brand-50/60 shadow-xs ring-1 ring-brand-500'
+                        : 'border-ink-150 bg-white hover:border-ink-200'
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className={`text-xs font-extrabold ${isSelected ? 'text-[#07988D]' : 'text-[#18243A]'}`}>
+                        <span className={`text-xs font-extrabold ${isSelected ? 'text-brand-700' : 'text-ink-900'}`}>
                           {m.label}
                         </span>
-                        {isSelected && <CheckCircle2 className="w-4 h-4 text-[#10B9A9]" />}
+                        {isSelected && <CheckCircle2 className="w-4 h-4 text-brand-600" />}
                       </div>
-                      <p className="text-[11px] text-[#64748B] mt-1 leading-snug">{m.desc}</p>
+                      <p className="text-[11px] text-ink-500 mt-1 leading-snug">{m.desc}</p>
                     </div>
                   </button>
                 );
@@ -429,11 +430,11 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
 
           {/* Subcard 3: Motif & plainte d'admission */}
           <div className="clinical-subcard p-4 sm:p-5 space-y-3">
-            <div className="flex items-center justify-between pb-1 border-b border-[#E8EEF2]">
-              <span className="text-xs font-black uppercase tracking-wider text-[#18243A]">
+            <div className="flex items-center justify-between pb-1 border-b border-ink-100">
+              <span className="text-sm font-bold text-ink-900">
                 3. Motif d’Admission & Plainte Principale (S3)
               </span>
-              <span className="text-[10px] text-[#07988D] font-bold">Initialise statut EN COURS si saisi</span>
+              <span className="text-[10px] text-brand-700 font-bold">Initialise statut EN COURS si saisi</span>
             </div>
             <textarea
               rows={2}
@@ -446,12 +447,12 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
 
           {/* Subcard 4: Coordonnées & Données Sociales */}
           <div className="clinical-subcard p-4 sm:p-5 space-y-3">
-            <span className="text-xs font-black uppercase tracking-wider text-[#18243A] block pb-1 border-b border-[#E8EEF2]">
+            <span className="text-sm font-bold text-ink-900 block pb-1 border-b border-ink-100">
               4. Données Complémentaires (Optionnelles à l'ouverture)
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-bold text-[#18243A] mb-1">Profession</label>
+                <label className="block text-xs font-bold text-ink-900 mb-1">Profession</label>
                 <input
                   type="text"
                   value={profession}
@@ -462,7 +463,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#18243A] mb-1">Ethnie</label>
+                <label className="block text-xs font-bold text-ink-900 mb-1">Ethnie</label>
                 <select
                   value={ethnie}
                   onChange={(e) => setEthnie(e.target.value)}
@@ -478,7 +479,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#18243A] mb-1">Téléphone</label>
+                <label className="block text-xs font-bold text-ink-900 mb-1">Téléphone</label>
                 <input
                   type="tel"
                   value={telephone}
@@ -491,17 +492,17 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
           </div>
 
           {/* Modal Footer Controls */}
-          <div className="flex items-center justify-between pt-4 border-t border-[#E8EEF2]">
+          <div className="flex items-center justify-between pt-4 border-t border-ink-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 text-xs font-bold text-[#64748B] hover:text-[#18243A] bg-[#F1F5F7] hover:bg-[#E2E8F0] rounded-xl transition-colors cursor-pointer"
+              className="px-4 py-2.5 text-xs font-bold text-ink-500 hover:text-ink-900 bg-ink-100 hover:bg-ink-150 rounded-xl transition-colors cursor-pointer"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="clinical-btn-primary px-5 py-2.5 text-xs flex items-center gap-2 cursor-pointer shadow-sm shadow-[#10B9A9]/20"
+              className="clinical-btn-primary px-5 py-2.5 text-xs flex items-center gap-2 cursor-pointer shadow-sm shadow-brand-500/20"
             >
               <Plus className="w-4 h-4" />
               <span>Créer & Ouvrir le Dossier Médical</span>

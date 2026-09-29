@@ -25,19 +25,19 @@ export const RubriqueFooterNav: React.FC<RubriqueFooterNavProps> = ({
     currentIndex < RUBRIQUES_CONFIG.length - 1 ? RUBRIQUES_CONFIG[currentIndex + 1] : null;
 
   return (
-    <div className="pt-5 mt-6 border-t border-[#EDF2F7] flex flex-col sm:flex-row items-center justify-between gap-3 bg-white">
+    <div className="pt-5 mt-6 border-t border-ink-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-white">
       {/* Previous button */}
       <div>
         {prevRubrique && onPrev ? (
           <button
             type="button"
             onClick={onPrev}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-[#18243A] bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#CBD5E1] rounded-xl transition-all cursor-pointer"
+            className="btn-secondary"
             title={`Revenir à ${prevRubrique.code} : ${prevRubrique.titre}`}
           >
-            <ChevronLeft className="w-4 h-4 text-[#64748B]" />
-            <span className="hidden sm:inline">Précédent :</span>
-            <span className="font-bold text-[#07988D]">{prevRubrique.code}</span>
+            <ChevronLeft className="w-4 h-4 text-ink-500" />
+            <span className="hidden sm:inline font-semibold text-ink-500">Précédent</span>
+            <span className="font-bold text-brand-700">{prevRubrique.code}</span>
           </button>
         ) : (
           <div />
@@ -47,7 +47,7 @@ export const RubriqueFooterNav: React.FC<RubriqueFooterNavProps> = ({
       {/* Center Save Action & Feedback */}
       <div className="flex items-center gap-3">
         {isSaved && (
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#15803D] bg-[#DCFCE7] px-3 py-1.5 rounded-xl border border-[#86EFAC]/40 animate-in fade-in">
+          <span className="chip bg-emerald-100 text-emerald-800 !py-1.5">
             <CheckCircle2 className="w-3.5 h-3.5" />
             Enregistré avec succès
           </span>
@@ -57,7 +57,7 @@ export const RubriqueFooterNav: React.FC<RubriqueFooterNavProps> = ({
           <button
             type="submit"
             disabled={!isFormValid}
-            className="flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-[#10B9A9] hover:bg-[#07988D] active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all shadow-sm shadow-[#10B9A9]/25 cursor-pointer"
+            className="btn-primary !px-5"
           >
             <Save className="w-4 h-4" />
             <span>Enregistrer la rubrique</span>
@@ -71,12 +71,12 @@ export const RubriqueFooterNav: React.FC<RubriqueFooterNavProps> = ({
           <button
             type="button"
             onClick={onNext}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-[#18243A] bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#CBD5E1] rounded-xl transition-all cursor-pointer group"
+            className="btn-secondary group"
             title={`Passer à ${nextRubrique.code} : ${nextRubrique.titre}`}
           >
-            <span className="hidden sm:inline">Suivant :</span>
-            <span className="font-bold text-[#07988D]">{nextRubrique.code}</span>
-            <ChevronRight className="w-4 h-4 text-[#64748B] group-hover:translate-x-0.5 transition-transform" />
+            <span className="hidden sm:inline font-semibold text-ink-500">Suivant</span>
+            <span className="font-bold text-brand-700">{nextRubrique.code}</span>
+            <ChevronRight className="w-4 h-4 text-ink-500 group-hover:translate-x-0.5 transition-transform" />
           </button>
         ) : (
           <div />

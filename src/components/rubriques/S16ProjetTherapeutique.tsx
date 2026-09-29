@@ -76,36 +76,36 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
   };
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-6">
+    <div className="clinical-card p-6 sm:p-7 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#EDF2F7] gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-ink-100 gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2.5 py-0.5 rounded-md border border-[#10B9A9]/20">
+            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
               S16 · PROJET
             </span>
-            <span className="text-xs text-[#64748B]">Objectifs & Planification</span>
+            <span className="text-xs text-ink-500">Objectifs & Planification</span>
           </div>
-          <h2 className="text-lg font-extrabold text-[#18243A] tracking-tight mt-1">
+          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
             Projet Thérapeutique Personnalisé
           </h2>
-          <p className="text-xs text-[#64748B] mt-0.5">
+          <p className="text-xs text-ink-500 mt-0.5">
             Objectifs à court, moyen et long terme, moyens d'action et planification des réévaluations
           </p>
         </div>
 
         {/* Version Badge & History toggle */}
         <div className="flex items-center gap-2">
-          <span className="font-mono text-xs font-extrabold text-[#07988D] bg-[#ECFBF9] px-3 py-1 rounded-xl border border-[#10B9A9]/25 shadow-2xs">
+          <span className="font-mono text-xs font-extrabold text-brand-700 bg-brand-50 px-3 py-1 rounded-xl border border-brand-500/25 shadow-2xs">
             Version {formData.versionCourante}.0
           </span>
           {formData.historiqueVersions && formData.historiqueVersions.length > 0 && (
             <button
               type="button"
               onClick={() => setShowHistory(!showHistory)}
-              className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-[#18243A] bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#CBD5E1] rounded-xl transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-ink-900 bg-ink-25 hover:bg-ink-100 border border-ink-200 rounded-xl transition-all cursor-pointer"
             >
-              <History className="w-3.5 h-3.5 text-[#07988D]" />
+              <History className="w-3.5 h-3.5 text-brand-700" />
               <span>Historique ({formData.historiqueVersions.length})</span>
             </button>
           )}
@@ -114,23 +114,23 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
 
       {/* History Drawer if open */}
       {showHistory && formData.historiqueVersions && (
-        <div className="p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl space-y-3">
-          <span className="text-xs font-bold text-[#18243A] uppercase tracking-wider block">
+        <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
+          <span className="text-sm font-bold text-ink-900 block">
             Versions Antérieures du Projet Thérapeutique
           </span>
           <div className="space-y-2">
             {formData.historiqueVersions.map((v) => (
               <div
                 key={v.version}
-                className="p-3 bg-white border border-[#E2E8F0] rounded-lg text-xs space-y-1"
+                className="p-3 bg-white border border-ink-150 rounded-lg text-xs space-y-1"
               >
-                <div className="flex items-center justify-between font-bold text-[#18243A]">
+                <div className="flex items-center justify-between font-bold text-ink-900">
                   <span>Version {v.version}.0</span>
-                  <span className="text-[#64748B] font-normal">
+                  <span className="text-ink-500 font-normal">
                     Archivée le {new Date(v.dateHeure).toLocaleDateString('fr-FR')} par {v.auteurNom}
                   </span>
                 </div>
-                <div className="text-[11px] text-[#475569]">
+                <div className="text-[11px] text-ink-600">
                   Court terme : {v.objectifsCourtTerme || 'Non précisé'}
                 </div>
               </div>
@@ -141,17 +141,17 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Subcard 1: Objectifs court & moyen terme */}
-        <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-5 space-y-4">
-          <div className="flex items-center gap-2 pb-2 border-b border-[#EDF2F7]">
-            <Target className="w-4 h-4 text-[#10B9A9]" />
-            <h3 className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
+            <Target className="w-4 h-4 text-brand-600" />
+            <h3 className="text-sm font-bold text-ink-900">
               Objectifs Thérapeutiques Définis
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-[#18243A] mb-1">
+              <label className="block text-xs font-semibold text-ink-900 mb-1">
                 Objectifs à court terme (Hospitalisation / Phase aiguë)
               </label>
               <textarea
@@ -159,13 +159,13 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
                 disabled={!canEdit}
                 value={formData.objectifsCourtTerme}
                 onChange={(e) => setFormData({ ...formData, objectifsCourtTerme: e.target.value })}
-                className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-medium rounded-xl p-3 focus:outline-none"
+                className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-medium rounded-xl p-3 focus:outline-none"
                 placeholder="Ex: Sédation de l'angoisse, rupture du délire, reprise du sommeil, apaisement de l'agitation..."
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#18243A] mb-1">
+              <label className="block text-xs font-semibold text-ink-900 mb-1">
                 Objectifs à moyen et long terme (Réhabilitation / Autonomie)
               </label>
               <textarea
@@ -173,7 +173,7 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
                 disabled={!canEdit}
                 value={formData.objectifsMoyenTerme}
                 onChange={(e) => setFormData({ ...formData, objectifsMoyenTerme: e.target.value })}
-                className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-medium rounded-xl p-3 focus:outline-none"
+                className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-medium rounded-xl p-3 focus:outline-none"
                 placeholder="Ex: Insight, prévention de la rechute, autonomie quotidienne, reprise d'une formation..."
               />
             </div>
@@ -181,9 +181,9 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
         </div>
 
         {/* Subcard 2: Moyens & Stratégies */}
-        <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-5 space-y-4">
+        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-4">
           <div>
-            <label className="block text-xs font-bold text-[#18243A] uppercase tracking-wider mb-1">
+            <label className="block text-sm font-bold text-ink-900 mb-1">
               Moyens et Stratégies Thérapeutiques Mobilisés
             </label>
             <textarea
@@ -191,14 +191,14 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
               disabled={!canEdit}
               value={formData.moyensEtStrategies}
               onChange={(e) => setFormData({ ...formData, moyensEtStrategies: e.target.value })}
-              className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-medium rounded-xl p-3 focus:outline-none"
+              className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-medium rounded-xl p-3 focus:outline-none"
               placeholder="Psychopharmacologie, entretiens réguliers, ateliers thérapeutiques, guidance parentale..."
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-[#18243A] mb-1">
+              <label className="block text-xs font-semibold text-ink-900 mb-1">
                 Échéances & Révisions programmées
               </label>
               <input
@@ -206,13 +206,13 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
                 disabled={!canEdit}
                 value={formData.echeancesEtRevisions}
                 onChange={(e) => setFormData({ ...formData, echeancesEtRevisions: e.target.value })}
-                className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-medium rounded-lg px-3 py-2.5 focus:outline-none"
+                className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-medium rounded-lg px-3 py-2.5 focus:outline-none"
                 placeholder="Ex: Évaluation clinique hebdomadaire, bilan à 3 mois"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#18243A] mb-1">
+              <label className="block text-xs font-semibold text-ink-900 mb-1">
                 Intervenants clés impliqués
               </label>
               <input
@@ -225,7 +225,7 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
                     intervenants: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
                   })
                 }
-                className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-medium rounded-lg px-3 py-2.5 focus:outline-none"
+                className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-medium rounded-lg px-3 py-2.5 focus:outline-none"
                 placeholder="Ex: Dr. Diallo, Psychologue Traoré, Infirmier Coulibaly..."
               />
             </div>

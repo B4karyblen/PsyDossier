@@ -60,72 +60,72 @@
 
 @theme {
   --font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Data font: Manrope with tabular figures (IDs, codes, counters). No separate mono face is shipped. */
+  --font-mono: 'Manrope', ui-sans-serif, system-ui, sans-serif;
 
-  /* ── Premium SaaS Type Scale (12 14 16 18 24 32) ── */
-  --text-display: 2rem;      /* 32px — Page titles, hero numbers */
-  --text-h1: 1.5rem;         /* 24px — Section headings */
-  --text-h2: 1.25rem;        /* 20px — Card titles, modal headers */
-  --text-h3: 1.125rem;       /* 18px — Sub-section headings */
-  --text-body: 1rem;         /* 16px — Body text, descriptions */
-  --text-body-sm: 0.875rem;  /* 14px — Secondary body, labels */
-  --text-caption: 0.75rem;   /* 12px — Captions, metadata, badges */
-  --text-mono: 0.8125rem;    /* 13px — Data, code, order numbers */
+  /* ── Type scale (12 · 14 · 16 · 18 · 20 · 24 · 32) ── */
+  --text-display: 2rem;
+  --text-h1: 1.5rem;
+  --text-h2: 1.25rem;
+  --text-h3: 1.125rem;
+  --text-body: 1rem;
+  --text-body-sm: 0.875rem;
+  --text-caption: 0.75rem;
+  --text-mono: 0.8125rem;
 
-  /* ── Letter Spacing ── */
   --tracking-tight: -0.025em;
   --tracking-snug: -0.015em;
   --tracking-normal: 0;
   --tracking-wide: 0.025em;
   --tracking-wider: 0.05em;
 
-  /* ── Line Heights ── */
   --leading-tight: 1.25;
   --leading-snug: 1.375;
   --leading-normal: 1.5;
   --leading-relaxed: 1.625;
   --leading-loose: 1.75;
 
-  /* ── Primary: Slate-800 (dark canvas) ── */
-  --color-primary: #1E293B;
-  --color-primary-dark: #0F172A;
-  --color-primary-darker: #020617;
-  --color-primary-light: #334155;
-  --color-primary-subtle: #475569;
+  /* ── Brand · Teal (signature). 500 = fills/icons, 600 = buttons (white text 4.6:1), 700 = text on light ── */
+  --color-brand-50: #EDFAF7;
+  --color-brand-100: #D3F4EC;
+  --color-brand-200: #A8E8DA;
+  --color-brand-300: #6FD6C2;
+  --color-brand-400: #34C2A8;
+  --color-brand-500: #14B39B;
+  --color-brand-600: #0A8474;
+  --color-brand-700: #0B7468;
+  --color-brand-800: #0D5E56;
+  --color-brand-900: #0E4B45;
+  --color-brand-950: #062D29;
 
-  /* ── Secondary: Teal (accents, CTAs only) ── */
-  --color-secondary: #10B9A9;
-  --color-secondary-dark: #07988D;
-  --color-secondary-darker: #0D6962;
-  --color-secondary-light: #D9F7F3;
-  --color-secondary-subtle: #ECFBF9;
+  /* ── Ink · Navy slate (text, surfaces, dark accents) ── */
+  --color-ink-25: #FAFBFC;
+  --color-ink-50: #F5F7F9;
+  --color-ink-100: #EEF2F5;
+  --color-ink-150: #E6EBF0;
+  --color-ink-200: #DDE3EA;
+  --color-ink-300: #C5CED8;
+  --color-ink-400: #94A1B2;
+  --color-ink-500: #64748B;
+  --color-ink-600: #4B5A6E;
+  --color-ink-700: #334155;
+  --color-ink-800: #1F2A3C;
+  --color-ink-900: #172033;
+  --color-ink-950: #0D1424;
 
-  --color-navy: #1E293B;
-  --color-navy-deep: #0F172A;
-  --color-navy-muted: #334155;
-
-  --color-app-bg: #F4F7F9;
+  /* ── Surfaces ── */
+  --color-canvas: #F2F5F8;
   --color-surface: #FFFFFF;
-  --color-surface-secondary: #F8FAFC;
-  --color-surface-tertiary: #F1F5F9;
 
-  --color-border-standard: #E2E8F0;
-  --color-border-light: #EDF2F7;
-  --color-border-strong: #CBD5E1;
+  /* ── Radius ── */
+  --radius-card: 1.25rem;
+  --radius-control: 0.75rem;
 
-  --color-text-primary: #18243A;
-  --color-text-secondary: #334155;
-  --color-text-muted: #64748B;
-  --color-text-subtle: #94A3B8;
-
-  --color-clinical-success: #10B981;
-  --color-clinical-success-light: #ECFDF5;
-  --color-clinical-warning: #F59E0B;
-  --color-clinical-warning-light: #FFFBEB;
-  --color-clinical-danger: #F43F5E;
-  --color-clinical-danger-light: #FFF1F2;
-  --color-clinical-purple: #8B5CF6;
-  --color-clinical-purple-light: #F5F3FF;
+  /* ── Elevation ── */
+  --shadow-soft: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 8px -2px rgba(16, 24, 40, 0.05);
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px -8px rgba(16, 24, 40, 0.08);
+  --shadow-float: 0 12px 40px -12px rgba(13, 20, 36, 0.25);
+  --shadow-brand: 0 8px 20px -8px rgba(10, 132, 116, 0.55);
 }
 
 @layer base {
@@ -142,34 +142,41 @@
     font-family: var(--font-sans);
     font-size: var(--text-body);
     font-weight: 400;
-    background-color: #F4F7F9;
-    color: #18243A;
+    background-color: var(--color-canvas);
+    color: var(--color-ink-900);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     letter-spacing: var(--tracking-normal);
     line-height: var(--leading-normal);
+    font-feature-settings: 'cv11', 'ss01';
   }
 
-  /* ── Accessible & Ethical Design System ── */
+  ::selection {
+    background: var(--color-brand-100);
+    color: var(--color-brand-800);
+  }
 
-  /* Clear focus rings (3-4px) for keyboard navigation */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
   :focus-visible {
-    outline: 3px solid #475569;
+    outline: 3px solid color-mix(in srgb, var(--color-brand-500) 55%, transparent);
     outline-offset: 2px;
-    border-radius: 4px;
+    border-radius: 6px;
   }
 
-  /* Skip link for keyboard users */
   .skip-link {
     position: absolute;
     top: -100%;
     left: 1rem;
     z-index: 9999;
     padding: 0.75rem 1.25rem;
-    background: #0F172A;
+    background: var(--color-ink-900);
     color: #FFFFFF;
     font-weight: 700;
-    border-radius: 0 0 0.5rem 0.5rem;
+    border-radius: 0 0 0.75rem 0.75rem;
     transition: top 0.2s ease;
   }
   .skip-link:focus {
@@ -177,12 +184,11 @@
   }
 
   /* Minimum 44x44px touch targets */
-  button, a, [role="button"], input[type="checkbox"], input[type="radio"], select {
+  button, a, [role="button"], select {
     min-height: 44px;
     min-width: 44px;
   }
 
-  /* Ensure inputs don't get overridden */
   input[type="text"],
   input[type="email"],
   input[type="password"],
@@ -194,23 +200,31 @@
     min-height: auto;
   }
 
-  /* Refined custom scrollbar */
+  input[type="checkbox"], input[type="radio"] {
+    accent-color: var(--color-brand-600);
+    width: 1.125rem;
+    height: 1.125rem;
+    cursor: pointer;
+  }
+
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #475569;
+    background: var(--color-ink-200);
     border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #64748B;
+    background: var(--color-ink-300);
+    background-clip: padding-box;
   }
 
-  /* Reduced motion preference */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -221,158 +235,289 @@
   }
 }
 
-/* Layered Surfaces & Card Architecture */
+/* ─────────────────────────────────────────────
+   Components
+   ───────────────────────────────────────────── */
+
+@layer components {
+/* Cards */
 .clinical-card {
-  background-color: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.02);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-ink-150);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
 }
 
 .clinical-subcard {
-  background-color: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  border-radius: 0.75rem;
+  background-color: var(--color-ink-25);
+  border: 1px solid var(--color-ink-150);
+  border-radius: 1rem;
   padding: 1rem;
 }
 
 .clinical-subcard-interactive {
-  background-color: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  border-radius: 0.75rem;
+  background-color: var(--color-ink-25);
+  border: 1px solid var(--color-ink-150);
+  border-radius: 1rem;
   padding: 1rem;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
 }
-
 .clinical-subcard-interactive:hover {
-  border-color: #10B9A9;
-  background-color: #F0FDFA;
-  box-shadow: 0 4px 6px -1px rgba(16, 185, 169, 0.08);
+  border-color: var(--color-brand-300);
+  background-color: var(--color-brand-50);
+  box-shadow: var(--shadow-soft);
 }
 
+/* Inputs */
 .clinical-input {
-  background-color: #FFFFFF;
-  border: 1px solid #CBD5E1;
-  color: #18243A;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-ink-200);
+  color: var(--color-ink-900);
   font-size: var(--text-body-sm);
   font-weight: 500;
-  letter-spacing: var(--tracking-normal);
   line-height: var(--leading-normal);
-  border-radius: 0.5rem;
+  border-radius: var(--radius-control);
   padding: 0.625rem 0.875rem;
-  transition: all 0.15s ease-in-out;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
   outline: none;
 }
-
-.clinical-input:focus {
-  border-color: #10B9A9;
-  box-shadow: 0 0 0 3px rgba(16, 185, 169, 0.15);
+.clinical-input::placeholder {
+  color: var(--color-ink-400);
+  font-weight: 500;
 }
-
+.clinical-input:hover {
+  border-color: var(--color-ink-300);
+}
+.clinical-input:focus {
+  border-color: var(--color-brand-500);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-brand-500) 16%, transparent);
+}
 .clinical-input:disabled,
 .clinical-input[readonly] {
-  background-color: #F1F5F9;
-  border-color: #E2E8F0;
-  color: #64748B;
+  background-color: var(--color-ink-50);
+  border-color: var(--color-ink-150);
+  color: var(--color-ink-500);
   cursor: not-allowed;
 }
 
-/* ── Premium SaaS Typography Utilities ── */
+/* Buttons */
+.clinical-btn-primary,
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--color-brand-600);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: var(--text-body-sm);
+  border-radius: var(--radius-control);
+  padding: 0.625rem 1.125rem;
+  box-shadow: var(--shadow-brand);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  cursor: pointer;
+}
+.clinical-btn-primary:hover,
+.btn-primary:hover {
+  background-color: var(--color-brand-700);
+}
+.clinical-btn-primary:active,
+.btn-primary:active {
+  transform: translateY(1px);
+}
+.clinical-btn-primary:disabled,
+.btn-primary:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+  cursor: not-allowed;
+}
 
-/* Display / Page titles */
+.btn-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--color-ink-900);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: var(--text-body-sm);
+  border-radius: var(--radius-control);
+  padding: 0.625rem 1.125rem;
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+}
+.btn-dark:hover {
+  background-color: var(--color-ink-950);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--color-surface);
+  color: var(--color-ink-800);
+  font-weight: 700;
+  font-size: var(--text-body-sm);
+  border: 1px solid var(--color-ink-200);
+  border-radius: var(--radius-control);
+  padding: 0.625rem 1.125rem;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  background-color: var(--color-ink-50);
+  border-color: var(--color-ink-300);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--color-ink-600);
+  font-weight: 600;
+  font-size: var(--text-body-sm);
+  border-radius: var(--radius-control);
+  padding: 0.5rem 0.75rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+}
+.btn-ghost:hover {
+  background-color: var(--color-ink-100);
+  color: var(--color-ink-900);
+}
+
+/* Icon tiles — pastel squares from the brand kit */
+.icon-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.875rem;
+}
+.tile-brand  { background: var(--color-brand-100); color: var(--color-brand-700); }
+.tile-rose   { background: #FFE4E8; color: #C9304A; }
+.tile-amber  { background: #FFF1D6; color: #9A5B00; }
+.tile-violet { background: #EFE7FF; color: #6B3FD0; }
+.tile-sky    { background: #E1F0FF; color: #1F63C9; }
+.tile-ink    { background: var(--color-ink-100); color: var(--color-ink-700); }
+
+/* Chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.1875rem 0.625rem;
+  border-radius: 9999px;
+  font-size: var(--text-caption);
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* Brand hero — teal gradient header card */
+.hero-brand {
+  position: relative;
+  overflow: hidden;
+  color: #FFFFFF;
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 45%),
+    linear-gradient(135deg, #0E9C88 0%, #0A8474 55%, #0B6F64 100%);
+  box-shadow: 0 20px 40px -20px rgba(10, 132, 116, 0.6);
+}
+.hero-brand::before,
+.hero-brand::after {
+  content: '';
+  position: absolute;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  pointer-events: none;
+}
+.hero-brand::before {
+  width: 22rem;
+  height: 22rem;
+  right: -6rem;
+  top: -11rem;
+}
+.hero-brand::after {
+  width: 14rem;
+  height: 14rem;
+  right: 8rem;
+  bottom: -9rem;
+}
+
+/* Segmented control */
+.segmented {
+  display: inline-flex;
+  padding: 0.25rem;
+  gap: 0.25rem;
+  background: var(--color-ink-100);
+  border-radius: 0.875rem;
+}
+
+/* ── Typography utilities ── */
 .text-display {
   font-size: var(--text-display);
   font-weight: 800;
   letter-spacing: var(--tracking-tight);
   line-height: var(--leading-tight);
 }
-
-/* H1 — Section headings */
 .text-h1 {
   font-size: var(--text-h1);
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: var(--tracking-tight);
   line-height: var(--leading-tight);
 }
-
-/* H2 — Card titles, modal headers */
 .text-h2 {
   font-size: var(--text-h2);
   font-weight: 700;
   letter-spacing: var(--tracking-snug);
   line-height: var(--leading-snug);
 }
-
-/* H3 — Sub-section headings */
 .text-h3 {
   font-size: var(--text-h3);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: var(--tracking-snug);
   line-height: var(--leading-snug);
 }
-
-/* Body — Default text */
 .text-body {
   font-size: var(--text-body);
   font-weight: 400;
-  letter-spacing: var(--tracking-normal);
   line-height: var(--leading-normal);
 }
-
-/* Body Small — Secondary text, labels */
 .text-body-sm {
   font-size: var(--text-body-sm);
   font-weight: 500;
-  letter-spacing: var(--tracking-normal);
   line-height: var(--leading-normal);
 }
-
-/* Caption — Metadata, badges, timestamps */
 .text-caption {
   font-size: var(--text-caption);
   font-weight: 600;
-  letter-spacing: var(--tracking-wide);
   line-height: var(--leading-normal);
 }
-
-/* Mono — Data, codes, order numbers */
 .text-mono {
   font-family: var(--font-mono);
   font-size: var(--text-mono);
-  font-weight: 500;
-  letter-spacing: var(--tracking-normal);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
   line-height: var(--leading-normal);
 }
-
-/* Label — Form labels, uppercase micro-labels */
+/* Section micro-label: sentence case, quiet */
 .text-label {
   font-size: var(--text-caption);
   font-weight: 700;
-  letter-spacing: var(--tracking-wider);
+  letter-spacing: 0.02em;
   line-height: var(--leading-normal);
-  text-transform: uppercase;
+}
 }
 
-/* Primary Button — Dark slate */
-.clinical-btn-primary {
-  background-color: #1E293B;
-  color: #FFFFFF;
-  font-weight: 700;
-  border-radius: 0.75rem;
-  padding: 0.625rem 1.25rem;
-  transition: all 0.15s ease-in-out;
-  cursor: pointer;
-}
-.clinical-btn-primary:hover {
-  background-color: #0F172A;
-}
-.clinical-btn-primary:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Custom clinical print styling */
 @media print {
   .no-print {
     display: none !important;
@@ -385,4 +530,3 @@
     color: #000000 !important;
   }
 }
-

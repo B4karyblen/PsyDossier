@@ -73,35 +73,35 @@ export const S10ExamenClinique: React.FC<Props> = ({
   const isTachycardie = constantes.pouls && constantes.pouls > 100;
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#EDF2F7] gap-3">
+    <div className="clinical-card p-6 sm:p-7 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-ink-100 gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2.5 py-0.5 rounded-md border border-[#10B9A9]/20">
+            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
               S10 · CLINIQUE
             </span>
-            <span className="text-xs text-[#64748B]">Obligatoire pour validation</span>
+            <span className="text-xs text-ink-500">Obligatoire pour validation</span>
           </div>
-          <h2 className="text-lg font-extrabold text-[#18243A] tracking-tight mt-1">
+          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
             Examen Clinique (Somatique & Psychiatrique)
           </h2>
-          <p className="text-xs text-[#64748B] mt-0.5">
+          <p className="text-xs text-ink-500 mt-0.5">
             Constantes vitales somatiques et sémiologie psychiatrique structurée
           </p>
         </div>
 
         {/* Tab switcher */}
-        <div className="flex items-center p-1 bg-[#F1F5F9] rounded-xl border border-[#CBD5E1] shrink-0 self-start sm:self-auto">
+        <div className="flex items-center p-1 bg-ink-100 rounded-xl border border-ink-200 shrink-0 self-start sm:self-auto">
           <button
             type="button"
             onClick={() => setActiveTab('somatique')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               activeTab === 'somatique'
-                ? 'bg-white text-[#18243A] shadow-xs'
-                : 'text-[#64748B] hover:text-[#18243A]'
+                ? 'bg-white text-ink-900 shadow-xs'
+                : 'text-ink-500 hover:text-ink-900'
             }`}
           >
-            <Activity className="w-3.5 h-3.5 text-[#10B9A9]" />
+            <Activity className="w-3.5 h-3.5 text-brand-600" />
             <span>A. Examen Somatique</span>
           </button>
           <button
@@ -109,11 +109,11 @@ export const S10ExamenClinique: React.FC<Props> = ({
             onClick={() => setActiveTab('psychiatrique')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               activeTab === 'psychiatrique'
-                ? 'bg-white text-[#18243A] shadow-xs'
-                : 'text-[#64748B] hover:text-[#18243A]'
+                ? 'bg-white text-ink-900 shadow-xs'
+                : 'text-ink-500 hover:text-ink-900'
             }`}
           >
-            <Brain className="w-3.5 h-3.5 text-[#07988D]" />
+            <Brain className="w-3.5 h-3.5 text-brand-700" />
             <span>B. Examen Psychiatrique</span>
           </button>
         </div>
@@ -121,14 +121,14 @@ export const S10ExamenClinique: React.FC<Props> = ({
 
 
       {error && (
-        <div className="mb-4 p-3 bg-[#FFE4E6] border border-[#F43F5E]/30 rounded-lg flex items-center gap-2 text-xs text-[#BE123C]">
+        <div className="mb-4 p-3 bg-rose-100 border border-rose-500/30 rounded-lg flex items-center gap-2 text-xs text-rose-700">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {isSaved && (
-        <div className="mb-4 p-2.5 bg-[#DCFCE7] border border-[#10B981]/30 rounded-lg text-xs text-[#15803D] font-medium flex items-center gap-1.5">
+        <div className="mb-4 p-2.5 bg-emerald-100 border border-emerald-500/30 rounded-lg text-xs text-emerald-700 font-medium flex items-center gap-1.5">
           <CheckCircle2 className="w-4 h-4" />
           Examen clinique enregistré avec succès.
         </div>
@@ -139,15 +139,15 @@ export const S10ExamenClinique: React.FC<Props> = ({
         {activeTab === 'somatique' && (
           <div className="space-y-4">
             {isSomatiqueReadOnly && !isReadOnly && (
-              <div className="p-2.5 bg-[#FEF3C7] border border-[#F59E0B]/30 text-[#B45309] rounded-lg text-xs font-semibold flex items-center gap-1.5">
+              <div className="p-2.5 bg-amber-100 border border-amber-500/30 text-amber-700 rounded-lg text-xs font-semibold flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5" />
                 <span>Examen somatique en lecture seule pour le rôle {currentUserRole} (Matrice de permissions B2)</span>
               </div>
             )}
 
             {/* Non réalisé option */}
-            <div className="p-3 bg-[#F8FAFC] border border-[#D9E2E8] rounded-xl flex flex-wrap items-center justify-between gap-3">
-              <label className="flex items-center gap-2 text-xs font-bold text-[#18243A] cursor-pointer">
+            <div className="p-3 bg-ink-25 border border-ink-150 rounded-xl flex flex-wrap items-center justify-between gap-3">
+              <label className="flex items-center gap-2 text-xs font-bold text-ink-900 cursor-pointer">
                 <input
                   type="checkbox"
                   disabled={isSomatiqueReadOnly}
@@ -159,7 +159,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                       nonRealise: e.target.checked
                     }
                   })}
-                  className="rounded text-[#10B9A9] focus:ring-[#10B9A9]"
+                  className="rounded text-brand-600 focus:ring-brand-500"
                 />
                 <span>Examen somatique impossible / non réalisé à ce stade</span>
               </label>
@@ -176,7 +176,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                       motifNonRealise: e.target.value
                     }
                   })}
-                  className="bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5 flex-1 min-w-[220px]"
+                  className="bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5 flex-1 min-w-[220px]"
                   placeholder="Motif : patient non coopérant, agitation, refus..."
                 />
               )}
@@ -185,19 +185,19 @@ export const S10ExamenClinique: React.FC<Props> = ({
             {!formData.somatique.nonRealise && (
               <>
                 {/* Constantes vitales */}
-                <div className="p-4 bg-[#F1F5F7] border border-[#D9E2E8] rounded-xl space-y-3">
+                <div className="p-4 bg-ink-100 border border-ink-150 rounded-xl space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+                    <h3 className="text-sm font-bold text-ink-900">
                       Constantes Vitales
                     </h3>
-                    <span className="text-[11px] text-[#64748B]">
+                    <span className="text-[11px] text-ink-500">
                       Saisie infirmier ou médecin
                     </span>
                   </div>
 
                   {/* Warning banner if abnormal values */}
                   {(isFievre || isHypertension || isHypoxie || isTachycardie) && (
-                    <div className="p-2.5 bg-[#FEF3C7] border border-[#F59E0B]/30 rounded-lg text-xs text-[#B45309] flex items-center gap-2">
+                    <div className="p-2.5 bg-amber-100 border border-amber-500/30 rounded-lg text-xs text-amber-700 flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 shrink-0" />
                       <span>
                         Alerte clinique :{' '}
@@ -214,7 +214,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                     {/* Température */}
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                         Température (°C)
                       </label>
                       <input
@@ -233,7 +233,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                           }
                         })}
                         className={`w-full bg-white border text-xs font-mono font-medium rounded-lg px-2.5 py-1.5 focus:outline-none ${
-                          isFievre ? 'border-[#F59E0B] text-[#B45309]' : 'border-[#D9E2E8] text-[#18243A]'
+                          isFievre ? 'border-amber-500 text-amber-700' : 'border-ink-150 text-ink-900'
                         }`}
                         placeholder="36.8"
                       />
@@ -241,7 +241,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
 
                     {/* TA Systolique */}
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                         TA Syst. (mmHg)
                       </label>
                       <input
@@ -258,14 +258,14 @@ export const S10ExamenClinique: React.FC<Props> = ({
                             }
                           }
                         })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs font-mono font-medium rounded-lg px-2.5 py-1.5 focus:outline-none"
+                        className="w-full bg-white border border-ink-150 text-xs font-mono font-medium rounded-lg px-2.5 py-1.5 focus:outline-none"
                         placeholder="120"
                       />
                     </div>
 
                     {/* TA Diastolique */}
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                         TA Diast. (mmHg)
                       </label>
                       <input
@@ -282,14 +282,14 @@ export const S10ExamenClinique: React.FC<Props> = ({
                             }
                           }
                         })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs font-mono font-medium rounded-lg px-2.5 py-1.5 focus:outline-none"
+                        className="w-full bg-white border border-ink-150 text-xs font-mono font-medium rounded-lg px-2.5 py-1.5 focus:outline-none"
                         placeholder="80"
                       />
                     </div>
 
                     {/* Pouls */}
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                         Pouls (bpm)
                       </label>
                       <input
@@ -306,14 +306,14 @@ export const S10ExamenClinique: React.FC<Props> = ({
                             }
                           }
                         })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs font-mono font-medium rounded-lg px-2.5 py-1.5 focus:outline-none"
+                        className="w-full bg-white border border-ink-150 text-xs font-mono font-medium rounded-lg px-2.5 py-1.5 focus:outline-none"
                         placeholder="75"
                       />
                     </div>
 
                     {/* FR */}
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                         FR (cycles/min)
                       </label>
                       <input
@@ -330,14 +330,14 @@ export const S10ExamenClinique: React.FC<Props> = ({
                             }
                           }
                         })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs font-mono font-medium rounded-lg px-2.5 py-1.5 focus:outline-none"
+                        className="w-full bg-white border border-ink-150 text-xs font-mono font-medium rounded-lg px-2.5 py-1.5 focus:outline-none"
                         placeholder="16"
                       />
                     </div>
 
                     {/* SpO2 */}
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                         SpO2 (%) [max 100]
                       </label>
                       <input
@@ -356,7 +356,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                             }
                           }
                         })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs font-mono font-medium rounded-lg px-2.5 py-1.5 focus:outline-none"
+                        className="w-full bg-white border border-ink-150 text-xs font-mono font-medium rounded-lg px-2.5 py-1.5 focus:outline-none"
                         placeholder="99"
                       />
                     </div>
@@ -365,7 +365,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
 
                 {/* État général */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                  <label className="block text-xs font-semibold text-ink-900 mb-1">
                     État général (nutrition, hydratation, conjonctives, plis cutanés)
                   </label>
                   <input
@@ -376,20 +376,20 @@ export const S10ExamenClinique: React.FC<Props> = ({
                       ...formData,
                       somatique: { ...formData.somatique, etatGeneral: e.target.value }
                     })}
-                    className="w-full bg-[#F8FAFC] border border-[#D9E2E8] text-xs rounded-lg px-3 py-2"
+                    className="w-full bg-ink-25 border border-ink-150 text-xs rounded-lg px-3 py-2"
                     placeholder="Ex: Patient en bon état général, normonutri, plis cutanés élastiques..."
                   />
                 </div>
 
                 {/* Examen des appareils */}
-                <div className="p-4 bg-[#F8FAFC] border border-[#D9E2E8] rounded-xl space-y-3">
-                  <h3 className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+                <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
+                  <h3 className="text-sm font-bold text-ink-900">
                     Examen des Appareils Somatiques
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-0.5">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-0.5">
                         Cardio-vasculaire
                       </label>
                       <input
@@ -403,13 +403,13 @@ export const S10ExamenClinique: React.FC<Props> = ({
                             appareils: { ...formData.somatique.appareils, cardiovasculaire: e.target.value }
                           }
                         })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs rounded px-2.5 py-1.5"
+                        className="w-full bg-white border border-ink-150 text-xs rounded px-2.5 py-1.5"
                         placeholder="Bruits du cœur réguliers, pas de souffle..."
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-0.5">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-0.5">
                         Respiratoire
                       </label>
                       <input
@@ -423,13 +423,13 @@ export const S10ExamenClinique: React.FC<Props> = ({
                             appareils: { ...formData.somatique.appareils, respiratoire: e.target.value }
                           }
                         })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs rounded px-2.5 py-1.5"
+                        className="w-full bg-white border border-ink-150 text-xs rounded px-2.5 py-1.5"
                         placeholder="Murmures vésiculaires symétriques..."
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-0.5">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-0.5">
                         Digestif
                       </label>
                       <input
@@ -443,13 +443,13 @@ export const S10ExamenClinique: React.FC<Props> = ({
                             appareils: { ...formData.somatique.appareils, digestif: e.target.value }
                           }
                         })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs rounded px-2.5 py-1.5"
+                        className="w-full bg-white border border-ink-150 text-xs rounded px-2.5 py-1.5"
                         placeholder="Abdomen souple, pas d’hépatomégalie..."
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-0.5">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-0.5">
                         Neurologique
                       </label>
                       <input
@@ -463,7 +463,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                             appareils: { ...formData.somatique.appareils, neurologique: e.target.value }
                           }
                         })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs rounded px-2.5 py-1.5"
+                        className="w-full bg-white border border-ink-150 text-xs rounded px-2.5 py-1.5"
                         placeholder="ROT symétriques, pas de déficit sensitivo-moteur..."
                       />
                     </div>
@@ -478,20 +478,20 @@ export const S10ExamenClinique: React.FC<Props> = ({
         {activeTab === 'psychiatrique' && (
           <div className="space-y-4">
             {isPsychiatriqueReadOnly && !isReadOnly && (
-              <div className="p-2.5 bg-[#FEF3C7] border border-[#F59E0B]/30 text-[#B45309] rounded-lg text-xs font-semibold flex items-center gap-1.5">
+              <div className="p-2.5 bg-amber-100 border border-amber-500/30 text-amber-700 rounded-lg text-xs font-semibold flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5" />
                 <span>Examen psychiatrique en lecture seule pour le rôle {currentUserRole} (Matrice de permissions B2)</span>
               </div>
             )}
 
             {/* 1. Présentation générale */}
-            <div className="p-4 bg-[#F8FAFC] border border-[#D9E2E8] rounded-xl space-y-3">
-              <h3 className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+            <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
+              <h3 className="text-sm font-bold text-ink-900">
                 1. Présentation générale
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                  <label className="block text-xs font-semibold text-ink-900 mb-1">
                     Tenue vestimentaire et hygiène
                   </label>
                   <input
@@ -502,13 +502,13 @@ export const S10ExamenClinique: React.FC<Props> = ({
                       ...formData,
                       psychiatrique: { ...formData.psychiatrique, tenueVestimentaireEtHygiene: e.target.value }
                     })}
-                    className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                    className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                     placeholder="Soignée, débraillée, bizarrerie vestimentaire, incurie..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                  <label className="block text-xs font-semibold text-ink-900 mb-1">
                     Mimique et regard
                   </label>
                   <input
@@ -519,13 +519,13 @@ export const S10ExamenClinique: React.FC<Props> = ({
                       ...formData,
                       psychiatrique: { ...formData.psychiatrique, mimique: e.target.value }
                     })}
-                    className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                    className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                     placeholder="Mobile, hypomimie, hypermimie, regard fuyant ou méfiant..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                  <label className="block text-xs font-semibold text-ink-900 mb-1">
                     Contact et relation avec le soignant
                   </label>
                   <input
@@ -536,13 +536,13 @@ export const S10ExamenClinique: React.FC<Props> = ({
                       ...formData,
                       psychiatrique: { ...formData.psychiatrique, contact: e.target.value }
                     })}
-                    className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                    className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                     placeholder="Facile, chaleureux, distant, méfiant, réticent, agressif..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                  <label className="block text-xs font-semibold text-ink-900 mb-1">
                     Psychomotricité et comportement moteur
                   </label>
                   <input
@@ -553,7 +553,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                       ...formData,
                       psychiatrique: { ...formData.psychiatrique, psychomotriciteComportement: e.target.value }
                     })}
-                    className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                    className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                     placeholder="Calme, ralentissement, agitation, stéréotypies, déambulation..."
                   />
                 </div>
@@ -562,7 +562,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
 
             {/* 2. Conduites */}
             <div>
-              <label className="block text-xs font-semibold text-[#18243A] mb-1">
+              <label className="block text-xs font-semibold text-ink-900 mb-1">
                 Conduites instinctuelles & comportementales (Alimentation, sommeil, impulsions)
               </label>
               <textarea
@@ -573,20 +573,20 @@ export const S10ExamenClinique: React.FC<Props> = ({
                   ...formData,
                   psychiatrique: { ...formData.psychiatrique, conduites: e.target.value }
                 })}
-                className="w-full bg-[#F8FAFC] border border-[#D9E2E8] text-xs rounded-lg p-2.5"
+                className="w-full bg-ink-25 border border-ink-150 text-xs rounded-lg p-2.5"
                 placeholder="Insomnie d'endormissement ou réveils précoces, anorexie, boulimie, risque auto/hétéro-agressif..."
               />
             </div>
 
             {/* 3. Fonctions supérieures */}
-            <div className="p-4 bg-[#F8FAFC] border border-[#D9E2E8] rounded-xl space-y-3">
-              <h3 className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+            <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
+              <h3 className="text-sm font-bold text-ink-900">
                 Fonctions supérieures & sémiologie cognitive
               </h3>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                  <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                     Fonctionnement de la pensée & du jugement (Délire, logique, flux verbal)
                   </label>
                   <textarea
@@ -597,13 +597,13 @@ export const S10ExamenClinique: React.FC<Props> = ({
                       ...formData,
                       psychiatrique: { ...formData.psychiatrique, penseeEtJugement: e.target.value }
                     })}
-                    className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg p-2.5"
+                    className="w-full bg-white border border-ink-150 text-xs rounded-lg p-2.5"
                     placeholder="Tachypsychie, fuite des idées, délire paranoïde ou paranoïaque, thèmes (persécution, mystique, mégalomanie), adhésion..."
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                  <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                     Activités perceptives (Hallucinations, illusions)
                   </label>
                   <input
@@ -614,14 +614,14 @@ export const S10ExamenClinique: React.FC<Props> = ({
                       ...formData,
                       psychiatrique: { ...formData.psychiatrique, activitesPerceptives: e.target.value }
                     })}
-                    className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                    className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                     placeholder="Hallucinations auditives (voix), visuelles, olfactives, automatisme mental..."
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                    <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                       Conscience de soi & de l’environnement (Orientation TS)
                     </label>
                     <input
@@ -632,13 +632,13 @@ export const S10ExamenClinique: React.FC<Props> = ({
                         ...formData,
                         psychiatrique: { ...formData.psychiatrique, conscienceDeSoiEtEnvironnement: e.target.value }
                       })}
-                      className="w-full bg-white border border-[#D9E2E8] text-xs rounded px-2.5 py-1.5"
+                      className="w-full bg-white border border-ink-150 text-xs rounded px-2.5 py-1.5"
                       placeholder="Orientation temporo-spatiale, lucidité, insight/conscience du trouble..."
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                    <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                       Expression des affects & humeur
                     </label>
                     <input
@@ -649,7 +649,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                         ...formData,
                         psychiatrique: { ...formData.psychiatrique, expressionDesAffects: e.target.value }
                       })}
-                      className="w-full bg-white border border-[#D9E2E8] text-xs rounded px-2.5 py-1.5"
+                      className="w-full bg-white border border-ink-150 text-xs rounded px-2.5 py-1.5"
                       placeholder="Euthymie, tristesse vitale, exaltation euphorique, discordance affective..."
                     />
                   </div>
@@ -657,7 +657,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                    <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                       Fonctions mnésiques (Mémoire)
                     </label>
                     <input
@@ -668,13 +668,13 @@ export const S10ExamenClinique: React.FC<Props> = ({
                         ...formData,
                         psychiatrique: { ...formData.psychiatrique, fonctionsMnesiques: e.target.value }
                       })}
-                      className="w-full bg-white border border-[#D9E2E8] text-xs rounded px-2.5 py-1.5"
+                      className="w-full bg-white border border-ink-150 text-xs rounded px-2.5 py-1.5"
                       placeholder="Mémoire de fixation, mémoire d'évocation..."
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                    <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                       Fonctions symboliques & langage
                     </label>
                     <input
@@ -685,7 +685,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                         ...formData,
                         psychiatrique: { ...formData.psychiatrique, fonctionsSymboliques: e.target.value }
                       })}
-                      className="w-full bg-white border border-[#D9E2E8] text-xs rounded px-2.5 py-1.5"
+                      className="w-full bg-white border border-ink-150 text-xs rounded px-2.5 py-1.5"
                       placeholder="Débit, prosodie, néologismes, barrages, mutisme..."
                     />
                   </div>

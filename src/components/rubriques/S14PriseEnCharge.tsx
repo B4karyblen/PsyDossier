@@ -78,19 +78,19 @@ export const S14PriseEnCharge: React.FC<Props> = ({
   };
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-6">
-      <div className="flex items-center justify-between pb-4 border-b border-[#EDF2F7]">
+    <div className="clinical-card p-6 sm:p-7 space-y-6">
+      <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2.5 py-0.5 rounded-md border border-[#10B9A9]/20">
+            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
               S14 · PRISE EN CHARGE
             </span>
-            <span className="text-xs text-[#64748B]">Obligatoire pour validation</span>
+            <span className="text-xs text-ink-500">Obligatoire pour validation</span>
           </div>
-          <h2 className="text-lg font-extrabold text-[#18243A] tracking-tight mt-1">
+          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
             Prise en Charge Thérapeutique
           </h2>
-          <p className="text-xs text-[#64748B] mt-0.5">
+          <p className="text-xs text-ink-500 mt-0.5">
             Orientation clinique (BR-009), prescriptions pharmacologiques (BR-014) et stratégie psychothérapeutique
           </p>
         </div>
@@ -98,14 +98,14 @@ export const S14PriseEnCharge: React.FC<Props> = ({
 
 
       {error && (
-        <div className="mb-4 p-3 bg-[#FFE4E6] border border-[#F43F5E]/30 rounded-lg flex items-center gap-2 text-xs text-[#BE123C]">
+        <div className="mb-4 p-3 bg-rose-100 border border-rose-500/30 rounded-lg flex items-center gap-2 text-xs text-rose-700">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {isSaved && (
-        <div className="mb-4 p-2.5 bg-[#DCFCE7] border border-[#10B981]/30 rounded-lg text-xs text-[#15803D] font-medium">
+        <div className="mb-4 p-2.5 bg-emerald-100 border border-emerald-500/30 rounded-lg text-xs text-emerald-700 font-medium">
           Prise en charge enregistrée avec succès.
         </div>
       )}
@@ -113,9 +113,9 @@ export const S14PriseEnCharge: React.FC<Props> = ({
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* 1. Orientation du patient (BR-009: Ambulatoire vs Hospitalisation exclusif) */}
         <div>
-          <label className="block text-xs font-bold text-[#18243A] mb-2 flex items-center gap-1.5">
-            <Building2 className="w-4 h-4 text-[#07988D]" />
-            Orientation du patient <span className="text-[#F43F5E]">*</span> (BR-009)
+          <label className="block text-xs font-bold text-ink-900 mb-2 flex items-center gap-1.5">
+            <Building2 className="w-4 h-4 text-brand-700" />
+            Orientation du patient <span className="text-rose-500">*</span> (BR-009)
           </label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {[
@@ -134,8 +134,8 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                 key={option.id}
                 className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3 ${
                   formData.orientation === option.id
-                    ? 'border-[#10B9A9] bg-[#ECFBF9] ring-2 ring-[#10B9A9]/20'
-                    : 'border-[#D9E2E8] bg-[#F8FAFC] hover:border-[#10B9A9]/50'
+                    ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-500/20'
+                    : 'border-ink-150 bg-ink-25 hover:border-brand-500/50'
                 } ${isReadOnly ? 'cursor-not-allowed opacity-80' : ''}`}
               >
                 <input
@@ -144,11 +144,11 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                   disabled={isReadOnly}
                   checked={formData.orientation === option.id}
                   onChange={() => setFormData({ ...formData, orientation: option.id })}
-                  className="mt-0.5 text-[#10B9A9] focus:ring-[#10B9A9]"
+                  className="mt-0.5 text-brand-600 focus:ring-brand-500"
                 />
                 <div>
-                  <span className="text-xs font-bold text-[#18243A] block">{option.title}</span>
-                  <span className="text-[11px] text-[#64748B]">{option.desc}</span>
+                  <span className="text-xs font-bold text-ink-900 block">{option.title}</span>
+                  <span className="text-[11px] text-ink-500">{option.desc}</span>
                 </div>
               </label>
             ))}
@@ -156,13 +156,13 @@ export const S14PriseEnCharge: React.FC<Props> = ({
 
           {/* Details si Hospitalisation */}
           {formData.orientation === 'Hospitalisation' && (
-            <div className="mt-3 p-4 bg-[#F1F5F7] border border-[#D9E2E8] rounded-xl space-y-3">
-              <span className="text-xs font-bold text-[#18243A] block">
+            <div className="mt-3 p-4 bg-ink-100 border border-ink-150 rounded-xl space-y-3">
+              <span className="text-xs font-bold text-ink-900 block">
                 Détails de l'admission en hospitalisation
               </span>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                  <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                     Service hospitalier
                   </label>
                   <input
@@ -173,12 +173,12 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                       ...formData,
                       hospitalisationDetails: { ...formData.hospitalisationDetails, service: e.target.value }
                     })}
-                    className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                    className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                     placeholder="Ex: Unité de soins de crise"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                  <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                     Lit / Chambre
                   </label>
                   <input
@@ -189,12 +189,12 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                       ...formData,
                       hospitalisationDetails: { ...formData.hospitalisationDetails, lit: e.target.value }
                     })}
-                    className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                    className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                     placeholder="Ex: Chambre 104"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                  <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                     Date d'entrée
                   </label>
                   <input
@@ -205,7 +205,7 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                       ...formData,
                       hospitalisationDetails: { ...formData.hospitalisationDetails, dateEntree: e.target.value }
                     })}
-                    className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                    className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                   />
                 </div>
               </div>
@@ -215,14 +215,14 @@ export const S14PriseEnCharge: React.FC<Props> = ({
 
         {/* 2. Traitement médicamenteux (BR-014: Psychiatre only) */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between pb-1 border-b border-[#E8EEF2]">
+          <div className="flex items-center justify-between pb-1 border-b border-ink-100">
             <div className="flex items-center gap-2">
-              <Pill className="w-4 h-4 text-[#07988D]" />
-              <h3 className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+              <Pill className="w-4 h-4 text-brand-700" />
+              <h3 className="text-sm font-bold text-ink-900">
                 Prescriptions médicamenteuses
               </h3>
               {!isPsychiatre && (
-                <span className="text-[10px] font-mono text-[#64748B] flex items-center gap-1">
+                <span className="text-[10px] font-mono text-ink-500 flex items-center gap-1">
                   <Lock className="w-3 h-3" /> Réservé Médecin Psychiatre
                 </span>
               )}
@@ -232,7 +232,7 @@ export const S14PriseEnCharge: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={addPrescription}
-                className="text-xs font-semibold text-white bg-[#10B9A9] hover:bg-[#07988D] px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
+                className="text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Ajouter une molécule
@@ -243,14 +243,14 @@ export const S14PriseEnCharge: React.FC<Props> = ({
           {formData.traitementMedicamenteux && formData.traitementMedicamenteux.length > 0 ? (
             <div className="space-y-3">
               {formData.traitementMedicamenteux.map((rx, idx) => (
-                <div key={rx.id} className="p-3.5 bg-[#F8FAFC] border border-[#D9E2E8] rounded-xl space-y-3">
+                <div key={rx.id} className="p-3.5 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#18243A]">Prescription #{idx + 1}</span>
+                    <span className="text-xs font-bold text-ink-900">Prescription #{idx + 1}</span>
                     {canPrescribeRx && (
                       <button
                         type="button"
                         onClick={() => removePrescription(rx.id)}
-                        className="text-xs text-[#BE123C] hover:bg-[#FFE4E6] p-1 rounded"
+                        className="text-xs text-rose-700 hover:bg-rose-100 p-1 rounded"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -259,7 +259,7 @@ export const S14PriseEnCharge: React.FC<Props> = ({
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div className="md:col-span-2">
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                         Molécule & Forme
                       </label>
                       <input
@@ -267,13 +267,13 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                         disabled={!canPrescribeRx}
                         value={rx.molecule}
                         onChange={(e) => updatePrescription(rx.id, { molecule: e.target.value })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs font-bold rounded-lg px-3 py-1.5"
+                        className="w-full bg-white border border-ink-150 text-xs font-bold rounded-lg px-3 py-1.5"
                         placeholder="Ex: Olanzapine 10mg ou Risperidone 2mg"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                         Posologie & Fréquence
                       </label>
                       <input
@@ -281,20 +281,20 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                         disabled={!canPrescribeRx}
                         value={rx.posologie}
                         onChange={(e) => updatePrescription(rx.id, { posologie: e.target.value })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                        className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                         placeholder="Ex: 1 cp le soir"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                         Voie d'administration
                       </label>
                       <select
                         disabled={!canPrescribeRx}
                         value={rx.voie}
                         onChange={(e) => updatePrescription(rx.id, { voie: e.target.value as any })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-2.5 py-1.5"
+                        className="w-full bg-white border border-ink-150 text-xs rounded-lg px-2.5 py-1.5"
                       >
                         <option value="Orale">Orale</option>
                         <option value="Injectable IM">Injectable IM</option>
@@ -306,7 +306,7 @@ export const S14PriseEnCharge: React.FC<Props> = ({
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                         Date début
                       </label>
                       <input
@@ -314,12 +314,12 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                         disabled={!canPrescribeRx}
                         value={rx.dateDebut}
                         onChange={(e) => updatePrescription(rx.id, { dateDebut: e.target.value })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                        className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                       />
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+                      <label className="block text-[11px] font-semibold text-ink-900 mb-1">
                         Remarques de surveillance clinique (NFS, glycémie, ECG...)
                       </label>
                       <input
@@ -327,7 +327,7 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                         disabled={!canPrescribeRx}
                         value={rx.remarques || ''}
                         onChange={(e) => updatePrescription(rx.id, { remarques: e.target.value })}
-                        className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                        className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                         placeholder="Surveillance hématologique, surveillance du poids..."
                       />
                     </div>
@@ -336,24 +336,24 @@ export const S14PriseEnCharge: React.FC<Props> = ({
               ))}
             </div>
           ) : (
-            <div className="p-6 text-center bg-[#F8FAFC] border border-dashed border-[#D9E2E8] rounded-xl text-xs text-[#64748B]">
+            <div className="p-6 text-center bg-ink-25 border border-dashed border-ink-150 rounded-xl text-xs text-ink-500">
               Aucun traitement médicamenteux prescrit.
             </div>
           )}
         </div>
 
         {/* 3. Psychothérapie (Psychologue & Psychiatre) */}
-        <div className="p-4 bg-[#F8FAFC] border border-[#D9E2E8] rounded-xl space-y-3">
+        <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
           <div className="flex items-center gap-2">
-            <HeartHandshake className="w-4 h-4 text-[#A855F7]" />
-            <h3 className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+            <HeartHandshake className="w-4 h-4 text-violet-500" />
+            <h3 className="text-sm font-bold text-ink-900">
               Prise en charge psychothérapeutique
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-[#18243A] mb-1">
+              <label className="block text-xs font-semibold text-ink-900 mb-1">
                 Type de psychothérapie
               </label>
               <input
@@ -364,13 +364,13 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                   ...formData,
                   psychotherapie: { ...formData.psychotherapie, type: e.target.value }
                 })}
-                className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                 placeholder="Ex: TCC, psychothérapie de soutien, systémique..."
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#18243A] mb-1">
+              <label className="block text-xs font-semibold text-ink-900 mb-1">
                 Fréquence des séances
               </label>
               <input
@@ -381,13 +381,13 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                   ...formData,
                   psychotherapie: { ...formData.psychotherapie, frequence: e.target.value }
                 })}
-                className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                 placeholder="Ex: 1 séance par semaine"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#18243A] mb-1">
+              <label className="block text-xs font-semibold text-ink-900 mb-1">
                 Thérapeute référent
               </label>
               <input
@@ -398,14 +398,14 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                   ...formData,
                   psychotherapie: { ...formData.psychotherapie, therapeute: e.target.value }
                 })}
-                className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
                 placeholder="Nom du psychologue / psychiatre"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#18243A] mb-1">
+            <label className="block text-xs font-semibold text-ink-900 mb-1">
               Objectifs thérapeutiques ciblés
             </label>
             <input
@@ -416,7 +416,7 @@ export const S14PriseEnCharge: React.FC<Props> = ({
                 ...formData,
                 psychotherapie: { ...formData.psychotherapie, objectifs: e.target.value }
               })}
-              className="w-full bg-white border border-[#D9E2E8] text-xs rounded-lg px-3 py-1.5"
+              className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
               placeholder="Ex: Restauration de l'estime de soi, travail sur le deuil..."
             />
           </div>

@@ -18,6 +18,7 @@ import {
   List,
   RotateCcw,
   Sparkles,
+  X,
 } from 'lucide-react';
 
 interface PatientListProps {
@@ -199,27 +200,29 @@ export const PatientList: React.FC<PatientListProps> = ({
   const archivedCount = dossiers.filter((d) => d.statut === 'ARCHIVÉ').length;
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
+    <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 space-y-5">
       {/* Title & Key Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[#18243A] tracking-tight">
-            Registre des Patients en Psychiatrie
-          </h1>
-          <p className="text-xs text-[#64748B] mt-0.5 font-medium">
-            Dossiers standardisés en 17 rubriques · <strong className="text-[#18243A]">{activeCount}</strong> actifs · <strong className="text-[#18243A]">{archivedCount}</strong> archivés
+          <h2 className="text-2xl font-extrabold text-ink-900 tracking-tight">
+            Registre des patients
+          </h2>
+          <p className="text-sm text-ink-500 mt-1 font-medium">
+            Dossiers standardisés en 17 rubriques · <strong className="text-ink-900">{activeCount}</strong> actifs · <strong className="text-ink-900">{archivedCount}</strong> archivés
           </p>
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto">
           {/* View mode toggle */}
-          <div className="flex items-center bg-[#F1F5F9] p-1 rounded-xl border border-[#CBD5E1]">
+          <div className="segmented">
             <button
               onClick={() => setViewMode('table')}
-              className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+              aria-label="Vue tableau"
+              aria-pressed={viewMode === 'table'}
+              className={`w-10 h-10 !min-h-0 !min-w-0 flex items-center justify-center rounded-[10px] transition-colors cursor-pointer ${
                 viewMode === 'table'
-                  ? 'bg-white text-[#18243A] shadow-xs font-bold'
-                  : 'text-[#64748B] hover:text-[#18243A]'
+                  ? 'bg-white text-ink-900 shadow-xs font-bold'
+                  : 'text-ink-500 hover:text-ink-900'
               }`}
               title="Vue Tableur Clinique"
             >
@@ -227,10 +230,12 @@ export const PatientList: React.FC<PatientListProps> = ({
             </button>
             <button
               onClick={() => setViewMode('cards')}
-              className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+              aria-label="Vue cartes"
+              aria-pressed={viewMode === 'cards'}
+              className={`w-10 h-10 !min-h-0 !min-w-0 flex items-center justify-center rounded-[10px] transition-colors cursor-pointer ${
                 viewMode === 'cards'
-                  ? 'bg-white text-[#18243A] shadow-xs font-bold'
-                  : 'text-[#64748B] hover:text-[#18243A]'
+                  ? 'bg-white text-ink-900 shadow-xs font-bold'
+                  : 'text-ink-500 hover:text-ink-900'
               }`}
               title="Vue Cartes Patients"
             >
@@ -240,39 +245,41 @@ export const PatientList: React.FC<PatientListProps> = ({
 
           <button
             onClick={onOpenNewPatient}
-            className="px-4 py-2.5 text-xs font-semibold text-white bg-[#10B9A9] hover:bg-[#07988D] active:scale-98 rounded-xl transition-all flex items-center gap-2 shadow-sm shadow-[#10B9A9]/20 cursor-pointer whitespace-nowrap"
+            className="btn-primary whitespace-nowrap"
           >
-            <Plus className="w-4 h-4" />
-            <span>Nouveau Dossier</span>
+            <Plus className="w-4 h-4" strokeWidth={2.75} />
+            <span>Nouveau dossier</span>
           </button>
         </div>
       </div>
 
       {/* Search & Filters Bar */}
-      <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-3.5">
+      <div className="clinical-card p-4 sm:p-5 space-y-4">
         <div className="flex flex-col md:flex-row gap-3">
           {/* Live Search */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-ink-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Rechercher par nom, prénom, N° d'ordre (PSY-2026-0001), diagnostic CIM-10..."
-              className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#10B9A9] focus:bg-white text-xs font-medium rounded-xl pl-9.5 pr-4 py-2.5 text-[#18243A] focus:outline-none transition-colors"
+              aria-label="Rechercher un patient"
+              className="clinical-input w-full !pl-10 !pr-10 !py-2.5 !bg-ink-25 focus:!bg-white"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-[#94A3B8] hover:text-[#18243A]"
+                aria-label="Effacer la recherche"
+                className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center justify-center text-ink-400 hover:text-ink-900 cursor-pointer"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
 
           {/* Quick Status Segmented Tabs */}
-          <div className="flex items-center gap-1 p-1 bg-[#F1F5F9] rounded-xl overflow-x-auto text-xs font-medium border border-[#E2E8F0]">
+          <div className="segmented overflow-x-auto text-[13px] font-semibold">
             {[
               { id: 'TOUS_ACTIFS', label: 'Actifs' },
               { id: 'EN_COURS', label: 'En cours' },
@@ -284,10 +291,10 @@ export const PatientList: React.FC<PatientListProps> = ({
               <button
                 key={st.id}
                 onClick={() => setStatusFilter(st.id)}
-                className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-3.5 !min-h-9 rounded-[10px] whitespace-nowrap transition-colors cursor-pointer ${
                   statusFilter === st.id
-                    ? 'bg-white text-[#18243A] font-bold shadow-xs'
-                    : 'text-[#64748B] hover:text-[#18243A]'
+                    ? 'bg-white text-ink-900 font-bold shadow-[var(--shadow-soft)]'
+                    : 'text-ink-500 hover:text-ink-900'
                 }`}
               >
                 {st.label}
@@ -297,17 +304,17 @@ export const PatientList: React.FC<PatientListProps> = ({
         </div>
 
         {/* Deep Filters Row */}
-        <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-[#EDF2F7] text-xs">
-          <div className="flex items-center gap-1.5 text-[#64748B] mr-1">
+        <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-ink-100 text-xs">
+          <div className="flex items-center gap-1.5 text-ink-500 mr-1">
             <Filter className="w-3.5 h-3.5" />
-            <span className="font-bold text-[10px] uppercase tracking-wider">Filtres :</span>
+            <span className="font-bold text-xs">Filtres</span>
           </div>
 
           {/* Tranche d'âge */}
           <select
             value={trancheAgeFilter}
             onChange={(e) => setTrancheAgeFilter(e.target.value)}
-            className="bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg px-2.5 py-1.5 text-xs font-medium text-[#18243A] focus:outline-none"
+            className="bg-white border border-ink-200 rounded-xl px-3 py-2 text-[13px] font-semibold text-ink-800 hover:border-ink-300 focus:outline-none focus:border-brand-500 cursor-pointer transition-colors"
           >
             <option value="TOUTES">Âges : Tous</option>
             <option value="MINEUR">&lt; 18 ans (Mineur)</option>
@@ -320,7 +327,7 @@ export const PatientList: React.FC<PatientListProps> = ({
           <select
             value={sexeFilter}
             onChange={(e) => setSexeFilter(e.target.value)}
-            className="bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg px-2.5 py-1.5 text-xs font-medium text-[#18243A] focus:outline-none"
+            className="bg-white border border-ink-200 rounded-xl px-3 py-2 text-[13px] font-semibold text-ink-800 hover:border-ink-300 focus:outline-none focus:border-brand-500 cursor-pointer transition-colors"
           >
             <option value="TOUS">Sexe : Tous</option>
             <option value="Masculin">Masculin</option>
@@ -331,7 +338,7 @@ export const PatientList: React.FC<PatientListProps> = ({
           <select
             value={modaliteFilter}
             onChange={(e) => setModaliteFilter(e.target.value)}
-            className="bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg px-2.5 py-1.5 text-xs font-medium text-[#18243A] focus:outline-none"
+            className="bg-white border border-ink-200 rounded-xl px-3 py-2 text-[13px] font-semibold text-ink-800 hover:border-ink-300 focus:outline-none focus:border-brand-500 cursor-pointer transition-colors"
           >
             <option value="TOUTES">Modalité : Toutes</option>
             <option value="Libre">Soins libres</option>
@@ -343,7 +350,7 @@ export const PatientList: React.FC<PatientListProps> = ({
           <select
             value={orientationFilter}
             onChange={(e) => setOrientationFilter(e.target.value)}
-            className="bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg px-2.5 py-1.5 text-xs font-medium text-[#18243A] focus:outline-none"
+            className="bg-white border border-ink-200 rounded-xl px-3 py-2 text-[13px] font-semibold text-ink-800 hover:border-ink-300 focus:outline-none focus:border-brand-500 cursor-pointer transition-colors"
           >
             <option value="TOUTES">Orientation : Toutes</option>
             <option value="Ambulatoire">Ambulatoire</option>
@@ -353,7 +360,7 @@ export const PatientList: React.FC<PatientListProps> = ({
           {hasActiveFilters && (
             <button
               onClick={resetAllFilters}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-xs text-[#BE123C] hover:bg-[#FFE4E6] rounded-lg transition-colors font-medium ml-1 cursor-pointer"
+              className="flex items-center gap-1 px-2.5 py-1.5 text-xs text-rose-700 hover:bg-rose-100 rounded-lg transition-colors font-medium ml-1 cursor-pointer"
             >
               <RotateCcw className="w-3 h-3" />
               Réinitialiser
@@ -362,11 +369,11 @@ export const PatientList: React.FC<PatientListProps> = ({
 
           {/* Sort dropdown */}
           <div className="ml-auto flex items-center gap-1.5">
-            <span className="text-[11px] text-[#64748B] font-medium">Trier par :</span>
+            <span className="text-[11px] text-ink-500 font-medium">Trier par :</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[#18243A] focus:outline-none"
+              className="bg-white border border-ink-200 rounded-xl px-3 py-2 text-[13px] font-semibold text-ink-800 focus:outline-none focus:border-brand-500 cursor-pointer"
             >
               <option value="dateModif">Dernière mise à jour</option>
               <option value="dateCreation">Date d'admission</option>
@@ -375,7 +382,7 @@ export const PatientList: React.FC<PatientListProps> = ({
             </select>
             <button
               onClick={() => setSortAsc(!sortAsc)}
-              className="p-1.5 text-[#64748B] hover:text-[#18243A] hover:bg-[#F1F5F9] rounded-lg cursor-pointer"
+              className="p-1.5 text-ink-500 hover:text-ink-900 hover:bg-ink-100 rounded-lg cursor-pointer"
               title={sortAsc ? 'Ordre croissant' : 'Ordre décroissant'}
             >
               <ArrowUpDown className="w-3.5 h-3.5" />
@@ -388,22 +395,22 @@ export const PatientList: React.FC<PatientListProps> = ({
       {paginatedDossiers.length > 0 ? (
         viewMode === 'table' ? (
           /* Table View */
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.03)] overflow-hidden">
+          <div className="clinical-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-label text-[#64748B]">
-                    <th className="py-3 px-4">N° d'Ordre</th>
-                    <th className="py-3 px-4">Patient</th>
-                    <th className="py-3 px-4">Âge / Sexe</th>
-                    <th className="py-3 px-4">Modalité & Orientation</th>
-                    <th className="py-3 px-4">Statut</th>
-                    <th className="py-3 px-4">Complétude</th>
-                    <th className="py-3 px-4">Dernière MaJ</th>
-                    <th className="py-3 px-4 text-right">Action</th>
+                  <tr className="bg-ink-25 border-b border-ink-150 text-xs font-bold text-ink-500">
+                    <th className="py-3.5 px-4">N° d'Ordre</th>
+                    <th className="py-3.5 px-4">Patient</th>
+                    <th className="py-3.5 px-4">Âge / Sexe</th>
+                    <th className="py-3.5 px-4">Modalité & Orientation</th>
+                    <th className="py-3.5 px-4">Statut</th>
+                    <th className="py-3.5 px-4">Complétude</th>
+                    <th className="py-3.5 px-4">Dernière MaJ</th>
+                    <th className="py-3.5 px-4 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#EDF2F7] text-body-sm">
+                <tbody className="divide-y divide-ink-100 text-body-sm">
                   {paginatedDossiers.map((dossier) => {
                     const stats = calculateDossierStats(dossier);
                     const diagPrincipal = dossier.s12HypothesesDiag.hypotheses?.find(
@@ -415,23 +422,26 @@ export const PatientList: React.FC<PatientListProps> = ({
                       <tr
                         key={dossier.id}
                         onClick={() => onSelectDossier(dossier.id)}
-                        className="hover:bg-[#F0FDFA]/50 cursor-pointer transition-colors group"
+                        className="hover:bg-brand-50/50 cursor-pointer transition-colors group"
                       >
                         {/* Numéro d'ordre */}
-                        <td className="py-3.5 px-4 font-mono font-bold text-[#18243A]">
-                          <span className="px-2 py-0.5 rounded-md bg-[#F1F5F9] border border-[#CBD5E1]">
-                            {dossier.s1Identification.numeroOrdre}
-                          </span>
+                        <td className="py-4 px-4 text-[13px] font-bold tabular-nums text-ink-500 whitespace-nowrap">
+                          {dossier.s1Identification.numeroOrdre}
                         </td>
 
                         {/* Nom & Prénoms */}
-                        <td className="py-3.5 px-4">
-                          <div className="font-bold text-[#18243A] group-hover:text-[#07988D] transition-colors">
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-3">
+                          <span className="w-9 h-9 rounded-xl bg-brand-100 text-brand-800 flex items-center justify-center text-xs font-extrabold shrink-0">
+                            {`${dossier.s1Identification.nom?.[0] || ''}${dossier.s1Identification.prenoms?.[0] || ''}`.toUpperCase()}
+                          </span>
+                          <div className="min-w-0">
+                          <div className="font-bold text-ink-900 group-hover:text-brand-700 transition-colors">
                             {dossier.s1Identification.nom} {dossier.s1Identification.prenoms}
                           </div>
-                          <div className="text-caption text-[#475569] truncate max-w-xs mt-0.5">
+                          <div className="text-caption text-ink-600 truncate max-w-xs mt-0.5">
                             {diagPrincipal ? (
-                              <span className="text-[#07988D] font-medium">
+                              <span className="text-brand-700 font-medium">
                                 {diagPrincipal.codeCimDsm ? `[${diagPrincipal.codeCimDsm}] ` : ''}
                                 {diagPrincipal.libelle}
                               </span>
@@ -442,20 +452,22 @@ export const PatientList: React.FC<PatientListProps> = ({
                               </span>
                             )}
                           </div>
+                          </div>
+                          </div>
                         </td>
 
                         {/* Âge / Sexe */}
-                        <td className="py-3.5 px-4 text-[#18243A]">
+                        <td className="py-4 px-4 text-ink-900">
                           <div className="tabular-nums font-semibold">{dossier.s1Identification.age} ans</div>
-                          <div className="text-caption text-[#64748B]">{dossier.s1Identification.sexe}</div>
+                          <div className="text-caption text-ink-500">{dossier.s1Identification.sexe}</div>
                         </td>
 
                         {/* Modalité & Orientation */}
-                        <td className="py-3.5 px-4">
-                          <div className="text-[#18243A] font-medium">
+                        <td className="py-4 px-4">
+                          <div className="text-ink-900 font-medium">
                             {dossier.s2Modalites.modalite}
                           </div>
-                          <div className="text-caption text-[#64748B]">
+                          <div className="text-caption text-ink-500">
                             {dossier.s14PriseEnCharge.orientation
                               ? `Orientation : ${dossier.s14PriseEnCharge.orientation}`
                               : 'Orientation non définie'}
@@ -463,26 +475,26 @@ export const PatientList: React.FC<PatientListProps> = ({
                         </td>
 
                         {/* Statut */}
-                        <td className="py-3.5 px-4">
+                        <td className="py-4 px-4">
                           {dossier.statut === 'VALIDÉ' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-caption font-bold bg-[#DCFCE7] text-[#15803D]">
+                            <span className="chip bg-emerald-100 text-emerald-700">
                               <CheckCircle2 className="w-3 h-3" />
                               Validé
                             </span>
                           )}
                           {dossier.statut === 'EN_COURS' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-caption font-bold bg-[#FEF3C7] text-[#B45309]">
+                            <span className="chip bg-amber-100 text-amber-700">
                               <Clock className="w-3 h-3" />
                               En cours
                             </span>
                           )}
                           {dossier.statut === 'BROUILLON' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-caption font-bold bg-[#F1F5F9] text-[#64748B]">
+                            <span className="chip bg-ink-100 text-ink-500">
                               Brouillon
                             </span>
                           )}
                           {dossier.statut === 'ARCHIVÉ' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-caption font-bold bg-[#FFE4E6] text-[#BE123C]">
+                            <span className="chip bg-rose-100 text-rose-700">
                               <Archive className="w-3 h-3" />
                               Archivé
                             </span>
@@ -490,32 +502,32 @@ export const PatientList: React.FC<PatientListProps> = ({
                         </td>
 
                         {/* Complétude */}
-                        <td className="py-3.5 px-4">
+                        <td className="py-4 px-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-16 bg-[#E2E8F0] h-2 rounded-full overflow-hidden">
+                            <div className="w-16 bg-ink-150 h-2 rounded-full overflow-hidden">
                               <div
                                 className={`h-full ${
                                   stats.percentage === 100
-                                    ? 'bg-[#10B981]'
+                                    ? 'bg-emerald-500'
                                     : stats.percentage >= 60
-                                    ? 'bg-[#10B9A9]'
-                                    : 'bg-[#F59E0B]'
+                                    ? 'bg-brand-500'
+                                    : 'bg-amber-500'
                                 }`}
                                 style={{ width: `${stats.percentage}%` }}
                               />
                             </div>
-                            <span className="text-mono font-bold text-[#18243A] tabular-nums">
+                            <span className="text-mono font-bold text-ink-900 tabular-nums">
                               {stats.percentage}%
                             </span>
                           </div>
-                          <div className="text-caption text-[#64748B] mt-0.5">
+                          <div className="text-caption text-ink-500 mt-0.5">
                             {stats.completeCount} complètes · {stats.partialCount} part.
                           </div>
                         </td>
 
                         {/* Dernière mise à jour */}
-                        <td className="py-3.5 px-4 text-[#64748B] text-caption tabular-nums">
-                          <div className="font-medium text-[#18243A]">
+                        <td className="py-4 px-4 text-ink-500 text-caption tabular-nums">
+                          <div className="font-medium text-ink-900">
                             {updatedDate.toLocaleDateString('fr-FR', {
                               day: '2-digit',
                               month: 'short',
@@ -531,14 +543,14 @@ export const PatientList: React.FC<PatientListProps> = ({
                         </td>
 
                         {/* Action */}
-                        <td className="py-3.5 px-4 text-right">
+                        <td className="py-4 px-4 text-right">
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               onSelectDossier(dossier.id);
                             }}
-                            className="inline-flex items-center text-xs font-semibold text-[#07988D] hover:text-[#067A71] bg-[#ECFBF9] hover:bg-[#D9F7F3] border border-[#10B9A9]/20 px-3 py-1 rounded-lg transition-all cursor-pointer group-hover:border-[#10B9A9]"
+                            className="inline-flex items-center text-[13px] font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 px-3.5 rounded-xl transition-colors cursor-pointer"
                           >
                             Ouvrir <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
                           </button>
@@ -551,7 +563,7 @@ export const PatientList: React.FC<PatientListProps> = ({
             </div>
 
             {/* Pagination Footer */}
-            <div className="px-5 py-3.5 bg-[#F8FAFC] border-t border-[#E2E8F0] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#64748B]">
+            <div className="px-5 py-3.5 bg-ink-25 border-t border-ink-150 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-500">
               <div className="flex items-center gap-2">
                 <span>Afficher</span>
                 <select
@@ -560,7 +572,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                     setPageSize(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="bg-white border border-[#CBD5E1] rounded-lg px-2.5 py-1 text-xs font-semibold text-[#18243A] focus:outline-none"
+                  className="bg-white border border-ink-200 rounded-lg px-2.5 py-1 text-xs font-semibold text-ink-900 focus:outline-none"
                 >
                   <option value={5}>5</option>
                   <option value={10}>10</option>
@@ -568,21 +580,21 @@ export const PatientList: React.FC<PatientListProps> = ({
                   <option value={50}>50</option>
                 </select>
                 <span>
-                  dossiers sur <strong className="text-[#18243A]">{totalItems}</strong> au total
+                  dossiers sur <strong className="text-ink-900">{totalItems}</strong> au total
                 </span>
               </div>
 
               <div className="flex items-center gap-3">
                 <span className="tabular-nums font-medium">
-                  Page <strong className="text-[#18243A]">{currentPage}</strong> sur{' '}
-                  <strong className="text-[#18243A]">{totalPages}</strong>
+                  Page <strong className="text-ink-900">{currentPage}</strong> sur{' '}
+                  <strong className="text-ink-900">{totalPages}</strong>
                 </span>
 
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="p-1.5 rounded-lg border border-[#CBD5E1] bg-white text-[#18243A] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#F1F5F9] cursor-pointer"
+                    className="p-1.5 rounded-lg border border-ink-200 bg-white text-ink-900 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-ink-100 cursor-pointer"
                     title="Page précédente"
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -591,7 +603,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                   <button
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className="p-1.5 rounded-lg border border-[#CBD5E1] bg-white text-[#18243A] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#F1F5F9] cursor-pointer"
+                    className="p-1.5 rounded-lg border border-ink-200 bg-white text-ink-900 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-ink-100 cursor-pointer"
                     title="Page suivante"
                   >
                     <ChevronRight className="w-4 h-4" />
@@ -617,60 +629,60 @@ export const PatientList: React.FC<PatientListProps> = ({
                   <div
                     key={dossier.id}
                     onClick={() => onSelectDossier(dossier.id)}
-                    className="clinical-card p-5 hover:border-[#10B9A9] hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                    className="clinical-card p-5 hover:border-brand-300 transition-colors cursor-pointer group flex flex-col justify-between"
                   >
                     <div>
                       {/* Top row: Avatar + Order + Status */}
                       <div className="flex items-center justify-between gap-2 mb-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-9 h-9 rounded-xl bg-[#18243A] text-white flex items-center justify-center font-bold text-xs tracking-wider">
+                          <div className="w-10 h-10 rounded-xl bg-brand-100 text-brand-800 flex items-center justify-center font-extrabold text-xs">
                             {initials}
                           </div>
-                          <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-[#F1F5F9] border border-[#CBD5E1] text-[#18243A]">
+                          <span className="text-xs font-bold tabular-nums text-ink-500">
                             {dossier.s1Identification.numeroOrdre}
                           </span>
                         </div>
 
                         {dossier.statut === 'VALIDÉ' && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#DCFCE7] text-[#15803D]">
+                          <span className="chip bg-emerald-100 text-emerald-700">
                             <CheckCircle2 className="w-3 h-3" /> Validé
                           </span>
                         )}
                         {dossier.statut === 'EN_COURS' && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FEF3C7] text-[#B45309]">
+                          <span className="chip bg-amber-100 text-amber-700">
                             <Clock className="w-3 h-3" /> En cours
                           </span>
                         )}
                         {dossier.statut === 'BROUILLON' && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F1F5F9] text-[#64748B]">
+                          <span className="chip bg-ink-100 text-ink-500">
                             Brouillon
                           </span>
                         )}
                         {dossier.statut === 'ARCHIVÉ' && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FFE4E6] text-[#BE123C]">
+                          <span className="chip bg-rose-100 text-rose-700">
                             <Archive className="w-3 h-3" /> Archivé
                           </span>
                         )}
                       </div>
 
                       {/* Name */}
-                      <h3 className="text-sm font-bold text-[#18243A] group-hover:text-[#07988D] transition-colors leading-tight">
+                      <h3 className="text-base font-bold text-ink-900 group-hover:text-brand-700 transition-colors leading-tight">
                         {dossier.s1Identification.nom} {dossier.s1Identification.prenoms}
                       </h3>
 
                       {/* Diagnostic highlight */}
-                      <div className="mt-1.5 p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg text-xs">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] block">
+                      <div className="mt-2 p-2.5 bg-ink-25 border border-ink-150 rounded-xl text-xs">
+                        <span className="text-[11px] font-bold text-ink-400 block">
                           Diagnostic principal
                         </span>
-                        <span className="text-xs font-semibold text-[#07988D] truncate block mt-0.5">
+                        <span className="text-xs font-semibold text-brand-700 truncate block mt-0.5">
                           {diagPrincipal ? diagPrincipal.libelle : 'Évaluation en cours'}
                         </span>
                       </div>
 
                       {/* Meta */}
-                      <div className="flex items-center gap-2 text-[11px] text-[#64748B] mt-2.5">
-                        <span className="font-semibold text-[#18243A]">{dossier.s1Identification.age} ans</span>
+                      <div className="flex items-center gap-2 text-[11px] text-ink-500 mt-2.5">
+                        <span className="font-semibold text-ink-900">{dossier.s1Identification.age} ans</span>
                         <span>·</span>
                         <span>{dossier.s1Identification.sexe}</span>
                         <span>·</span>
@@ -679,26 +691,26 @@ export const PatientList: React.FC<PatientListProps> = ({
                     </div>
 
                     {/* Bottom: Completeness & button */}
-                    <div className="mt-4 pt-3 border-t border-[#EDF2F7] flex items-center justify-between">
+                    <div className="mt-4 pt-3 border-t border-ink-100 flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="w-14 bg-[#E2E8F0] h-1.5 rounded-full overflow-hidden">
+                        <div className="w-14 bg-ink-150 h-1.5 rounded-full overflow-hidden">
                           <div
                             className={`h-full ${
                               stats.percentage === 100
-                                ? 'bg-[#10B981]'
+                                ? 'bg-emerald-500'
                                 : stats.percentage >= 60
-                                ? 'bg-[#10B9A9]'
-                                : 'bg-[#F59E0B]'
+                                ? 'bg-brand-500'
+                                : 'bg-amber-500'
                             }`}
                             style={{ width: `${stats.percentage}%` }}
                           />
                         </div>
-                        <span className="font-mono text-xs font-bold text-[#18243A]">
+                        <span className="font-mono text-xs font-bold text-ink-900">
                           {stats.percentage}%
                         </span>
                       </div>
 
-                      <span className="text-xs font-bold text-[#07988D] group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+                      <span className="text-xs font-bold text-brand-700 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
                         Consulter <ChevronRight className="w-3.5 h-3.5" />
                       </span>
                     </div>
@@ -708,7 +720,7 @@ export const PatientList: React.FC<PatientListProps> = ({
             </div>
 
             {/* Cards Pagination */}
-            <div className="flex items-center justify-between px-4 py-3 bg-white border border-[#E2E8F0] rounded-xl text-xs text-[#64748B]">
+            <div className="flex items-center justify-between px-4 py-2 clinical-card text-xs text-ink-500">
               <span>
                 Affichage de {paginatedDossiers.length} dossiers sur {totalItems}
               </span>
@@ -716,17 +728,17 @@ export const PatientList: React.FC<PatientListProps> = ({
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1 rounded-lg border border-[#CBD5E1] bg-white text-[#18243A] disabled:opacity-40"
+                  className="px-3 py-1 rounded-lg border border-ink-200 bg-white text-ink-900 disabled:opacity-40"
                 >
                   Précédent
                 </button>
-                <span className="font-semibold text-[#18243A]">
+                <span className="font-semibold text-ink-900">
                   {currentPage} / {totalPages}
                 </span>
                 <button
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1 rounded-lg border border-[#CBD5E1] bg-white text-[#18243A] disabled:opacity-40"
+                  className="px-3 py-1 rounded-lg border border-ink-200 bg-white text-ink-900 disabled:opacity-40"
                 >
                   Suivant
                 </button>
@@ -736,31 +748,31 @@ export const PatientList: React.FC<PatientListProps> = ({
         )
       ) : (
         /* Empty State */
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center space-y-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
-          <div className="w-12 h-12 rounded-2xl bg-[#ECFBF9] text-[#10B9A9] flex items-center justify-center mx-auto">
+        <div className="clinical-card p-12 text-center space-y-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
             <User className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-bold text-[#18243A]">
+          <h3 className="text-base font-bold text-ink-900">
             Aucun dossier patient ne correspond à vos critères
           </h3>
-          <p className="text-xs text-[#64748B] max-w-sm mx-auto">
+          <p className="text-xs text-ink-500 max-w-sm mx-auto">
             Ajustez votre recherche ou vos filtres, ou créez directement une nouvelle admission pour enregistrer un patient.
           </p>
           <div className="flex items-center justify-center gap-2 pt-2">
             {hasActiveFilters && (
               <button
                 onClick={resetAllFilters}
-                className="px-3.5 py-2 text-xs font-semibold text-[#18243A] bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-xl transition-colors cursor-pointer"
+                className="px-3.5 py-2 text-xs font-semibold text-ink-900 bg-ink-100 hover:bg-ink-150 rounded-xl transition-colors cursor-pointer"
               >
                 Réinitialiser les filtres
               </button>
             )}
             <button
               onClick={onOpenNewPatient}
-              className="px-4 py-2 text-xs font-semibold text-white bg-[#10B9A9] hover:bg-[#07988D] rounded-xl transition-all inline-flex items-center gap-1.5 shadow-sm shadow-[#10B9A9]/20 cursor-pointer"
+              className="btn-primary"
             >
-              <Plus className="w-3.5 h-3.5" />
-              Nouveau Patient
+              <Plus className="w-4 h-4" />
+              Nouveau patient
             </button>
           </div>
         </div>

@@ -34,6 +34,9 @@ import {
   INITIAL_REFERENCE_LISTS,
 } from './data/initialData';
 import { getRubriquePermission, RUBRIQUES_CONFIG } from './utils/rules';
+import { AlertTriangle, HeartPulse } from 'lucide-react';
+import { api } from './lib/api';
+import { useServerSync } from './lib/useServerSync';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { PatientBanner } from './components/PatientBanner';
@@ -70,62 +73,40 @@ import { S17Pronostic } from './components/rubriques/S17Pronostic';
 export default function App() {
   const [currentUser, setCurrentUser] = useState<UserProfile>(CLINICAL_USERS[0]); // Dr. Oumar Diallo (Psychiatre)
 
-  // LocalStorage-backed state with initial fallback
-  const [dossiers, setDossiers] = useState<DossierPsychiatrique[]>(() => {
-    try {
-      const saved = localStorage.getItem('psydossier_patients');
-      return saved ? JSON.parse(saved) : INITIAL_DOSSIERS;
-    } catch {
-      return INITIAL_DOSSIERS;
-    }
-  });
+  // Data is persisted by the local server (SQLite). See server/index.ts.
+  const [dossiers, setDossiers] = useState<DossierPsychiatrique[]>([]);
 
   const [activeDossierId, setActiveDossierId] = useState<string | null>(null);
   const [activeRubriqueId, setActiveRubriqueId] = useState<string>('s1');
   const [activeView, setActiveView] = useState<'DASHBOARD' | 'REGISTRE' | 'DOSSIER' | 'AUDIT' | 'REFERENTIELS'>('DASHBOARD');
+  const [registreFilters, setRegistreFilters] = useState<React.ComponentProps<typeof PatientList>['initialFilters']>(null);
 
-  const [auditLogs, setAuditLogs] = useState<AuditEntry[]>(() => {
+  const [auditLogs, setAuditLogs] = useState<AuditEntry[]>([]);
+  const [referenceLists, setReferenceLists] = useState<ReferenceLists>(INITIAL_REFERENCE_LISTS);
+
+  const [loadStatus, setLoadStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const { setBaseline, pendingCount } = useServerSync(dossiers, auditLogs, referenceLists, loadStatus === 'ready');
+
+  const loadFromServer = React.useCallback(async () => {
+    setLoadStatus('loading');
     try {
-      const saved = localStorage.getItem('psydossier_audit_logs');
-      return saved ? JSON.parse(saved) : INITIAL_AUDIT_LOGS;
+      const state = await api.loadState();
+      setBaseline(state);
+      const isNewDatabase = state.dossiers.length === 0 && state.auditLogs.length === 0 && !state.referenceLists;
+      // Demo patients are only seeded in development; a fresh install starts with an empty registry.
+      const seedDemo = isNewDatabase && import.meta.env.DEV;
+      setDossiers(seedDemo ? INITIAL_DOSSIERS : state.dossiers);
+      setAuditLogs(seedDemo ? INITIAL_AUDIT_LOGS : state.auditLogs);
+      setReferenceLists(state.referenceLists ?? INITIAL_REFERENCE_LISTS);
+      setLoadStatus('ready');
     } catch {
-      return INITIAL_AUDIT_LOGS;
+      setLoadStatus('error');
     }
-  });
-
-  const [referenceLists, setReferenceLists] = useState<ReferenceLists>(() => {
-    try {
-      const saved = localStorage.getItem('psydossier_referentiels');
-      return saved ? JSON.parse(saved) : INITIAL_REFERENCE_LISTS;
-    } catch {
-      return INITIAL_REFERENCE_LISTS;
-    }
-  });
-
-  // Save to localStorage on changes
-  React.useEffect(() => {
-    try {
-      localStorage.setItem('psydossier_patients', JSON.stringify(dossiers));
-    } catch (e) {
-      console.warn('Storage limit reached', e);
-    }
-  }, [dossiers]);
+  }, [setBaseline]);
 
   React.useEffect(() => {
-    try {
-      localStorage.setItem('psydossier_audit_logs', JSON.stringify(auditLogs));
-    } catch (e) {
-      console.warn('Storage limit reached', e);
-    }
-  }, [auditLogs]);
-
-  React.useEffect(() => {
-    try {
-      localStorage.setItem('psydossier_referentiels', JSON.stringify(referenceLists));
-    } catch (e) {
-      console.warn('Storage limit reached', e);
-    }
-  }, [referenceLists]);
+    loadFromServer();
+  }, [loadFromServer]);
 
   // Sidebar layout state
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
@@ -456,8 +437,45 @@ export default function App() {
   const isReadOnly = activeDossier ? activeDossier.statut === 'VALIDÉ' || activeDossier.statut === 'ARCHIVÉ' || permission === 'read' : true;
   const activeRubriqueConfig = RUBRIQUES_CONFIG.find((r) => r.id === activeRubriqueId);
 
+  if (loadStatus !== 'ready') {
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center p-6 font-sans">
+        <div className="clinical-card max-w-md w-full p-8 text-center">
+          <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white">
+            <HeartPulse className="w-6 h-6" strokeWidth={2.5} />
+          </div>
+          {loadStatus === 'loading' ? (
+            <p className="mt-5 text-sm font-semibold text-ink-500" role="status">
+              Chargement des dossiers…
+            </p>
+          ) : (
+            <>
+              <h1 className="mt-5 text-lg font-extrabold text-ink-900">Serveur local injoignable</h1>
+              <p className="mt-2 text-sm text-ink-500">
+                Vérifiez que la fenêtre « PsyDossier » est toujours ouverte, ou relancez
+                « Demarrer PsyDossier ».
+              </p>
+              <button type="button" onClick={loadFromServer} className="btn-primary mt-6">
+                Réessayer
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#F4F7F9] text-[#18243A] flex antialiased font-sans">
+    <div className="min-h-screen bg-canvas text-ink-900 flex antialiased font-sans">
+      {pendingCount > 0 && (
+        <div
+          role="alert"
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] chip bg-amber-100 text-amber-900 !py-2.5 !px-4 shadow-[var(--shadow-float)] no-print"
+        >
+          <AlertTriangle className="w-4 h-4" />
+          Enregistrement en attente ({pendingCount}) — le serveur local ne répond pas, nouvelle tentative…
+        </div>
+      )}
       {/* 1. Sleek Modern Sidebar Navigation */}
       <Sidebar
         activeView={activeView}
@@ -511,6 +529,11 @@ export default function App() {
               currentUser={currentUser}
               onSelectDossier={handleSelectDossier}
               onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
+              onNavigateToFilteredRegistre={(filters) => {
+                setRegistreFilters(filters);
+                setActiveView('REGISTRE');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             />
           )}
 
@@ -521,6 +544,8 @@ export default function App() {
               onSelectDossier={handleSelectDossier}
               onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
               currentUserRole={currentUser.role}
+              initialFilters={registreFilters}
+              onClearInitialFilters={() => setRegistreFilters(null)}
             />
           )}
 
@@ -559,7 +584,7 @@ export default function App() {
               />
 
               {/* 2-Column Clinical Workspace */}
-              <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6">
+              <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6">
               {/* Left Column : 17 Rubriques Sidebar */}
               <RubriquesNav
                 dossier={activeDossier}
@@ -767,15 +792,15 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-[#D9E2E8] py-4 px-6 text-center text-xs text-[#64748B] no-print mt-auto">
-        <div className="w-full max-w-[1920px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <footer className="bg-white border-t border-ink-150 py-4 px-6 text-center text-xs text-ink-500 no-print mt-auto">
+        <div className="w-full max-w-[1600px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
             PsyDossier EHR © {new Date().getFullYear()} · Plan type de dossier patient en psychiatrie (17 rubriques)
           </div>
           <div className="flex items-center gap-3 text-[11px]">
-            <span>Session active : <strong className="text-[#18243A]">{currentUser.name}</strong></span>
+            <span>Session active : <strong className="text-ink-900">{currentUser.name}</strong></span>
             <span aria-hidden="true">·</span>
-            <span>Rôle : <span className="font-mono text-[#07988D]">{currentUser.role}</span></span>
+            <span>Rôle : <span className="font-mono text-brand-700">{currentUser.role}</span></span>
           </div>
         </div>
       </footer>

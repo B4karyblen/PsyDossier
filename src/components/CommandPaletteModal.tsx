@@ -82,7 +82,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       title: 'Nouveau Dossier Patient',
       subtitle: 'Créer une nouvelle admission psychiatrique (S1 à S17)',
       badge: 'Action',
-      icon: <Plus className="w-4 h-4 text-[#10B9A9]" />,
+      icon: <Plus className="w-4 h-4 text-brand-600" />,
       action: () => {
         onClose();
         onOpenNewPatient();
@@ -95,7 +95,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       title: 'Tableau de Bord Clinique',
       subtitle: 'Surveillance des indicateurs, vigilance légale et bilans',
       badge: 'Vue',
-      icon: <Activity className="w-4 h-4 text-[#07988D]" />,
+      icon: <Activity className="w-4 h-4 text-brand-700" />,
       action: () => {
         onClose();
         onChangeView('DASHBOARD');
@@ -108,7 +108,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       title: 'Registre des Patients',
       subtitle: 'Liste complète des dossiers actifs et archivés',
       badge: 'Vue',
-      icon: <User className="w-4 h-4 text-[#18243A]" />,
+      icon: <User className="w-4 h-4 text-ink-900" />,
       action: () => {
         onClose();
         onChangeView('REGISTRE');
@@ -121,7 +121,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       title: 'Journal d’Audit & Traçabilité',
       subtitle: 'Historique légal des accès, validations et exports (BR-016)',
       badge: 'Audit',
-      icon: <ShieldCheck className="w-4 h-4 text-[#A855F7]" />,
+      icon: <ShieldCheck className="w-4 h-4 text-violet-500" />,
       action: () => {
         onClose();
         onChangeView('AUDIT');
@@ -134,7 +134,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       title: 'Référentiels & Nomenclatures (CIM-10)',
       subtitle: 'Paramétrage des classifications médicales et listes de valeurs',
       badge: 'Admin',
-      icon: <Database className="w-4 h-4 text-[#F59E0B]" />,
+      icon: <Database className="w-4 h-4 text-amber-500" />,
       action: () => {
         onClose();
         onChangeView('REFERENTIELS');
@@ -149,7 +149,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         title: `${r.code} · ${r.titre}`,
         subtitle: r.description,
         badge: 'Rubrique',
-        icon: <FileText className="w-4 h-4 text-[#10B9A9]" />,
+        icon: <FileText className="w-4 h-4 text-brand-600" />,
         action: () => {
           onClose();
           if (activeDossierId) {
@@ -172,7 +172,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
           diagPrincipal ? diagPrincipal.libelle : d.s2Modalites.modalite
         }`,
         badge: d.statut,
-        icon: <User className="w-4 h-4 text-[#07988D]" />,
+        icon: <User className="w-4 h-4 text-brand-700" />,
         action: () => {
           onClose();
           onSelectDossier(d.id, 's1');
@@ -214,14 +214,14 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0F172A]/50 backdrop-blur-sm flex items-start justify-center pt-16 sm:pt-24 px-4 overflow-y-auto no-print">
+    <div className="fixed inset-0 z-50 bg-ink-950/50 backdrop-blur-sm flex items-start justify-center pt-16 sm:pt-24 px-4 overflow-y-auto no-print">
       <div
-        className="w-full max-w-2xl bg-[#1E293B] rounded-2xl shadow-2xl border border-[#334155] overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-150"
+        className="w-full max-w-2xl bg-ink-800 rounded-2xl shadow-2xl border border-ink-700 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input Bar */}
-        <div className="flex items-center px-4 py-3.5 border-b border-[#334155] gap-3 bg-[#0F172A]">
-          <Search className="w-5 h-5 text-[#10B9A9] shrink-0" />
+        <div className="flex items-center px-4 py-3.5 border-b border-ink-700 gap-3 bg-ink-950">
+          <Search className="w-5 h-5 text-brand-600 shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -242,14 +242,14 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
               <X className="w-4 h-4" />
             </button>
           ) : (
-            <span className="hidden sm:inline-flex items-center gap-1 text-caption font-semibold text-slate-400 bg-[#334155] px-2 py-0.5 rounded border border-[#475569]">
+            <span className="hidden sm:inline-flex items-center gap-1 text-caption font-semibold text-slate-400 bg-ink-700 px-2 py-0.5 rounded border border-ink-600">
               ESC pour fermer
             </span>
           )}
         </div>
 
         {/* Results List */}
-        <div className="max-h-[380px] overflow-y-auto p-2 divide-y divide-[#334155]">
+        <div className="max-h-[380px] overflow-y-auto p-2 divide-y divide-ink-700">
           {results.length > 0 ? (
             results.map((item, index) => {
               const isSelected = index === selectedIndex;
@@ -260,16 +260,16 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
                     isSelected
-                      ? 'bg-[#10B9A9]/15 text-[#10B9A9]'
-                      : 'hover:bg-[#334155] text-white'
+                      ? 'bg-brand-500/15 text-brand-600'
+                      : 'hover:bg-ink-700 text-white'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
                       className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                         isSelected
-                          ? 'bg-[#10B9A9]/20 text-[#10B9A9]'
-                          : 'bg-[#334155] text-slate-400'
+                          ? 'bg-brand-500/20 text-brand-600'
+                          : 'bg-ink-700 text-slate-400'
                       }`}
                     >
                       {item.icon}
@@ -284,7 +284,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
                                 ? 'bg-emerald-500/20 text-emerald-400'
                                 : item.badge === 'EN_COURS'
                                 ? 'bg-amber-500/20 text-amber-400'
-                                : 'bg-[#334155] text-slate-400'
+                                : 'bg-ink-700 text-slate-400'
                             }`}
                           >
                             {item.badge}
@@ -299,7 +299,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
 
                   <div className="flex items-center gap-1 shrink-0 ml-3">
                     {isSelected && (
-                      <span className="text-caption font-medium text-[#10B9A9] flex items-center gap-1">
+                      <span className="text-caption font-medium text-brand-600 flex items-center gap-1">
                         Ouvrir <CornerDownLeft className="w-3 h-3" />
                       </span>
                     )}
@@ -315,13 +315,13 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         </div>
 
         {/* Footer shortcuts */}
-        <div className="px-4 py-2.5 bg-[#0F172A] border-t border-[#334155] flex items-center justify-between text-caption text-slate-400">
+        <div className="px-4 py-2.5 bg-ink-950 border-t border-ink-700 flex items-center justify-between text-caption text-slate-400">
           <div className="flex items-center gap-3">
             <span>↑↓ pour naviguer</span>
             <span>↵ pour sélectionner</span>
             <span>ESC pour fermer</span>
           </div>
-          <span className="font-bold text-[#10B9A9]">PsyDossier Navigation Rapide</span>
+          <span className="font-bold text-brand-600">PsyDossier Navigation Rapide</span>
         </div>
       </div>
     </div>

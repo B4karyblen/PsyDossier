@@ -90,27 +90,27 @@ export const S12HypothesesDiag: React.FC<Props> = ({
   };
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-6">
+    <div className="clinical-card p-6 sm:p-7 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-[#EDF2F7]">
+      <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2.5 py-0.5 rounded-md border border-[#10B9A9]/20">
+            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
               S12 · SYNTHÈSE
             </span>
-            <span className="text-xs text-[#64748B]">Obligatoire pour validation</span>
+            <span className="text-xs text-ink-500">Obligatoire pour validation</span>
           </div>
-          <h2 className="text-lg font-extrabold text-[#18243A] tracking-tight mt-1">
+          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
             Hypothèses Diagnostiques (CIM-10 / DSM-5)
           </h2>
-          <p className="text-xs text-[#64748B] mt-0.5">
+          <p className="text-xs text-ink-500 mt-0.5">
             Diagnostic principal et diagnostics différentiels argumentés (BR-014 : exclusivité Psychiatre)
           </p>
         </div>
       </div>
 
       {!isPsychiatre && (
-        <div className="p-3 bg-[#FEF3C7] border border-[#F59E0B]/30 text-[#B45309] rounded-xl text-xs font-semibold flex items-center gap-2">
+        <div className="p-3 bg-amber-100 border border-amber-500/30 text-amber-700 rounded-xl text-xs font-semibold flex items-center gap-2">
           <Lock className="w-4 h-4 shrink-0" />
           <span>
             Règle BR-014 : La formulation des hypothèses diagnostiques est réservée au Médecin Psychiatre (lecture seule pour {currentUserRole}).
@@ -119,7 +119,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
       )}
 
       {error && (
-        <div className="p-3.5 bg-[#FFE4E6] border border-[#F43F5E]/30 rounded-xl flex items-center gap-2.5 text-xs text-[#BE123C] font-medium">
+        <div className="p-3.5 bg-rose-100 border border-rose-500/30 rounded-xl flex items-center gap-2.5 text-xs text-rose-700 font-medium">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -128,10 +128,10 @@ export const S12HypothesesDiag: React.FC<Props> = ({
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Quick CIM-10 Presets from Referentiels */}
         {!effectiveReadOnly && (
-          <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4 space-y-2.5">
+          <div className="bg-ink-25 border border-ink-150 rounded-2xl p-4 space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#18243A] uppercase tracking-wider flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-[#10B9A9]" />
+              <span className="text-sm font-bold text-ink-900 flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-brand-600" />
                 Nomenclatures CIM-10 Fréquentes (Cliquer pour insérer) :
               </span>
             </div>
@@ -141,9 +141,9 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                   key={preset.code}
                   type="button"
                   onClick={() => addHypothese(preset)}
-                  className="px-2.5 py-1 text-[11px] font-semibold bg-white hover:bg-[#ECFBF9] text-[#18243A] hover:text-[#07988D] border border-[#CBD5E1] hover:border-[#10B9A9] rounded-lg transition-all cursor-pointer shadow-2xs"
+                  className="px-2.5 py-1 text-[11px] font-semibold bg-white hover:bg-brand-50 text-ink-900 hover:text-brand-700 border border-ink-200 hover:border-brand-500 rounded-lg transition-all cursor-pointer shadow-2xs"
                 >
-                  <span className="font-mono text-[10px] text-[#07988D] mr-1">[{preset.code}]</span>
+                  <span className="font-mono text-[10px] text-brand-700 mr-1">[{preset.code}]</span>
                   {preset.label}
                 </button>
               ))}
@@ -154,14 +154,14 @@ export const S12HypothesesDiag: React.FC<Props> = ({
         {/* Hypotheses List */}
         <div className="space-y-3.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+            <span className="text-sm font-bold text-ink-900">
               Diagnostics Formalisés ({formData.hypotheses?.length || 0})
             </span>
             {!effectiveReadOnly && (
               <button
                 type="button"
                 onClick={() => addHypothese()}
-                className="px-3 py-1.5 text-xs font-bold text-[#07988D] bg-[#ECFBF9] hover:bg-[#D9F7F3] border border-[#10B9A9]/30 rounded-xl transition-all flex items-center gap-1 cursor-pointer"
+                className="px-3 py-1.5 text-xs font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-500/30 rounded-xl transition-all flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Ajouter une hypothèse
@@ -175,13 +175,13 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                 key={hyp.id}
                 className={`p-5 rounded-2xl border transition-all ${
                   hyp.type === 'Principale'
-                    ? 'bg-[#F0FDFA]/40 border-[#10B9A9]/50 shadow-xs'
-                    : 'bg-[#F8FAFC] border-[#E2E8F0]'
+                    ? 'bg-brand-50/40 border-brand-500/50 shadow-xs'
+                    : 'bg-ink-25 border-ink-150'
                 }`}
               >
-                <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#EDF2F7] gap-3">
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-ink-100 gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-white border border-[#CBD5E1] text-[#18243A]">
+                    <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-white border border-ink-200 text-ink-900">
                       #{index + 1}
                     </span>
                     <select
@@ -194,8 +194,8 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                       }
                       className={`text-xs font-bold rounded-lg px-2.5 py-1 border transition-colors ${
                         hyp.type === 'Principale'
-                          ? 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC]'
-                          : 'bg-white text-[#64748B] border-[#CBD5E1]'
+                          ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
+                          : 'bg-white text-ink-500 border-ink-200'
                       }`}
                     >
                       <option value="Principale">Hypothèse Principale</option>
@@ -207,7 +207,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                     <button
                       type="button"
                       onClick={() => removeHypothese(hyp.id)}
-                      className="p-1.5 text-[#94A3B8] hover:text-[#BE123C] hover:bg-[#FFE4E6] rounded-lg transition-colors cursor-pointer"
+                      className="p-1.5 text-ink-400 hover:text-rose-700 hover:bg-rose-100 rounded-lg transition-colors cursor-pointer"
                       title="Supprimer cette hypothèse"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -217,7 +217,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                   <div className="md:col-span-1">
-                    <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                    <label className="block text-xs font-semibold text-ink-900 mb-1">
                       Code CIM-10 / DSM-5
                     </label>
                     <input
@@ -225,28 +225,28 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                       disabled={effectiveReadOnly}
                       value={hyp.codeCimDsm || ''}
                       onChange={(e) => updateHypothese(hyp.id, { codeCimDsm: e.target.value.toUpperCase() })}
-                      className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-mono font-bold rounded-lg px-3 py-2 uppercase"
+                      className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-mono font-bold rounded-lg px-3 py-2 uppercase"
                       placeholder="Ex: F20.0"
                     />
                   </div>
 
                   <div className="md:col-span-3">
-                    <label className="block text-xs font-semibold text-[#18243A] mb-1">
-                      Libellé nosologique / Diagnostic <span className="text-[#F43F5E]">*</span>
+                    <label className="block text-xs font-semibold text-ink-900 mb-1">
+                      Libellé nosologique / Diagnostic <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       disabled={effectiveReadOnly}
                       value={hyp.libelle}
                       onChange={(e) => updateHypothese(hyp.id, { libelle: e.target.value })}
-                      className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-bold text-[#18243A] rounded-lg px-3 py-2"
+                      className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-bold text-ink-900 rounded-lg px-3 py-2"
                       placeholder="Ex: Schizophrénie paranoïde"
                     />
                   </div>
                 </div>
 
                 <div className="mt-3">
-                  <label className="block text-xs font-semibold text-[#18243A] mb-1">
+                  <label className="block text-xs font-semibold text-ink-900 mb-1">
                     Arguments cliniques & critères remplis
                   </label>
                   <textarea
@@ -254,21 +254,21 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                     disabled={effectiveReadOnly}
                     value={hyp.argumentsCliniques}
                     onChange={(e) => updateHypothese(hyp.id, { argumentsCliniques: e.target.value })}
-                    className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-medium rounded-lg p-3 focus:outline-none"
+                    className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-medium rounded-lg p-3 focus:outline-none"
                     placeholder="Critères remplis, durée des symptômes, évolution, arguments en faveur..."
                   />
                 </div>
               </div>
             ))
           ) : (
-            <div className="p-8 text-center bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-2xl text-xs text-[#64748B] space-y-2">
-              <Stethoscope className="w-8 h-8 text-[#94A3B8] mx-auto" />
+            <div className="p-8 text-center bg-ink-25 border border-dashed border-ink-200 rounded-2xl text-xs text-ink-500 space-y-2">
+              <Stethoscope className="w-8 h-8 text-ink-400 mx-auto" />
               <p>Aucune hypothèse diagnostique formalisée pour le moment.</p>
               {!effectiveReadOnly && (
                 <button
                   type="button"
                   onClick={() => addHypothese()}
-                  className="px-3 py-1.5 text-xs font-bold text-[#07988D] bg-[#ECFBF9] hover:bg-[#D9F7F3] rounded-lg transition-colors cursor-pointer"
+                  className="px-3 py-1.5 text-xs font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors cursor-pointer"
                 >
                   + Ajouter une première hypothèse
                 </button>

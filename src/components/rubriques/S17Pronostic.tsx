@@ -55,13 +55,13 @@ export const S17Pronostic: React.FC<Props> = ({
     dataItem: PronosticHorizon
   ) => {
     return (
-      <div className="p-4 sm:p-5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[#EDF2F7]">
+      <div className="p-4 sm:p-5 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-ink-100">
           <div>
-            <h4 className="text-xs font-bold text-[#18243A] uppercase tracking-wider">
+            <h4 className="text-sm font-bold text-ink-900">
               {title}
             </h4>
-            <span className="text-[11px] text-[#64748B] font-medium">{timeframe}</span>
+            <span className="text-[11px] text-ink-500 font-medium">{timeframe}</span>
           </div>
 
           <div className="flex gap-2">
@@ -71,11 +71,11 @@ export const S17Pronostic: React.FC<Props> = ({
                 className={`px-3 py-1 text-xs font-bold rounded-lg border cursor-pointer transition-all ${
                   dataItem.appreciation === appr
                     ? appr === 'Favorable'
-                      ? 'bg-[#DCFCE7] text-[#15803D] border-[#86EFAC]'
+                      ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
                       : appr === 'Réservé'
-                      ? 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]'
-                      : 'bg-[#FFE4E6] text-[#BE123C] border-[#FECDD3]'
-                    : 'bg-white text-[#64748B] border-[#CBD5E1] hover:border-[#10B9A9]'
+                      ? 'bg-amber-100 text-amber-700 border-amber-200'
+                      : 'bg-rose-100 text-rose-700 border-rose-200'
+                    : 'bg-white text-ink-500 border-ink-200 hover:border-brand-500'
                 } ${effectiveReadOnly ? 'cursor-not-allowed opacity-80' : ''}`}
               >
                 <input
@@ -93,7 +93,7 @@ export const S17Pronostic: React.FC<Props> = ({
         </div>
 
         <div>
-          <label className="block text-[11px] font-semibold text-[#18243A] mb-1">
+          <label className="block text-[11px] font-semibold text-ink-900 mb-1">
             Éléments d’appréciation & justification
           </label>
           <textarea
@@ -101,7 +101,7 @@ export const S17Pronostic: React.FC<Props> = ({
             disabled={effectiveReadOnly}
             value={dataItem.details || ''}
             onChange={(e) => updateHorizon(horizonKey, { details: e.target.value })}
-            className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-medium rounded-lg p-2.5 focus:outline-none"
+            className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-medium rounded-lg p-2.5 focus:outline-none"
             placeholder="Arguments cliniques (adhésion, sévérité, comorbidités)..."
           />
         </div>
@@ -110,27 +110,27 @@ export const S17Pronostic: React.FC<Props> = ({
   };
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-6">
+    <div className="clinical-card p-6 sm:p-7 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-[#EDF2F7]">
+      <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold text-[#07988D] bg-[#ECFBF9] px-2.5 py-0.5 rounded-md border border-[#10B9A9]/20">
+            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
               S17 · CONCLUSION CLINIQUE
             </span>
-            <span className="text-xs text-[#64748B]">Dernière rubrique du plan</span>
+            <span className="text-xs text-ink-500">Dernière rubrique du plan</span>
           </div>
-          <h2 className="text-lg font-extrabold text-[#18243A] tracking-tight mt-1">
+          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
             Pronostic & Perspectives Évolutives
           </h2>
-          <p className="text-xs text-[#64748B] mt-0.5">
+          <p className="text-xs text-ink-500 mt-0.5">
             Évaluation pronostique à court, moyen et long terme (BR-014 : exclusivité Psychiatre)
           </p>
         </div>
       </div>
 
       {!isPsychiatre && (
-        <div className="p-3 bg-[#FEF3C7] border border-[#F59E0B]/30 text-[#B45309] rounded-xl text-xs font-semibold flex items-center gap-2">
+        <div className="p-3 bg-amber-100 border border-amber-500/30 text-amber-700 rounded-xl text-xs font-semibold flex items-center gap-2">
           <Lock className="w-4 h-4 shrink-0" />
           <span>
             Règle BR-014 : L’évaluation pronostique médicale relève de la responsabilité du Psychiatre (lecture seule pour {currentUserRole}).
@@ -139,7 +139,7 @@ export const S17Pronostic: React.FC<Props> = ({
       )}
 
       {isSaved && (
-        <div className="p-3 bg-[#DCFCE7] border border-[#10B981]/30 rounded-xl text-xs text-[#15803D] font-bold flex items-center gap-2">
+        <div className="p-3 bg-emerald-100 border border-emerald-500/30 rounded-xl text-xs text-emerald-700 font-bold flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4" />
           Évaluation pronostique enregistrée avec succès.
         </div>
@@ -154,8 +154,8 @@ export const S17Pronostic: React.FC<Props> = ({
         </div>
 
         {/* Facteurs pronostiques */}
-        <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-5 space-y-2">
-          <label className="block text-xs font-bold text-[#18243A] uppercase tracking-wider">
+        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-2">
+          <label className="block text-sm font-bold text-ink-900">
             Synthèse des Facteurs Pronostiques Majeurs (Favorables vs Péjoratifs)
           </label>
           <textarea
@@ -163,21 +163,21 @@ export const S17Pronostic: React.FC<Props> = ({
             disabled={effectiveReadOnly}
             value={formData.facteursPronostiques || ''}
             onChange={(e) => setFormData({ ...formData, facteursPronostiques: e.target.value })}
-            className="w-full bg-white border border-[#CBD5E1] focus:border-[#10B9A9] text-xs font-medium rounded-xl p-3 focus:outline-none leading-relaxed"
+            className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-medium rounded-xl p-3 focus:outline-none leading-relaxed"
             placeholder="Ex: Facteurs favorables (début aigu, bonne insertion antérieure, soutien familial, observance) vs facteurs péjoratifs (isolement, rupture de soins, abus de substances)..."
           />
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-5 border-t border-[#EDF2F7]">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-5 border-t border-ink-100">
           <div>
             {onPrevious && (
               <button
                 type="button"
                 onClick={onPrevious}
-                className="px-4 py-2 text-xs font-semibold text-[#18243A] bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#CBD5E1] rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold text-ink-900 bg-ink-25 hover:bg-ink-100 border border-ink-200 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
               >
-                <ChevronLeft className="w-4 h-4 text-[#64748B]" />
+                <ChevronLeft className="w-4 h-4 text-ink-500" />
                 <span>Précédent : S16</span>
               </button>
             )}
@@ -187,7 +187,7 @@ export const S17Pronostic: React.FC<Props> = ({
             {!effectiveReadOnly && (
               <button
                 type="submit"
-                className="px-5 py-2.5 text-xs font-bold text-white bg-[#10B9A9] hover:bg-[#07988D] active:scale-98 rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-sm shadow-[#10B9A9]/25"
+                className="px-5 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 active:scale-98 rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-sm shadow-brand-500/25"
               >
                 <Save className="w-4 h-4" />
                 <span>Enregistrer S17</span>
@@ -198,7 +198,7 @@ export const S17Pronostic: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={onOpenValidation}
-                className="px-4 py-2 text-xs font-bold text-white bg-[#10B981] hover:bg-[#059669] active:scale-98 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="px-4 py-2 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 active:scale-98 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Valider le dossier</span>
@@ -209,9 +209,9 @@ export const S17Pronostic: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={onOpenExport}
-                className="px-3.5 py-2 text-xs font-semibold text-[#18243A] bg-white border border-[#CBD5E1] hover:bg-[#F8FAFC] rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="px-3.5 py-2 text-xs font-semibold text-ink-900 bg-white border border-ink-200 hover:bg-ink-25 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
-                <Printer className="w-4 h-4 text-[#64748B]" />
+                <Printer className="w-4 h-4 text-ink-500" />
                 <span>Exporter</span>
               </button>
             )}

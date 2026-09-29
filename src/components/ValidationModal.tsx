@@ -63,22 +63,22 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0F172A]/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="clinical-card w-full max-w-xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200 border-[#CBD5E1] shadow-2xl">
+    <div className="fixed inset-0 z-50 bg-ink-950/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className="clinical-card w-full max-w-xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200 !rounded-3xl !border-ink-150 shadow-[var(--shadow-float)]">
         {/* Header */}
-        <div className="bg-[#1E293B] border-b border-[#334155] px-6 sm:px-7 py-4.5 flex items-center justify-between">
+        <div className="bg-ink-800 border-b border-ink-700 px-6 sm:px-7 py-4.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {mode === 'VALIDATION' ? (
               <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shadow-xs">
                 <CheckCircle2 className="w-5 h-5 text-emerald-400" />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-xl bg-[#10B9A9]/20 text-[#10B9A9] flex items-center justify-center border border-[#10B9A9]/30 shadow-xs">
-                <FilePlus2 className="w-5 h-5 text-[#10B9A9]" />
+              <div className="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-600 flex items-center justify-center border border-brand-500/30 shadow-xs">
+                <FilePlus2 className="w-5 h-5 text-brand-600" />
               </div>
             )}
             <div>
-              <h2 className="text-h2 font-black text-white tracking-tight">
+              <h2 className="text-h2 font-extrabold text-white tracking-tight">
                 {mode === 'VALIDATION' ? 'Validation & Verrouillage Clinique' : "Consignation d'un Addendum"}
               </h2>
               <p className="text-body-sm text-slate-400 font-medium">
@@ -87,9 +87,10 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
             </div>
           </div>
           <button
+            aria-label="Fermer"
             type="button"
             onClick={onClose}
-            className="text-[#94A3B8] hover:text-[#18243A] p-2 rounded-xl hover:bg-[#F1F5F7] transition-colors cursor-pointer"
+            className="text-ink-400 hover:text-ink-900 p-2 rounded-xl hover:bg-ink-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -100,14 +101,14 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
           <form onSubmit={handleValidationSubmit} className="p-6 sm:p-7 space-y-4.5">
             {/* Checklist des préconditions */}
             <div className="clinical-subcard p-4 sm:p-5 space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-[#E8EEF2]">
-                <span className="text-xs font-black uppercase tracking-wider text-[#18243A]">
+              <div className="flex items-center justify-between pb-2 border-b border-ink-100">
+                <span className="text-sm font-bold text-ink-900">
                   Contrôle Qualité & Préconditions (F-21 & B3)
                 </span>
                 <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded ${
                   validationChecks.missingRequirements.length === 0
-                    ? 'bg-[#DCFCE7] text-[#15803D]'
-                    : 'bg-[#FFE4E6] text-[#BE123C]'
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : 'bg-rose-100 text-rose-700'
                 }`}>
                   {8 - validationChecks.missingRequirements.length}/8 conformes
                 </span>
@@ -124,18 +125,18 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                   { id: 's14', label: 'S14 : Orientation thérapeutique choisie', ok: Boolean(dossier.s14PriseEnCharge.orientation) },
                   { id: 's17', label: 'S17 : Pronostic à court, moyen et long terme (BR-017)', ok: Boolean(dossier.s17Pronostic.courtTerme.appreciation && dossier.s17Pronostic.moyenTerme.appreciation && dossier.s17Pronostic.longTerme.appreciation) },
                 ].map((item) => (
-                  <div key={item.id} className="flex items-center justify-between p-2 rounded-lg bg-white border border-[#E8EEF2] hover:border-[#CBD5E1] transition-colors">
+                  <div key={item.id} className="flex items-center justify-between p-2 rounded-lg bg-white border border-ink-100 hover:border-ink-200 transition-colors">
                     <div className="flex items-center gap-2.5">
                       {item.ok ? (
-                        <div className="w-5 h-5 rounded-full bg-[#DCFCE7] text-[#15803D] flex items-center justify-center font-bold text-xs shrink-0">
+                        <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0">
                           ✓
                         </div>
                       ) : (
-                        <div className="w-5 h-5 rounded-full bg-[#FFE4E6] text-[#BE123C] flex items-center justify-center font-bold text-xs shrink-0">
+                        <div className="w-5 h-5 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-xs shrink-0">
                           ✕
                         </div>
                       )}
-                      <span className={`font-semibold ${item.ok ? 'text-[#18243A]' : 'text-[#BE123C]'}`}>
+                      <span className={`font-semibold ${item.ok ? 'text-ink-900' : 'text-rose-700'}`}>
                         {item.label}
                       </span>
                     </div>
@@ -147,7 +148,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                           onNavigateToRubrique(item.id);
                           onClose();
                         }}
-                        className="text-[11px] text-[#07988D] hover:underline font-bold flex items-center gap-1 cursor-pointer shrink-0 ml-2"
+                        className="text-[11px] text-brand-700 hover:underline font-bold flex items-center gap-1 cursor-pointer shrink-0 ml-2"
                       >
                         Compléter <ArrowRight className="w-3 h-3" />
                       </button>
@@ -159,8 +160,8 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
 
             {/* Role restriction notification if not Psychiatre */}
             {currentUser.role !== 'PSYCHIATRE' && (
-              <div className="p-3.5 bg-[#FEF3C7] border border-[#F59E0B]/30 rounded-xl flex items-start gap-3 text-xs text-[#92400E]">
-                <AlertTriangle className="w-4 h-4 text-[#B45309] shrink-0 mt-0.5" />
+              <div className="p-3.5 bg-amber-100 border border-amber-500/30 rounded-xl flex items-start gap-3 text-xs text-amber-800">
+                <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
                 <div className="flex-1 space-y-1">
                   <span className="font-extrabold block">Signature réservée au Médecin Psychiatre (BR-014)</span>
                   <p className="leading-snug">
@@ -170,7 +171,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                     <button
                       type="button"
                       onClick={onSwitchToPsychiatre}
-                      className="mt-1.5 px-3 py-1 bg-white text-[#B45309] border border-[#F59E0B] font-bold rounded-lg hover:bg-[#FEF3C7] text-xs cursor-pointer shadow-2xs"
+                      className="mt-1.5 px-3 py-1 bg-white text-amber-700 border border-amber-500 font-bold rounded-lg hover:bg-amber-100 text-xs cursor-pointer shadow-2xs"
                     >
                       Basculer sur le Dr. Oumar Diallo (Psychiatre)
                     </button>
@@ -180,7 +181,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
             )}
 
             {!validationChecks.canValidate ? (
-              <div className="p-3.5 bg-[#FFE4E6] border border-[#F43F5E]/30 rounded-xl flex items-start gap-2.5 text-xs text-[#BE123C]">
+              <div className="p-3.5 bg-rose-100 border border-rose-500/30 rounded-xl flex items-start gap-2.5 text-xs text-rose-700">
                 <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                 <div>
                   <span className="font-extrabold block">Impossible de valider le dossier en l'état</span>
@@ -191,14 +192,14 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
               </div>
             ) : (
               <>
-                <div className="p-3.5 bg-[#DCFCE7]/70 border border-[#86EFAC] rounded-xl text-xs text-[#15803D] flex items-center gap-2 font-semibold">
-                  <ShieldCheck className="w-5 h-5 shrink-0 text-[#15803D]" />
+                <div className="p-3.5 bg-emerald-100/70 border border-emerald-300 rounded-xl text-xs text-emerald-700 flex items-center gap-2 font-semibold">
+                  <ShieldCheck className="w-5 h-5 shrink-0 text-emerald-700" />
                   <span>Toutes les rubriques requises sont conformes. Le dossier est prêt pour la signature et le verrouillage officiel.</span>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#18243A] mb-1">
-                    Signature du médecin psychiatre signataire <span className="text-[#F43F5E]">*</span>
+                  <label className="block text-xs font-bold text-ink-900 mb-1">
+                    Signature du médecin psychiatre signataire <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -209,12 +210,12 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                   />
                 </div>
 
-                <label className="flex items-start gap-2.5 p-3.5 bg-[#F1F5F7] rounded-xl text-xs text-[#18243A] cursor-pointer border border-[#D9E2E8]">
+                <label className="flex items-start gap-2.5 p-3.5 bg-ink-100 rounded-xl text-xs text-ink-900 cursor-pointer border border-ink-150">
                   <input
                     type="checkbox"
                     checked={confirmedCheckbox}
                     onChange={(e) => setConfirmedCheckbox(e.target.checked)}
-                    className="mt-0.5 rounded text-[#10B9A9] focus:ring-[#10B9A9]"
+                    className="mt-0.5 rounded text-brand-600 focus:ring-brand-500"
                   />
                   <span className="font-medium leading-relaxed">
                     J'atteste sur l'honneur l'exactitude de ces constatations cliniques. Je confirme le verrouillage définitif du dossier. Toute observation ultérieure fera l’objet d’un addendum horodaté (BR-013).
@@ -223,11 +224,11 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
               </>
             )}
 
-            <div className="flex items-center justify-between pt-3 border-t border-[#E8EEF2]">
+            <div className="flex items-center justify-between pt-3 border-t border-ink-100">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2.5 text-xs font-bold text-[#64748B] hover:text-[#18243A] bg-[#F1F5F7] hover:bg-[#E2E8F0] rounded-xl transition-colors cursor-pointer"
+                className="px-4 py-2.5 text-xs font-bold text-ink-500 hover:text-ink-900 bg-ink-100 hover:bg-ink-150 rounded-xl transition-colors cursor-pointer"
               >
                 Annuler
               </button>
@@ -235,7 +236,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
               <button
                 type="submit"
                 disabled={!validationChecks.canValidate || !confirmedCheckbox || !signataire.trim()}
-                className="px-5 py-2.5 text-body-sm font-black text-white bg-[#1E293B] hover:bg-[#0F172A] disabled:opacity-40 disabled:cursor-not-allowed rounded-xl transition-all flex items-center gap-2 shadow-sm shadow-[#1E293B]/25 cursor-pointer"
+                className="px-5 py-2.5 text-body-sm font-extrabold text-white bg-ink-800 hover:bg-ink-950 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl transition-all flex items-center gap-2 shadow-sm shadow-ink-800/25 cursor-pointer"
               >
                 <Lock className="w-4 h-4" />
                 <span>Valider & Verrouiller le Dossier</span>
@@ -245,7 +246,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
         ) : (
           /* Mode ADDENDUM (BR-013) */
           <form onSubmit={handleAddendumSubmit} className="p-6 sm:p-7 space-y-4.5">
-            <div className="p-3.5 bg-[#F3E8FF] border border-[#D8B4FE] rounded-xl text-xs text-[#7E22CE]">
+            <div className="p-3.5 bg-violet-100 border border-violet-300 rounded-xl text-xs text-violet-700">
               <span className="font-extrabold block">Règle médico-légale BR-013 : Dossier Validé</span>
               <p className="mt-0.5 leading-relaxed font-medium">
                 Le dossier étant clôturé et certifié, toute nouvelle observation ou rectification clinique doit être inscrite dans un addendum daté et signé nominativement sans altérer l'historique d'origine.
@@ -253,8 +254,8 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#18243A] mb-1">
-                Rubrique concernée par l'addendum <span className="text-[#F43F5E]">*</span>
+              <label className="block text-xs font-bold text-ink-900 mb-1">
+                Rubrique concernée par l'addendum <span className="text-rose-500">*</span>
               </label>
               <select
                 value={addendumRubriqueId}
@@ -270,8 +271,8 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#18243A] mb-1">
-                Contenu de l'addendum clinique <span className="text-[#F43F5E]">*</span>
+              <label className="block text-xs font-bold text-ink-900 mb-1">
+                Contenu de l'addendum clinique <span className="text-rose-500">*</span>
               </label>
               <textarea
                 rows={4}
@@ -283,11 +284,11 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
               />
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-[#E8EEF2]">
+            <div className="flex items-center justify-between pt-3 border-t border-ink-100">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2.5 text-xs font-bold text-[#64748B] hover:text-[#18243A] bg-[#F1F5F7] hover:bg-[#E2E8F0] rounded-xl transition-colors cursor-pointer"
+                className="px-4 py-2.5 text-xs font-bold text-ink-500 hover:text-ink-900 bg-ink-100 hover:bg-ink-150 rounded-xl transition-colors cursor-pointer"
               >
                 Annuler
               </button>
@@ -295,7 +296,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
               <button
                 type="submit"
                 disabled={!addendumContent.trim()}
-                className="clinical-btn-primary px-5 py-2.5 text-xs flex items-center gap-2 disabled:opacity-50 cursor-pointer shadow-sm shadow-[#10B9A9]/20"
+                className="clinical-btn-primary px-5 py-2.5 text-xs flex items-center gap-2 disabled:opacity-50 cursor-pointer shadow-sm shadow-brand-500/20"
               >
                 <FilePlus2 className="w-4 h-4" />
                 <span>Consigner l'Addendum Horodaté</span>

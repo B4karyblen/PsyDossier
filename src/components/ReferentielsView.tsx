@@ -122,24 +122,21 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
   }, [referenceLists.situationsMatrimoniales, searchTerm]);
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 space-y-5">
       {/* 1. Header */}
-      <div className="clinical-card p-6 sm:p-7 bg-gradient-to-br from-white via-[#FCFDFE] to-[#F0FDFA] flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-[#ECFBF9] text-[#07988D] flex items-center justify-center border border-[#10B9A9]/20 shadow-xs">
-              <Database className="w-5 h-5 text-[#07988D]" />
-            </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black text-[#18243A] tracking-tight">
-                  Gestion des Référentiels & Nomenclatures
-                </h1>
-                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#ECFBF9] text-[#07988D] border border-[#10B9A9]/30">
+                <h2 className="text-2xl font-extrabold text-ink-900 tracking-tight">
+                  Référentiels & nomenclatures
+                </h2>
+                <span className="hidden sm:inline-flex chip bg-ink-100 text-ink-600">
                   <Tag className="w-3 h-3" /> F-24
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-[#475569] font-medium mt-0.5">
+              <p className="text-sm text-ink-500 font-medium mt-1">
                 Nomenclatures CIM-10 / DSM-5, syndromes, bilans paracliniques et listes de valeurs cliniques
               </p>
             </div>
@@ -149,22 +146,22 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
         <div>
           {!isAdmin ? (
             <div className="flex flex-wrap items-center gap-2">
-              <div className="px-3 py-1.5 bg-[#FEF3C7] text-[#B45309] rounded-xl text-xs font-bold border border-[#FDE68A] flex items-center gap-1.5 shadow-2xs">
+              <div className="chip bg-amber-100 text-amber-800 !py-2 !px-3.5">
                 <Lock className="w-3.5 h-3.5" />
-                <span>Lecture seule (Modifications réservées ADMIN)</span>
+                <span>Lecture seule · modifications réservées à l'administrateur</span>
               </div>
               {onSwitchToAdmin && (
                 <button
                   type="button"
                   onClick={onSwitchToAdmin}
-                  className="px-3.5 py-1.5 text-xs font-bold bg-white border border-[#D9E2E8] hover:border-[#10B9A9] text-[#18243A] rounded-xl transition-all cursor-pointer shadow-xs"
+                  className="btn-secondary !py-2"
                 >
                   Basculer en Admin (M. Touré)
                 </button>
               )}
             </div>
           ) : (
-            <div className="px-3.5 py-1.5 bg-[#DCFCE7] text-[#15803D] rounded-xl text-xs font-bold border border-[#86EFAC] flex items-center gap-1.5 shadow-2xs">
+            <div className="chip bg-emerald-100 text-emerald-800 !py-2 !px-3.5">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Mode Administrateur actif : modifications autorisées</span>
             </div>
@@ -173,14 +170,14 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
       </div>
 
       {isSaved && (
-        <div className="p-3 bg-[#DCFCE7] border border-[#86EFAC] rounded-xl text-body-sm text-[#15803D] font-bold flex items-center gap-2 animate-in fade-in duration-200">
-          <CheckCircle2 className="w-4 h-4 text-[#15803D]" />
+        <div className="p-3 bg-emerald-100 border border-emerald-300 rounded-xl text-body-sm text-emerald-700 font-bold flex items-center gap-2 animate-in fade-in duration-200">
+          <CheckCircle2 className="w-4 h-4 text-emerald-700" />
           Référentiel mis à jour et synchronisé avec succès.
         </div>
       )}
 
       {/* 2. Tabs Bar */}
-      <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-[#F1F5F7] rounded-2xl border border-[#D9E2E8]">
+      <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-ink-100 rounded-2xl border border-ink-150">
         {[
           { id: 'syndromes', label: 'Syndromes Fréquents', count: referenceLists.syndromesFrequents.length },
           { id: 'cim', label: 'Classifications CIM-10', count: referenceLists.diagnosticClassifications.length },
@@ -198,14 +195,14 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             }}
             className={`px-3.5 py-2 text-body-sm font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
               activeTab === tab.id
-                ? 'bg-white text-[#07988D] shadow-xs border border-[#D9E2E8]'
-                : 'text-[#64748B] hover:text-[#18243A] hover:bg-white/50'
+                ? 'bg-white text-brand-700 shadow-xs border border-ink-150'
+                : 'text-ink-500 hover:text-ink-900 hover:bg-white/50'
             }`}
           >
             <span>{tab.label}</span>
             <span
               className={`px-1.5 py-0.2 rounded text-caption font-mono font-bold ${
-                activeTab === tab.id ? 'bg-[#ECFBF9] text-[#07988D]' : 'bg-[#E2E8F0] text-[#64748B]'
+                activeTab === tab.id ? 'bg-brand-50 text-brand-700' : 'bg-ink-150 text-ink-500'
               }`}
             >
               {tab.count}
@@ -217,9 +214,9 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
       {/* 3. Tab Contents Container */}
       <div className="clinical-card p-6 sm:p-7 space-y-5">
         {/* Category Header + Search Filter */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8EEF2]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-ink-100">
           <div>
-            <h2 className="text-h2 font-extrabold text-[#18243A]">
+            <h2 className="text-h2 font-extrabold text-ink-900">
               {activeTab === 'syndromes' && 'Nomenclature des Syndromes Psychiatriques Fréquents'}
               {activeTab === 'cim' && 'Nomenclature CIM-10 / DSM-5'}
               {activeTab === 'bilans' && 'Référentiel des Bilans Paracliniques Types'}
@@ -227,13 +224,13 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {activeTab === 'religions' && 'Référentiel des Confessions Religieuses'}
               {activeTab === 'matrimoniales' && 'Référentiel des Statuts Matrimoniaux'}
             </h2>
-            <p className="text-body-sm text-[#64748B] mt-0.5">
+            <p className="text-body-sm text-ink-500 mt-0.5">
               Éléments disponibles dans les sélecteurs de saisie des rubriques correspondantes
             </p>
           </div>
 
           <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 text-[#94A3B8] absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchTerm}
@@ -251,14 +248,14 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredSyndromes.map((s) => (
                 <div
                   key={s}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-[#10B9A9]/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
                 >
-                  <span className="text-[#18243A]">{s}</span>
+                  <span className="text-ink-900">{s}</span>
                   {isAdmin && (
                     <button
                       type="button"
                       onClick={() => removeItem('syndromesFrequents', s)}
-                      className="text-[#94A3B8] hover:text-[#BE123C] hover:bg-[#FFE4E6] p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                       title="Supprimer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -269,7 +266,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
@@ -298,19 +295,19 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredCim.map((item) => (
                 <div
                   key={item.code}
-                  className="clinical-subcard p-3.5 flex items-start justify-between text-body-sm hover:border-[#10B9A9]/40 transition-colors group"
+                  className="clinical-subcard p-3.5 flex items-start justify-between text-body-sm hover:border-brand-500/40 transition-colors group"
                 >
                   <div className="flex items-start gap-2.5">
-                    <span className="text-mono font-black text-[#07988D] bg-[#ECFBF9] px-2 py-0.5 rounded border border-[#10B9A9]/30 shrink-0">
+                    <span className="text-mono font-extrabold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-500/30 shrink-0">
                       {item.code}
                     </span>
-                    <span className="font-bold text-[#18243A] leading-snug">{item.label}</span>
+                    <span className="font-bold text-ink-900 leading-snug">{item.label}</span>
                   </div>
                   {isAdmin && (
                     <button
                       type="button"
                       onClick={() => removeCimItem(item.code)}
-                      className="text-[#94A3B8] hover:text-[#BE123C] hover:bg-[#FFE4E6] p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer shrink-0 ml-2"
+                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer shrink-0 ml-2"
                       title="Supprimer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -321,7 +318,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-2xl grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
                 <input
                   type="text"
                   value={newCimCode}
@@ -357,14 +354,14 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredBilans.map((b) => (
                 <div
                   key={b}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-[#10B9A9]/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
                 >
-                  <span className="text-[#18243A]">{b}</span>
+                  <span className="text-ink-900">{b}</span>
                   {isAdmin && (
                     <button
                       type="button"
                       onClick={() => removeItem('typesBilans', b)}
-                      className="text-[#94A3B8] hover:text-[#BE123C] hover:bg-[#FFE4E6] p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -374,7 +371,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
@@ -403,14 +400,14 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredEthnies.map((e) => (
                 <div
                   key={e}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-[#10B9A9]/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
                 >
-                  <span className="text-[#18243A]">{e}</span>
+                  <span className="text-ink-900">{e}</span>
                   {isAdmin && (
                     <button
                       type="button"
                       onClick={() => removeItem('ethnies', e)}
-                      className="text-[#94A3B8] hover:text-[#BE123C] hover:bg-[#FFE4E6] p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -420,7 +417,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
@@ -449,14 +446,14 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredReligions.map((r) => (
                 <div
                   key={r}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-[#10B9A9]/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
                 >
-                  <span className="text-[#18243A]">{r}</span>
+                  <span className="text-ink-900">{r}</span>
                   {isAdmin && (
                     <button
                       type="button"
                       onClick={() => removeItem('religions', r)}
-                      className="text-[#94A3B8] hover:text-[#BE123C] hover:bg-[#FFE4E6] p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -466,7 +463,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
@@ -495,14 +492,14 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredMatrimoniales.map((m) => (
                 <div
                   key={m}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-[#10B9A9]/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
                 >
-                  <span className="text-[#18243A]">{m}</span>
+                  <span className="text-ink-900">{m}</span>
                   {isAdmin && (
                     <button
                       type="button"
                       onClick={() => removeItem('situationsMatrimoniales', m)}
-                      className="text-[#94A3B8] hover:text-[#BE123C] hover:bg-[#FFE4E6] p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -512,7 +509,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
