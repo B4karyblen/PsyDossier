@@ -3,9 +3,11 @@
  *
  * - Passwords: scrypt with per-user salt.
  * - Sessions: random token in an HttpOnly, SameSite=Strict cookie; only its SHA-256 is stored.
- *   Idle timeout 30 min, absolute lifetime 12 h.
- * - Accounts are created by an ADMIN; the user sets their own password with a one-time
- *   activation code. Accounts are deactivated, never deleted.
+ *   Idle timeout 2 h (single-user workstation), absolute lifetime 12 h.
+ * - Single-doctor install: the account created at first start is the *owner* — a psychiatrist
+ *   who also manages lists and accounts. Further accounts (optional) are created by the owner or
+ *   an ADMIN; they set their own password with a one-time activation code.
+ * - Accounts are deactivated, never deleted.
  */
 import crypto from 'node:crypto';
 import type { Express, NextFunction, Request, Response } from 'express';
@@ -14,7 +16,7 @@ import { db, transaction } from './db';
 import { Actor, writeAudit } from './audit';
 
 const COOKIE = 'psyd_session';
-const IDLE_MS = 30 * 60 * 1000;
+const IDLE_MS = 2 * 60 * 60 * 1000;
 const ABSOLUTE_MS = 12 * 60 * 60 * 1000;
 const SETUP_CODE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const MIN_PASSWORD = 8;
@@ -35,6 +37,8 @@ export interface SessionUser extends Actor {
   login: string;
   title: string;
   service: string;
+  /** The doctor who installed PsyDossier: clinical role + list/account management. */
+  isOwner: boolean;
 }
 
 interface UserRow {
@@ -76,7 +80,43 @@ const q = {
   deleteSession: db.prepare('DELETE FROM sessions WHERE token_hash = ?'),
   deleteUserSessions: db.prepare('DELETE FROM sessions WHERE user_id = ?'),
   purgeSessions: db.prepare('DELETE FROM sessions WHERE last_seen < ? OR created_at < ?'),
+  getSetting: db.prepare('SELECT value FROM settings WHERE key = ?'),
+  setSetting: db.prepare(`
+    INSERT INTO settings (key, value) VALUES (?, ?)
+    ON CONFLICT(key) DO UPDATE SET value = excluded.value
+  `),
+  setRole: db.prepare('UPDATE users SET role = ?, title = ? WHERE id = ?'),
 };
+
+// ── Owner (single-doctor install) ───────────────────────────
+
+const OWNER_KEY = 'owner_user_id';
+
+export function ownerId(): string | null {
+  const row = q.getSetting.get(OWNER_KEY) as { value: string } | undefined;
+  return row?.value ?? null;
+}
+
+export function setOwner(userId: string) {
+  q.setSetting.run(OWNER_KEY, userId);
+}
+
+/**
+ * Installs set up before the owner concept created a lone ADMIN, who cannot see clinical data.
+ * Such an account becomes the owning psychiatrist; multi-user installs are left untouched.
+ */
+export function migrateOwner() {
+  if (ownerId()) return;
+  const users = q.allUsers.all() as unknown as UserRow[];
+  if (users.length === 1 && users[0].role === 'ADMIN') {
+    q.setRole.run('PSYCHIATRE', users[0].title === 'Administrateur' ? 'Médecin psychiatre' : users[0].title, users[0].id);
+    setOwner(users[0].id);
+    console.log(`[comptes] « ${users[0].login} » devient le compte du médecin (psychiatre, gestion des listes).`);
+  }
+}
+
+/** Account / list management: ADMIN, or the owning doctor. */
+export const canManage = (u: SessionUser) => u.role === 'ADMIN' || u.isOwner;
 
 // ── Helpers ─────────────────────────────────────────────────
 
@@ -122,6 +162,7 @@ function toAccount(u: UserRow): UserAccount {
     service: u.service,
     active: u.active === 1,
     hasPassword: Boolean(u.password_hash),
+    isOwner: u.id === ownerId(),
     createdAt: u.created_at,
     lastLoginAt: u.last_login_at ?? undefined,
   };
@@ -134,6 +175,7 @@ const toSessionUser = (u: UserRow): SessionUser => ({
   role: u.role,
   title: u.title,
   service: u.service,
+  isOwner: u.id === ownerId(),
 });
 
 function passwordProblem(pw: unknown): string | null {
@@ -246,6 +288,17 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+/** ADMIN or the owning doctor (lists, accounts, backups). */
+export function requireManager(req: Request, res: Response, next: NextFunction) {
+  const user = currentUser(res);
+  if (!canManage(user)) {
+    writeAudit(user, 'ACCES_REFUSE', { details: `Accès refusé : ${req.method} ${req.path} (rôle ${user.role}).` });
+    res.status(403).json({ error: 'Action réservée au médecin titulaire ou à l’administrateur.' });
+    return;
+  }
+  next();
+}
+
 export function requireRole(...roles: UserRole[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = currentUser(res);
@@ -282,7 +335,7 @@ export function registerAuthRoutes(app: Express) {
     res.json({ setupRequired: !usersExist(), user });
   });
 
-  // First start: create the initial administrator. Only possible while no account exists.
+  // First start: create the doctor's own account (owner). Only possible while no account exists.
   app.post('/api/auth/setup', (req, res) => {
     const name = str(req.body?.name);
     const login = str(req.body?.login, 40);
@@ -298,20 +351,23 @@ export function registerAuthRoutes(app: Express) {
     }
     const created = transaction(() => {
       if (usersExist()) return null;
-      return createUserWithPassword({
+      const u = createUserWithPassword({
         login,
         name,
-        role: 'ADMIN',
-        title: str(req.body?.title) || 'Administrateur',
+        role: 'PSYCHIATRE',
+        title: str(req.body?.title) || 'Médecin psychiatre',
+        service: str(req.body?.service),
         password,
       });
+      setOwner(u.id);
+      return u;
     });
     if (!created) {
       res.status(409).json({ error: 'La configuration initiale a déjà été effectuée.' });
       return;
     }
     writeAudit(toSessionUser(created), 'GESTION_COMPTE', {
-      details: `Configuration initiale : création du compte administrateur « ${login} ».`,
+      details: `Configuration initiale : création du compte du médecin « ${login} ».`,
     });
     startSession(res, created);
     res.json({ user: toSessionUser(created) });
@@ -410,7 +466,7 @@ export function registerAuthRoutes(app: Express) {
   });
 
   // ── Account management (ADMIN) ──
-  const admin = [requireAuth, requireRole('ADMIN')];
+  const admin = [requireAuth, requireManager];
 
   app.get('/api/users', ...admin, (_req, res) => {
     res.json((q.allUsers.all() as unknown as UserRow[]).map(toAccount));
@@ -465,12 +521,16 @@ export function registerAuthRoutes(app: Express) {
       res.status(400).json({ error: 'Nom et rôle valides requis.' });
       return;
     }
-    if (u.id === actor.id && (next.active === 0 || next.role !== 'ADMIN')) {
-      res.status(400).json({ error: 'Vous ne pouvez pas désactiver votre propre compte ni retirer votre rôle administrateur.' });
+    if (u.id === actor.id && (next.active === 0 || next.role !== u.role)) {
+      res.status(400).json({ error: 'Vous ne pouvez pas désactiver votre propre compte ni changer votre propre rôle.' });
+      return;
+    }
+    if (u.id === ownerId() && (next.active === 0 || next.role !== u.role)) {
+      res.status(400).json({ error: 'Le compte du médecin titulaire ne peut être ni désactivé ni changé de rôle.' });
       return;
     }
     const losesAdmin = u.role === 'ADMIN' && u.active === 1 && (next.role !== 'ADMIN' || next.active === 0);
-    if (losesAdmin && (q.activeAdmins.get() as { n: number }).n <= 1) {
+    if (losesAdmin && !ownerId() && (q.activeAdmins.get() as { n: number }).n <= 1) {
       res.status(400).json({ error: 'Au moins un administrateur actif est requis.' });
       return;
     }

@@ -11,7 +11,9 @@ import {
   Plus,
   ArrowUpRight,
   ChevronRight,
+  HardDrive,
 } from 'lucide-react';
+import { BACKUP_REMINDER_DAYS, daysSince } from './BackupDialog';
 
 interface ClinicalDashboardProps {
   dossiers: DossierPsychiatrique[];
@@ -25,6 +27,8 @@ interface ClinicalDashboardProps {
     search?: string;
     sortBy?: 'dateModif' | 'dateCreation' | 'nom' | 'completude';
   }) => void;
+  /** Owner / ADMIN: reminder to back up off the PC. */
+  backupReminder?: { lastBackup: string | null; onOpen: () => void };
 }
 
 export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
@@ -33,6 +37,7 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
   onSelectDossier,
   onOpenNewPatient,
   onNavigateToFilteredRegistre,
+  backupReminder,
 }) => {
   const activeDossiers = dossiers.filter((d) => d.statut !== 'ARCHIVÉ');
   const valides = dossiers.filter((d) => d.statut === 'VALIDÉ');
@@ -179,7 +184,7 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
             {greeting}, Dr {firstName}
           </h1>
           <p className="page-subtitle">
-            Service de psychiatrie universitaire · {currentUser.title}
+            {[currentUser.service, currentUser.title].filter(Boolean).join(" · ")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -199,6 +204,23 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
           )}
         </div>
       </header>
+
+      {backupReminder && (() => {
+        const age = daysSince(backupReminder.lastBackup);
+        if (age !== null && age < BACKUP_REMINDER_DAYS) return null;
+        return (
+          <div role="status" className="flex flex-col sm:flex-row sm:items-center gap-3 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200">
+            <HardDrive className="w-5 h-5 text-amber-700 shrink-0" />
+            <p className="flex-1 text-base text-amber-900">
+              <strong className="font-semibold">Sauvegarde externe {age === null ? 'jamais faite' : `datant de ${age} jours`}.</strong>{' '}
+              Copiez vos dossiers sur une clé USB : si ce disque tombe en panne, tout serait perdu.
+            </p>
+            <button type="button" onClick={backupReminder.onOpen} className="btn-primary shrink-0">
+              Sauvegarder maintenant
+            </button>
+          </div>
+        );
+      })()}
 
       {/* KPI strip */}
       <div className="clinical-card grid grid-cols-2 xl:grid-cols-4 overflow-hidden">

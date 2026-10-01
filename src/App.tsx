@@ -33,7 +33,8 @@ import { getRubriqueCompleteness, getRubriquePermission, RUBRIQUES_CONFIG } from
 import { RubriqueStateCard } from './components/rubriques/RubriqueStateCard';
 import { ROLES_CAN_CREATE_DOSSIER, ROLES_CAN_EXPORT, ROLES_CAN_READ_AUDIT } from './utils/emptyDossier';
 import { AlertTriangle, HeartPulse } from 'lucide-react';
-import { api, ApiError, SessionUser } from './lib/api';
+import { api, ApiError, canManage, SessionUser } from './lib/api';
+import { BackupDialog } from './components/BackupDialog';
 import { useServerSync } from './lib/useServerSync';
 import { confirmDiscard } from './lib/dirtyGuard';
 import { SessionExpiredDialog, SetupScreen, SignInScreen } from './components/auth/AuthScreens';
@@ -138,6 +139,7 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
   );
   const canReadAudit = ROLES_CAN_READ_AUDIT.includes(currentUser.role);
   const canCreateDossier = ROLES_CAN_CREATE_DOSSIER.includes(currentUser.role);
+  const isManager = canManage(user);
   const openNewPatient = canCreateDossier ? () => setIsNewPatientModalOpen(true) : undefined;
 
   // Data is persisted by the local server (SQLite), which enforces permissions. See server/.
@@ -155,6 +157,8 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
   const [loadStatus, setLoadStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [isBackupOpen, setIsBackupOpen] = useState(false);
+  const [lastBackup, setLastBackup] = useState<string | null>(null);
   // Empty rubrique the user chose to fill in (« Renseigner »), as `${dossierId}:${rubriqueId}`
   const [startedRubrique, setStartedRubrique] = useState<string | null>(null);
 
@@ -234,6 +238,7 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
       setAuditLogs(state.auditLogs);
       setReferenceLists(refs);
       setReferentielsUsage(state.referentielsUsage ?? {});
+      setLastBackup(state.lastExternalBackup ?? null);
       setLoadStatus('ready');
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) onSignedOut();
@@ -540,6 +545,9 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
         onOpenQuickSearch={() => setIsCommandPaletteOpen(true)}
         currentUser={currentUser}
         canReadAudit={canReadAudit}
+        canManage={isManager}
+        lastBackup={lastBackup}
+        onOpenBackup={() => setIsBackupOpen(true)}
         onLogout={handleLogout}
         onChangePassword={() => setIsPasswordDialogOpen(true)}
         isCollapsed={isSidebarCollapsed}
@@ -582,6 +590,7 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
                 setActiveView('REGISTRE');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
+              backupReminder={isManager ? { lastBackup, onOpen: () => setIsBackupOpen(true) } : undefined}
             />
           )}
 
@@ -598,7 +607,7 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
           )}
 
           {/* VIEW B: JOURNAL D'AUDIT */}
-          {activeView === 'UTILISATEURS' && currentUser.role === 'ADMIN' && <UsersView currentUserId={currentUser.id} />}
+          {activeView === 'UTILISATEURS' && isManager && <UsersView currentUserId={currentUser.id} />}
 
           {activeView === 'AUDIT' && canReadAudit && (
             <AuditLogView
@@ -616,6 +625,7 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
               onUpdateReferenceLists={setReferenceLists}
               currentUserRole={currentUser.role}
               usage={referentielsUsage}
+              canEdit={isManager}
             />
           )}
 
@@ -916,6 +926,9 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
       )}
 
       {isPasswordDialogOpen && <ChangePasswordDialog onClose={() => setIsPasswordDialogOpen(false)} />}
+      {isBackupOpen && (
+        <BackupDialog lastBackup={lastBackup} onClose={() => setIsBackupOpen(false)} onDone={setLastBackup} />
+      )}
 
       {sessionExpired && (
         <SessionExpiredDialog
@@ -952,6 +965,8 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
         activeDossierId={activeDossierId}
         canCreateDossier={canCreateDossier}
         canReadAudit={canReadAudit}
+        canManage={isManager}
+        onOpenBackup={() => setIsBackupOpen(true)}
       />
     </div>
   );

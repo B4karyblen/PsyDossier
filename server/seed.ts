@@ -5,7 +5,7 @@
 import { CLINICAL_USERS, INITIAL_AUDIT_LOGS, INITIAL_DOSSIERS, INITIAL_REFERENCE_LISTS } from '../src/data/initialData';
 import { db, transaction } from './db';
 import { importAudit } from './audit';
-import { createUserWithPassword, usersExist } from './auth';
+import { createUserWithPassword, setOwner, usersExist } from './auth';
 import { allDossiers, saveDossier } from './dossiers';
 
 export const DEMO_PASSWORD = 'demo1234';
@@ -24,6 +24,7 @@ export function seedDemo() {
           password: DEMO_PASSWORD,
         });
       }
+      setOwner('user-psy-1'); // Dr. Oumar Diallo: the doctor running this demo install
       console.log(`[demo] comptes créés (identifiant = partie locale de l’e-mail, mot de passe « ${DEMO_PASSWORD} »)`);
       for (const u of CLINICAL_USERS) console.log(`        ${u.role.padEnd(16)} ${u.email.split('@')[0]}`);
     }

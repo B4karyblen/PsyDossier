@@ -90,6 +90,8 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
         return 'bg-white text-ink-600 border-ink-200';
       case 'GESTION_COMPTE':
         return 'bg-sky-50 text-sky-800 border-sky-200';
+      case 'SAUVEGARDE':
+        return 'bg-emerald-50 text-emerald-800 border-emerald-200';
       default:
         return 'bg-ink-25 text-ink-500 border-ink-150';
     }
@@ -171,6 +173,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                 <option value="ECHEC_CONNEXION">Échec de connexion</option>
                 <option value="DECONNEXION">Déconnexion</option>
                 <option value="GESTION_COMPTE">Gestion des comptes</option>
+                <option value="SAUVEGARDE">Sauvegarde</option>
               </select>
             </div>
 

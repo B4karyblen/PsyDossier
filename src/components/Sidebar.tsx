@@ -17,7 +17,9 @@ import {
   UserCog,
   LogOut,
   KeyRound,
+  HardDrive,
 } from 'lucide-react';
+import { BACKUP_REMINDER_DAYS, daysSince } from './BackupDialog';
 
 interface SidebarProps {
   activeView: AppView;
@@ -31,6 +33,9 @@ interface SidebarProps {
   onOpenQuickSearch: () => void;
   currentUser: UserProfile;
   canReadAudit: boolean;
+  canManage: boolean;
+  lastBackup: string | null;
+  onOpenBackup: () => void;
   onLogout: () => void;
   onChangePassword: () => void;
   isCollapsed: boolean;
@@ -51,6 +56,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenQuickSearch,
   currentUser,
   canReadAudit,
+  canManage,
+  lastBackup,
+  onOpenBackup,
   onLogout,
   onChangePassword,
   isCollapsed,
@@ -180,7 +188,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 PsyDossier
               </div>
               <p className="text-xs text-ink-600 font-medium truncate mt-1">
-                CHU Point G · Psychiatrie
+                {currentUser.service || 'Dossier patient en psychiatrie'}
               </p>
             </div>
           )}
@@ -326,6 +334,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             );
           })}
+
+          {canManage && (() => {
+            const age = daysSince(lastBackup);
+            const overdue = age === null || age >= BACKUP_REMINDER_DAYS;
+            return (
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenBackup();
+                  onCloseMobile();
+                }}
+                className={itemClass(false)}
+                title={isCollapsed ? 'Sauvegarde sur clé USB' : undefined}
+              >
+                <span className={iconWrapClass(false)}>
+                  <HardDrive className="w-[18px] h-[18px]" strokeWidth={2} />
+                </span>
+                {!isCollapsed && (
+                  <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                    <span className="text-sm truncate leading-tight font-semibold">Sauvegarde</span>
+                    {overdue && (
+                      <span className="chip bg-amber-50 text-amber-800 ring-1 ring-inset ring-amber-200 !px-1.5" title="Sauvegarde externe à faire">
+                        <span className="dot" />
+                        À faire
+                      </span>
+                    )}
+                  </div>
+                )}
+              </button>
+            );
+          })()}
         </div>
       </nav>
 
