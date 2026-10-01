@@ -69,7 +69,7 @@ export const S17Pronostic: React.FC<Props> = ({
             {(['Favorable', 'Réservé', 'Défavorable'] as const).map((appr) => (
               <label
                 key={appr}
-                className={`px-3 py-1 text-xs font-bold rounded-lg border cursor-pointer transition-all ${
+                className={`px-3 py-1 text-xs font-bold rounded-lg border cursor-pointer transition-all has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary-500 has-[:focus-visible]:ring-offset-1 ${
                   dataItem.appreciation === appr
                     ? appr === 'Favorable'
                       ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
