@@ -29,7 +29,8 @@ import {
   AppView,
 } from './types';
 import { INITIAL_REFERENCE_LISTS } from './data/initialData';
-import { getRubriquePermission, RUBRIQUES_CONFIG } from './utils/rules';
+import { getRubriqueCompleteness, getRubriquePermission, RUBRIQUES_CONFIG } from './utils/rules';
+import { RubriqueStateCard } from './components/rubriques/RubriqueStateCard';
 import { ROLES_CAN_CREATE_DOSSIER, ROLES_CAN_EXPORT, ROLES_CAN_READ_AUDIT } from './utils/emptyDossier';
 import { AlertTriangle, HeartPulse } from 'lucide-react';
 import { api, ApiError, SessionUser } from './lib/api';
@@ -38,6 +39,7 @@ import { confirmDiscard } from './lib/dirtyGuard';
 import { SessionExpiredDialog, SetupScreen, SignInScreen } from './components/auth/AuthScreens';
 import { UsersView, ChangePasswordDialog } from './components/UsersView';
 import { useToast } from './components/ui/Toaster';
+import { AppSkeleton } from './components/ui/AppSkeleton';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { PatientBanner } from './components/PatientBanner';
@@ -153,6 +155,8 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
   const [loadStatus, setLoadStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  // Empty rubrique the user chose to fill in (« Renseigner »), as `${dossierId}:${rubriqueId}`
+  const [startedRubrique, setStartedRubrique] = useState<string | null>(null);
 
   const appendAudit = React.useCallback(
     (entries: AuditEntry[]) => {
@@ -479,13 +483,20 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
   // Current permission for active rubrique
   const permission = activeDossier ? getRubriquePermission(currentUser.role, activeRubriqueId) : 'none';
   const isReadOnly = activeDossier ? activeDossier.statut === 'VALIDÉ' || activeDossier.statut === 'ARCHIVÉ' || permission === 'read' : true;
+  // B4: restricted rubriques are never shown as a form; empty ones show « Non renseigné » first
+  const rubriqueState: 'restricted' | 'empty' | null = !activeDossier
+    ? null
+    : permission === 'none'
+    ? 'restricted'
+    : getRubriqueCompleteness(activeDossier, activeRubriqueId) === 'NON_COMMENCEE' &&
+      startedRubrique !== `${activeDossier.id}:${activeRubriqueId}`
+    ? 'empty'
+    : null;
   const activeRubriqueConfig = RUBRIQUES_CONFIG.find((r) => r.id === activeRubriqueId);
 
   if (loadStatus !== 'ready') {
     return loadStatus === 'loading' ? (
-      <SplashCard>
-        <p className="mt-5 text-base font-semibold text-ink-600" role="status">Chargement des dossiers…</p>
-      </SplashCard>
+      <AppSkeleton />
     ) : (
       <SplashCard>
         <h1 className="mt-5 text-lg font-bold text-ink-900">Serveur local injoignable</h1>
@@ -639,6 +650,15 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
 
               {/* Right Column : Active Rubrique Form (remounted per dossier) */}
               <div className="flex-1 min-w-0" key={activeDossier.id}>
+                {rubriqueState && (
+                  <RubriqueStateCard
+                    rubriqueId={activeRubriqueId}
+                    kind={rubriqueState}
+                    canEdit={!isReadOnly}
+                    onStart={() => setStartedRubrique(`${activeDossier.id}:${activeRubriqueId}`)}
+                  />
+                )}
+                {!rubriqueState && (<>
                 {activeRubriqueId === 's1' && (
                   <S1Identification
                     data={activeDossier.s1Identification}
@@ -827,6 +847,7 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
                     onOpenExport={() => setIsExportModalOpen(true)}
                   />
                 )}
+                </>)}
               </div>
             </div>
           </div>
