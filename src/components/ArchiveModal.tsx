@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DossierPsychiatrique, UserProfile } from '../types';
 import { X, Archive, RefreshCw, AlertTriangle, ArrowRight, ShieldCheck } from 'lucide-react';
 
@@ -12,6 +12,20 @@ interface ArchiveModalProps {
   onConfirmReactivate: (motif: string) => void;
 }
 
+const ARCHIVE_REASONS = [
+  'Fin de prise en charge / Rétablissement',
+  'Mutation géographique / Transfert de structure',
+  'Perdu de vue / Rupture de suivi',
+  'Décès du patient',
+  'Autre motif clinique',
+];
+const REACTIVATION_REASONS = [
+  'Nouvelle consultation / Reprise des soins',
+  'Réadmission après transfert',
+  'Réévaluation diagnostique',
+  'Autre motif',
+];
+
 export const ArchiveModal: React.FC<ArchiveModalProps> = ({
   isOpen,
   onClose,
@@ -21,11 +35,20 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
   onConfirmArchive,
   onConfirmReactivate,
 }) => {
-  if (!isOpen) return null;
-
-  const [motifSelect, setMotifSelect] = useState('Fin de suivi médical');
+  const options = mode === 'ARCHIVER' ? ARCHIVE_REASONS : REACTIVATION_REASONS;
+  const [motifSelect, setMotifSelect] = useState(options[0]);
   const [motifDetails, setMotifDetails] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // Each opening starts from the first reason of the current mode
+  useEffect(() => {
+    if (!isOpen) return;
+    setMotifSelect(options[0]);
+    setMotifDetails('');
+    setError(null);
+  }, [isOpen, mode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,22 +132,9 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
               onChange={(e) => setMotifSelect(e.target.value)}
               className="clinical-input"
             >
-              {mode === 'ARCHIVER' ? (
-                <>
-                  <option value="Fin de prise en charge / Rétablissement">Fin de prise en charge / Rétablissement</option>
-                  <option value="Mutation géographique / Transfert de structure">Mutation géographique / Transfert de structure</option>
-                  <option value="Perdu de vue / Rupture de suivi">Perdu de vue / Rupture de suivi</option>
-                  <option value="Décès du patient">Décès du patient</option>
-                  <option value="Autre motif clinique">Autre motif clinique</option>
-                </>
-              ) : (
-                <>
-                  <option value="Nouvelle consultation / Reprise des soins">Nouvelle consultation / Reprise des soins</option>
-                  <option value="Réadmission après transfert">Réadmission après transfert</option>
-                  <option value="Réévaluation diagnostique">Réévaluation diagnostique</option>
-                  <option value="Autre motif">Autre motif</option>
-                </>
-              )}
+              {options.map((o) => (
+                <option key={o} value={o}>{o}</option>
+              ))}
             </select>
           </div>
 

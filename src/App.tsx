@@ -880,6 +880,7 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
       </div>
 
       {/* Modals */}
+      {isNewPatientModalOpen && (
       <NewPatientModal
         isOpen={isNewPatientModalOpen}
         onClose={() => setIsNewPatientModalOpen(false)}
@@ -890,8 +891,9 @@ function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () =
         currentUserName={currentUser.name}
         canWriteMotif={getRubriquePermission(currentUser.role, 's3') === 'write'}
       />
+      )}
 
-      {activeDossier && (
+      {activeDossier && validationModalState.isOpen && (
         <ValidationModal
           isOpen={validationModalState.isOpen}
           onClose={() => setValidationModalState({ ...validationModalState, isOpen: false })}
