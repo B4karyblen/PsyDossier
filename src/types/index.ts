@@ -1,3 +1,5 @@
+export type AppView = 'DASHBOARD' | 'REGISTRE' | 'DOSSIER' | 'AUDIT' | 'REFERENTIELS' | 'UTILISATEURS';
+
 export type UserRole = 
   | 'ADMIN'
   | 'PSYCHIATRE'
@@ -16,6 +18,29 @@ export interface UserProfile {
   email: string;
 }
 
+/** Account as returned by the server (no secrets). */
+export interface UserAccount {
+  id: string;
+  login: string;
+  name: string;
+  role: UserRole;
+  title: string;
+  service: string;
+  active: boolean;
+  hasPassword: boolean;
+  createdAt: string;
+  lastLoginAt?: string;
+}
+
+export interface ReferenceListsInactive {
+  religions?: string[];
+  ethnies?: string[];
+  situationsMatrimoniales?: string[];
+  typesBilans?: string[];
+  syndromesFrequents?: string[];
+  diagnosticClassifications?: string[];
+}
+
 export type DossierStatus = 'BROUILLON' | 'EN_COURS' | 'VALIDÉ' | 'ARCHIVÉ';
 
 export type RubriqueCompleteness = 'NON_COMMENCEE' | 'PARTIELLE' | 'COMPLETE';
@@ -28,7 +53,19 @@ export type AuditAction =
   | 'ARCHIVAGE'
   | 'REACTIVATION'
   | 'EXPORT'
-  | 'ADDENDUM';
+  | 'ADDENDUM'
+  | 'ACCES_REFUSE'
+  | 'CONNEXION'
+  | 'ECHEC_CONNEXION'
+  | 'DECONNEXION'
+  | 'GESTION_COMPTE';
+
+/** One changed field in a MODIFICATION audit entry (BR-012). */
+export interface AuditFieldChange {
+  champ: string;
+  avant: string;
+  apres: string;
+}
 
 export interface AuditEntry {
   id: string;
@@ -45,6 +82,7 @@ export interface AuditEntry {
   details: string;
   oldValueSummary?: string;
   newValueSummary?: string;
+  changes?: AuditFieldChange[];
 }
 
 // S1: Identification
@@ -423,6 +461,13 @@ export interface DossierPsychiatrique {
     motif: string;
   };
 
+  // Last reactivation of an archived dossier (PRD B3: motif required)
+  derniereReactivation?: {
+    dateHeure: string;
+    parNom: string;
+    motif: string;
+  };
+
   // Addenda when dossier is VALIDÉ
   addenda: Array<{
     id: string;
@@ -451,4 +496,6 @@ export interface ReferenceLists {
   typesBilans: string[];
   syndromesFrequents: string[];
   diagnosticClassifications: Array<{ code: string; label: string }>;
+  /** Deactivated values (PRD F-24): kept for existing dossiers, hidden from new selections. */
+  inactive?: ReferenceListsInactive;
 }

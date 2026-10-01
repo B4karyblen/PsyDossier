@@ -8,7 +8,8 @@ interface ExportDossierModalProps {
   onClose: () => void;
   dossier: DossierPsychiatrique;
   currentUser: UserProfile;
-  onLogExport: () => void;
+  /** Logs the export on the server; resolves false if it was refused. */
+  onLogExport: (rubriques: string[]) => Promise<boolean>;
 }
 
 export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
@@ -18,11 +19,12 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
   currentUser,
   onLogExport,
 }) => {
-  if (!isOpen) return null;
-
   const [selectedRubriques, setSelectedRubriques] = useState<string[]>(
     RUBRIQUES_CONFIG.map(r => r.id)
   );
+  const [isLogging, setIsLogging] = useState(false);
+
+  if (!isOpen) return null;
 
   const toggleAll = () => {
     if (selectedRubriques.length === RUBRIQUES_CONFIG.length) {
@@ -40,30 +42,34 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
     }
   };
 
-  const handlePrint = () => {
-    onLogExport();
-    window.print();
+  // F-22: the export is journalised first; printing only happens once the server accepted it.
+  const handlePrint = async () => {
+    setIsLogging(true);
+    const allowed = await onLogExport(selectedRubriques);
+    setIsLogging(false);
+    if (allowed) window.print();
   };
 
   const diagPrincipal = dossier.s12HypothesesDiag.hypotheses?.find(h => h.type === 'Principale');
 
   return (
-    <div className="fixed inset-0 z-50 bg-ink-950/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto print:static print:bg-white print:p-0 print:overflow-visible">
-      <div className="clinical-card w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[92vh] !rounded-3xl !border-ink-150 shadow-[var(--shadow-float)] print:max-h-none print:shadow-none print:border-none print:m-0 print:w-full print:max-w-none print:overflow-visible">
+    <div className="fixed inset-0 z-50 bg-ink-950/40 flex items-center justify-center p-4 overflow-y-auto print:static print:bg-white print:p-0 print:overflow-visible">
+      <div className="clinical-card w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[92vh] !rounded-2xl !border-ink-150 shadow-[var(--shadow-float)] print:max-h-none print:shadow-none print:border-none print:m-0 print:w-full print:max-w-none print:overflow-visible">
         {/* Header - Screen only */}
-        <div className="bg-gradient-to-r from-ink-25 via-white to-brand-50 border-b border-ink-150 px-6 sm:px-7 py-4 flex items-center justify-between no-print shrink-0">
+        <div className="bg-white border-b border-ink-150 px-6 sm:px-7 py-4 flex items-center justify-between no-print shrink-0">
           <div>
-            <h2 className="text-h2 font-extrabold text-white tracking-tight">
+            <h2 className="text-base font-semibold text-ink-900">
               Exportation & Impression Clinique
             </h2>
-            <p className="text-body-sm text-slate-400 font-medium">
+            <p className="text-sm text-ink-500">
               Standard 17 Rubriques · Document officiel sous secret médical (Art. 226-13)
             </p>
           </div>
           <div className="flex items-center gap-2.5">
             <button
               onClick={handlePrint}
-              className="clinical-btn-primary px-4 py-2 text-xs flex items-center gap-2 cursor-pointer shadow-sm shadow-brand-500/20"
+              disabled={isLogging}
+              className="btn-primary"
             >
               <Printer className="w-4 h-4" />
               <span>Imprimer / Exporter PDF</span>
@@ -71,7 +77,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
             <button
             aria-label="Fermer"
               onClick={onClose}
-              className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-ink-700 transition-colors cursor-pointer"
+              className="btn-icon"
             >
               <X className="w-5 h-5" />
             </button>
@@ -79,14 +85,14 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
         </div>
 
         {/* Rubrique selection bar - Screen only */}
-        <div className="p-4 sm:px-7 bg-ink-100 border-b border-ink-150 text-xs no-print shrink-0 space-y-2.5">
+        <div className="p-4 sm:px-6 bg-ink-50 border-b border-ink-150 text-xs no-print shrink-0 space-y-2.5">
           <div className="flex items-center justify-between">
-            <span className="font-extrabold text-white">
+            <span className="font-semibold text-ink-900">
               Rubriques à inclure dans l'export officiel ({selectedRubriques.length} / {RUBRIQUES_CONFIG.length}) :
             </span>
             <button
               onClick={toggleAll}
-              className="text-brand-700 hover:underline font-bold text-xs cursor-pointer"
+              className="text-primary-700 hover:underline font-bold text-xs cursor-pointer"
             >
               {selectedRubriques.length === RUBRIQUES_CONFIG.length ? 'Désélectionner tout' : 'Tout sélectionner (17)'}
             </button>
@@ -99,13 +105,13 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
                 <button
                   key={r.id}
                   onClick={() => toggleRubrique(r.id)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-mono border transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-mono border transition-all flex items-center gap-1.5 cursor-pointer ${
                     checked
-                      ? 'bg-ink-800 text-white border-ink-800 font-bold shadow-2xs'
-                      : 'bg-ink-700 text-slate-400 border-ink-600 hover:border-brand-500/50'
+                      ? 'bg-primary-50 text-primary-900 border-primary-200 font-semibold'
+                      : 'bg-white text-ink-600 border-ink-200 hover:border-ink-300'
                   }`}
                 >
-                  {checked ? <CheckSquare className="w-3.5 h-3.5 text-brand-600" /> : <Square className="w-3.5 h-3.5 text-ink-400" />}
+                  {checked ? <CheckSquare className="w-3.5 h-3.5 text-primary-700" /> : <Square className="w-3.5 h-3.5 text-ink-400" />}
                   <span>{r.code}</span>
                 </button>
               );
@@ -116,7 +122,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
         {/* Preview / Printable Document View */}
         <div className="p-8 overflow-y-auto space-y-6 bg-white text-ink-900 print:p-0 print:space-y-4 font-sans text-xs">
           {/* Watermark Notice */}
-          <div className="p-2.5 bg-ink-100 border border-ink-150 rounded text-center text-[10px] font-bold tracking-widest text-ink-500 uppercase">
+          <div className="p-2.5 bg-ink-100 border border-ink-150 rounded text-center text-xs font-bold tracking-widest text-ink-500 uppercase">
             *** CONFIDENTIEL — DOSSIER PATIENT EN PSYCHIATRIE — SECRET MÉDICAL (ART. 226-13) ***
           </div>
 
@@ -129,7 +135,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
               <div className="text-xs text-ink-500">
                 Médecin Psychiatre Référent : <strong>{dossier.psychiatreReferent}</strong>
               </div>
-              <div className="text-[11px] text-ink-500">
+              <div className="text-xs text-ink-500">
                 Date d’édition : {new Date().toLocaleDateString('fr-FR')} par {currentUser.name} ({currentUser.role})
               </div>
             </div>
@@ -138,7 +144,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
               <div className="font-mono text-base font-bold text-ink-900 px-2 py-1 bg-ink-100 inline-block border border-ink-150">
                 N° {dossier.s1Identification.numeroOrdre}
               </div>
-              <div className="text-xs font-bold text-brand-700 mt-1">
+              <div className="text-xs font-bold text-primary-700 mt-1">
                 Statut : {dossier.statut}
               </div>
             </div>
@@ -147,21 +153,21 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* Patient Card Summary */}
           <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div>
-              <span className="text-[10px] text-ink-500 block">Nom & Prénoms :</span>
+              <span className="text-xs text-ink-500 block">Nom & Prénoms :</span>
               <strong className="text-ink-900 uppercase">
                 {dossier.s1Identification.nom} {dossier.s1Identification.prenoms}
               </strong>
             </div>
             <div>
-              <span className="text-[10px] text-ink-500 block">Âge & Sexe :</span>
+              <span className="text-xs text-ink-500 block">Âge & Sexe :</span>
               <strong>{dossier.s1Identification.age} ans · {dossier.s1Identification.sexe}</strong>
             </div>
             <div>
-              <span className="text-[10px] text-ink-500 block">Modalité :</span>
+              <span className="text-xs text-ink-500 block">Modalité :</span>
               <strong>{dossier.s2Modalites.modalite}</strong>
             </div>
             <div>
-              <span className="text-[10px] text-ink-500 block">Orientation :</span>
+              <span className="text-xs text-ink-500 block">Orientation :</span>
               <strong>{dossier.s14PriseEnCharge.orientation || 'Non définie'}</strong>
             </div>
           </div>
@@ -169,7 +175,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S1: Identification */}
           {selectedRubriques.includes('s1') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S1. Identification & Données socio-démographiques
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
@@ -186,7 +192,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S2: Modalités */}
           {selectedRubriques.includes('s2') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S2. Modalités de consultation
               </h3>
               <p><strong>Régime :</strong> {dossier.s2Modalites.modalite}</p>
@@ -202,13 +208,13 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S3: Motif */}
           {selectedRubriques.includes('s3') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S3. Motif de consultation actuel
               </h3>
-              <p className="leading-relaxed bg-ink-25 p-2.5 rounded border border-ink-100">
+              <p className="leading-relaxed bg-white p-2.5 rounded border border-ink-100">
                 {dossier.s3Motif.plaintePrincipale || 'Non renseigné'}
               </p>
-              <div className="text-[11px] text-ink-500">
+              <div className="text-xs text-ink-500">
                 Source : {dossier.s3Motif.sourcePlainte} · {dossier.s3Motif.accompagnateurs ? `Accompagnateurs : ${dossier.s3Motif.accompagnateurs}` : ''}
               </div>
             </section>
@@ -217,7 +223,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S4: Histoire de la maladie */}
           {selectedRubriques.includes('s4') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S4. Histoire de la maladie (Anamnèse)
               </h3>
               <div className="grid grid-cols-2 gap-2">
@@ -237,7 +243,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S5: Représentation socio-culturelle */}
           {selectedRubriques.includes('s5') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S5. Représentation socio-culturelle de la maladie
               </h3>
               <p><strong>Catégories évoquées :</strong> {dossier.s5Representation.categories?.join(', ') || 'Aucune catégorie spécifique'}</p>
@@ -253,13 +259,13 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S6: Antécédents */}
           {selectedRubriques.includes('s6') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S6. Antécédents
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-bold text-[11px] text-ink-900">Personnels :</h4>
-                  <ul className="list-disc pl-4 text-[11px] space-y-0.5">
+                  <h4 className="font-bold text-xs text-ink-900">Personnels :</h4>
+                  <ul className="list-disc pl-4 text-xs space-y-0.5">
                     <li>Médicaux : {dossier.s6Antecedents.personnels.medicaux.aucun ? 'Néant' : dossier.s6Antecedents.personnels.medicaux.details || 'Non renseigné'}</li>
                     <li>Chirurgicaux : {dossier.s6Antecedents.personnels.chirurgicaux.aucun ? 'Néant' : dossier.s6Antecedents.personnels.chirurgicaux.details || 'Non renseigné'}</li>
                     {dossier.s1Identification.sexe === 'Féminin' && (
@@ -271,8 +277,8 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-bold text-[11px] text-ink-900">Familiaux :</h4>
-                  <ul className="list-disc pl-4 text-[11px] space-y-0.5">
+                  <h4 className="font-bold text-xs text-ink-900">Familiaux :</h4>
+                  <ul className="list-disc pl-4 text-xs space-y-0.5">
                     <li>Médicaux : {dossier.s6Antecedents.familiaux.medicaux.aucun ? 'Néant' : dossier.s6Antecedents.familiaux.medicaux.details || 'Non renseigné'}</li>
                     <li>Chirurgicaux : {dossier.s6Antecedents.familiaux.chirurgicaux.aucun ? 'Néant' : dossier.s6Antecedents.familiaux.chirurgicaux.details || 'Non renseigné'}</li>
                     <li>Psychiatriques : {dossier.s6Antecedents.familiaux.psychiatriques.aucun ? 'Néant' : dossier.s6Antecedents.familiaux.psychiatriques.details || 'Non renseigné'}</li>
@@ -286,24 +292,24 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S10: Examen clinique */}
           {selectedRubriques.includes('s10') && (
             <section className="space-y-2 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S10. Examen Clinique
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-bold text-[11px] text-ink-900">Constantes vitales :</h4>
-                  <p className="text-[11px]">
+                  <h4 className="font-bold text-xs text-ink-900">Constantes vitales :</h4>
+                  <p className="text-xs">
                     T° : {dossier.s10ExamenClinique.somatique.constantes.temperature ?? '--'} °C · TA : {dossier.s10ExamenClinique.somatique.constantes.tensionSystolique ?? '--'}/{dossier.s10ExamenClinique.somatique.constantes.tensionDiastolique ?? '--'} mmHg · Pouls : {dossier.s10ExamenClinique.somatique.constantes.pouls ?? '--'} bpm · SpO2 : {dossier.s10ExamenClinique.somatique.constantes.saturationO2 ?? '--'}%
                   </p>
-                  <p className="text-[11px] text-ink-500 mt-1">
+                  <p className="text-xs text-ink-500 mt-1">
                     État général : {dossier.s10ExamenClinique.somatique.etatGeneral || 'Non précisé'}
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-bold text-[11px] text-ink-900">Sémiologie psychiatrique :</h4>
-                  <p className="text-[11px]"><strong>Contact / Mimique :</strong> {dossier.s10ExamenClinique.psychiatrique.contact || '--'} · {dossier.s10ExamenClinique.psychiatrique.mimique || '--'}</p>
-                  <p className="text-[11px]"><strong>Pensée & Jugement :</strong> {dossier.s10ExamenClinique.psychiatrique.penseeEtJugement || 'Non documenté'}</p>
-                  <p className="text-[11px]"><strong>Affects :</strong> {dossier.s10ExamenClinique.psychiatrique.expressionDesAffects || '--'}</p>
+                  <h4 className="font-bold text-xs text-ink-900">Sémiologie psychiatrique :</h4>
+                  <p className="text-xs"><strong>Contact / Mimique :</strong> {dossier.s10ExamenClinique.psychiatrique.contact || '--'} · {dossier.s10ExamenClinique.psychiatrique.mimique || '--'}</p>
+                  <p className="text-xs"><strong>Pensée & Jugement :</strong> {dossier.s10ExamenClinique.psychiatrique.penseeEtJugement || 'Non documenté'}</p>
+                  <p className="text-xs"><strong>Affects :</strong> {dossier.s10ExamenClinique.psychiatrique.expressionDesAffects || '--'}</p>
                 </div>
               </div>
             </section>
@@ -312,10 +318,10 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S11: Résumé syndromique */}
           {selectedRubriques.includes('s11') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S11. Résumé Syndromique
               </h3>
-              <p className="bg-ink-25 p-3 rounded border border-ink-100 leading-relaxed">
+              <p className="bg-white p-3 rounded border border-ink-100 leading-relaxed">
                 {dossier.s11ResumeSyndromique.resume || 'Aucun résumé syndromique'}
               </p>
             </section>
@@ -324,18 +330,18 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S12: Hypothèses diagnostiques */}
           {selectedRubriques.includes('s12') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S12. Hypothèses Diagnostiques
               </h3>
               <div className="space-y-1">
                 {dossier.s12HypothesesDiag.hypotheses?.map((h) => (
                   <div key={h.id} className="flex items-start gap-2">
-                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${h.type === 'Principale' ? 'bg-brand-600 text-white' : 'bg-ink-100 text-ink-900'}`}>
+                    <span className={`px-2 py-0.5 text-xs font-bold rounded ${h.type === 'Principale' ? 'bg-primary-900 text-white' : 'bg-ink-100 text-ink-900'}`}>
                       {h.type}
                     </span>
                     <div>
                       <strong>{h.codeCimDsm ? `[${h.codeCimDsm}] ` : ''}{h.libelle}</strong>
-                      {h.argumentsCliniques && <p className="text-[11px] text-ink-500">{h.argumentsCliniques}</p>}
+                      {h.argumentsCliniques && <p className="text-xs text-ink-500">{h.argumentsCliniques}</p>}
                     </div>
                   </div>
                 ))}
@@ -346,14 +352,14 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S14: Prise en charge */}
           {selectedRubriques.includes('s14') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S14. Prise en charge & Prescriptions
               </h3>
               <p><strong>Orientation :</strong> {dossier.s14PriseEnCharge.orientation}</p>
               {dossier.s14PriseEnCharge.traitementMedicamenteux?.length > 0 && (
                 <div className="mt-2">
-                  <h4 className="font-bold text-[11px] mb-1">Prescriptions pharmacologiques :</h4>
-                  <table className="w-full text-left border-collapse text-[11px]">
+                  <h4 className="font-bold text-xs mb-1">Prescriptions pharmacologiques :</h4>
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className="border-b border-ink-150 text-ink-500">
                         <th className="py-1">Molécule</th>
@@ -381,20 +387,20 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S17: Pronostic */}
           {selectedRubriques.includes('s17') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S17. Pronostic
               </h3>
               <div className="grid grid-cols-3 gap-2">
-                <div className="p-2 bg-ink-25 rounded border border-ink-100">
-                  <span className="text-[10px] text-ink-500 block">Court terme :</span>
+                <div className="p-2 bg-white rounded border border-ink-100">
+                  <span className="text-xs text-ink-500 block">Court terme :</span>
                   <strong>{dossier.s17Pronostic.courtTerme.appreciation || 'Non évalué'}</strong>
                 </div>
-                <div className="p-2 bg-ink-25 rounded border border-ink-100">
-                  <span className="text-[10px] text-ink-500 block">Moyen terme :</span>
+                <div className="p-2 bg-white rounded border border-ink-100">
+                  <span className="text-xs text-ink-500 block">Moyen terme :</span>
                   <strong>{dossier.s17Pronostic.moyenTerme.appreciation || 'Non évalué'}</strong>
                 </div>
-                <div className="p-2 bg-ink-25 rounded border border-ink-100">
-                  <span className="text-[10px] text-ink-500 block">Long terme :</span>
+                <div className="p-2 bg-white rounded border border-ink-100">
+                  <span className="text-xs text-ink-500 block">Long terme :</span>
                   <strong>{dossier.s17Pronostic.longTerme.appreciation || 'Non évalué'}</strong>
                 </div>
               </div>
@@ -404,7 +410,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S7: Biographie */}
           {selectedRubriques.includes('s7') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S7. Éléments de Biographie
               </h3>
               {dossier.s7Biographie.ascendants?.pere && (
@@ -434,7 +440,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S8: Enquête sociale */}
           {selectedRubriques.includes('s8') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S8. Enquête Sociale
               </h3>
               {dossier.s8EnqueteSociale.autodescription && (
@@ -458,7 +464,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S9: Demande */}
           {selectedRubriques.includes('s9') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S9. Demande du Patient
               </h3>
               {dossier.s9Demande.demandeConsciente && (
@@ -473,20 +479,20 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S13: Bilans paracliniques */}
           {selectedRubriques.includes('s13') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S13. Bilans Paracliniques
               </h3>
               {dossier.s13Bilans.bilans?.length > 0 ? (
                 <div className="space-y-2">
                   {dossier.s13Bilans.bilans.map((b) => (
-                    <div key={b.id} className="p-2 bg-ink-25 rounded border border-ink-100">
+                    <div key={b.id} className="p-2 bg-white rounded border border-ink-100">
                       <div className="flex items-center justify-between">
                         <strong>{b.type}</strong>
-                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${b.statut === 'Prescrit' ? 'bg-blue-100 text-blue-700' : b.statut === 'Réalisé' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-800'}`}>
+                        <span className={`px-2 py-0.5 text-xs font-bold rounded ${b.statut === 'Prescrit' ? 'bg-blue-100 text-blue-700' : b.statut === 'Réalisé' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-800'}`}>
                           {b.statut}
                         </span>
                       </div>
-                      {b.resultat && <p className="text-[11px] text-ink-500 mt-1">{b.resultat}</p>}
+                      {b.resultat && <p className="text-xs text-ink-500 mt-1">{b.resultat}</p>}
                     </div>
                   ))}
                 </div>
@@ -499,18 +505,18 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S15: Évolution clinique */}
           {selectedRubriques.includes('s15') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S15. Évolution Clinique
               </h3>
               {dossier.s15Evolution.entrees?.length > 0 ? (
                 <div className="space-y-2">
                   {dossier.s15Evolution.entrees.slice(0, 10).map((e) => (
-                    <div key={e.id} className="p-2 bg-ink-25 rounded border border-ink-100">
-                      <div className="flex items-center justify-between text-[11px] text-ink-500">
+                    <div key={e.id} className="p-2 bg-white rounded border border-ink-100">
+                      <div className="flex items-center justify-between text-xs text-ink-500">
                         <span><strong>{e.auteurNom}</strong> ({e.auteurRole})</span>
                         <span>{new Date(e.dateHeure).toLocaleDateString('fr-FR')}</span>
                       </div>
-                      <p className="text-[11px] mt-1">{e.note}</p>
+                      <p className="text-xs mt-1">{e.note}</p>
                     </div>
                   ))}
                 </div>
@@ -523,7 +529,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S16: Projet thérapeutique */}
           {selectedRubriques.includes('s16') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S16. Projet Thérapeutique
               </h3>
               {dossier.s16ProjetTherapeutique.objectifsCourtTerme && (
@@ -551,7 +557,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
                 <div key={add.id} className="p-2.5 bg-violet-100/30 border border-violet-500/30 rounded text-xs space-y-1">
                   <div className="flex justify-between font-semibold text-ink-900">
                     <span>{add.rubriqueNom}</span>
-                    <span className="text-[11px] text-ink-500">{new Date(add.dateHeure).toLocaleDateString('fr-FR')} - {add.auteurNom}</span>
+                    <span className="text-xs text-ink-500">{new Date(add.dateHeure).toLocaleDateString('fr-FR')} - {add.auteurNom}</span>
                   </div>
                   <p className="text-ink-900">{add.contenu}</p>
                 </div>
@@ -566,7 +572,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
               <p className="text-ink-500">Conservation et traçabilité selon le plan type en 17 rubriques.</p>
             </div>
             <div className="text-right border-t border-dashed border-ink-900 pt-2 min-w-[240px]">
-              <span className="text-[10px] text-ink-500 block">Signature & Cachet du Praticien :</span>
+              <span className="text-xs text-ink-500 block">Signature & Cachet du Praticien :</span>
               <strong className="block mt-4">{dossier.validationInfo?.signataire || dossier.psychiatreReferent}</strong>
             </div>
           </div>

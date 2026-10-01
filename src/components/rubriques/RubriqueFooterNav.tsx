@@ -9,6 +9,10 @@ interface RubriqueFooterNavProps {
   onPrev?: () => void;
   onNext?: () => void;
   isFormValid?: boolean;
+  /** Unsaved edits in the form (PRD B4). */
+  isDirty?: boolean;
+  /** « Annuler » : restore the last saved values. */
+  onCancel?: () => void;
 }
 
 export const RubriqueFooterNav: React.FC<RubriqueFooterNavProps> = ({
@@ -18,6 +22,8 @@ export const RubriqueFooterNav: React.FC<RubriqueFooterNavProps> = ({
   onPrev,
   onNext,
   isFormValid = true,
+  isDirty = false,
+  onCancel,
 }) => {
   const currentIndex = RUBRIQUES_CONFIG.findIndex((r) => r.id === currentRubriqueId);
   const prevRubrique = currentIndex > 0 ? RUBRIQUES_CONFIG[currentIndex - 1] : null;
@@ -36,8 +42,8 @@ export const RubriqueFooterNav: React.FC<RubriqueFooterNavProps> = ({
             title={`Revenir à ${prevRubrique.code} : ${prevRubrique.titre}`}
           >
             <ChevronLeft className="w-4 h-4 text-ink-500" />
-            <span className="hidden sm:inline font-semibold text-ink-500">Précédent</span>
-            <span className="font-bold text-brand-700">{prevRubrique.code}</span>
+            <span className="hidden sm:inline font-medium text-ink-500">Précédent</span>
+            <span className="font-semibold text-ink-900">{prevRubrique.code}</span>
           </button>
         ) : (
           <div />
@@ -45,12 +51,31 @@ export const RubriqueFooterNav: React.FC<RubriqueFooterNavProps> = ({
       </div>
 
       {/* Center Save Action & Feedback */}
-      <div className="flex items-center gap-3">
-        {isSaved && (
-          <span className="chip bg-emerald-100 text-emerald-800 !py-1.5">
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        {isDirty && !isReadOnly && (
+          <span className="chip bg-amber-50 text-amber-800 ring-1 ring-inset ring-amber-200">
+            <span className="dot" />
+            Modifications non enregistrées
+          </span>
+        )}
+        {isSaved && !isDirty && (
+          <span className="chip bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200">
             <CheckCircle2 className="w-3.5 h-3.5" />
             Enregistré avec succès
           </span>
+        )}
+
+        {!isReadOnly && onCancel && (
+          <button
+            type="button"
+            onClick={() => {
+              if (window.confirm('Annuler les modifications non enregistrées de cette rubrique ?')) onCancel();
+            }}
+            disabled={!isDirty}
+            className="btn-ghost disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Annuler
+          </button>
         )}
 
         {!isReadOnly && (
@@ -74,8 +99,8 @@ export const RubriqueFooterNav: React.FC<RubriqueFooterNavProps> = ({
             className="btn-secondary group"
             title={`Passer à ${nextRubrique.code} : ${nextRubrique.titre}`}
           >
-            <span className="hidden sm:inline font-semibold text-ink-500">Suivant</span>
-            <span className="font-bold text-brand-700">{nextRubrique.code}</span>
+            <span className="hidden sm:inline font-medium text-ink-500">Suivant</span>
+            <span className="font-semibold text-ink-900">{nextRubrique.code}</span>
             <ChevronRight className="w-4 h-4 text-ink-500 group-hover:translate-x-0.5 transition-transform" />
           </button>
         ) : (

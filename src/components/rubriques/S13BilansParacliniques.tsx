@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
+import { activeValues } from '../../utils/referentiels';
 import { S13BilansData, BilanItem, ReferenceLists, UserRole } from '../../types';
 import { Plus, Trash2, CheckCircle2, FileSpreadsheet, Lock } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -24,7 +26,7 @@ export const S13BilansParacliniques: React.FC<Props> = ({
   onPrev,
   referenceLists,
 }) => {
-  const [formData, setFormData] = useState<S13BilansData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S13BilansData>(data);
   const [isSaved, setIsSaved] = useState(false);
 
   const canPrescribe = ['PSYCHIATRE', 'ADMIN'].includes(currentUserRole) && !isReadOnly;
@@ -35,7 +37,7 @@ export const S13BilansParacliniques: React.FC<Props> = ({
     if (!canPrescribe && currentUserRole !== 'INFIRMIER') return;
     const newItem: BilanItem = {
       id: 'bil-' + Date.now(),
-      type: typePreset || referenceLists.typesBilans[0] || 'NFS, Ionogramme sanguin',
+      type: typePreset || activeValues(referenceLists, 'typesBilans')[0] || 'NFS, Ionogramme sanguin',
       datePrescription: new Date().toISOString().split('T')[0],
       prescripteur: currentUserName,
       statut: 'Prescrit',
@@ -77,20 +79,20 @@ export const S13BilansParacliniques: React.FC<Props> = ({
   };
 
   return (
-    <div className="clinical-card p-6 sm:p-7 space-y-6">
+    <div className="clinical-card p-5 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S13 · PARACLINIQUE
             </span>
             <span className="text-xs text-ink-500">Biologie & Imagerie</span>
           </div>
-          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
+          <h2 className="text-h2 text-ink-900 mt-2">
             Bilans Paracliniques
           </h2>
-          <p className="text-xs text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Prescription et suivi des examens biologiques, toxicologiques, EEG et imagerie cérébrale
           </p>
         </div>
@@ -99,20 +101,20 @@ export const S13BilansParacliniques: React.FC<Props> = ({
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Quick Prescription Presets */}
         {canPrescribe && (
-          <div className="bg-ink-25 border border-ink-150 rounded-2xl p-4 space-y-2.5">
+          <div className="bg-ink-25 border border-ink-150 rounded-xl p-4 space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-ink-900 flex items-center gap-1.5">
-                <FileSpreadsheet className="w-3.5 h-3.5 text-brand-600" />
+                <FileSpreadsheet className="w-3.5 h-3.5 text-primary-600" />
                 Examens Prédéfinis Référencés (Cliquer pour prescrire) :
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {(referenceLists.typesBilans || []).map((preset) => (
+              {activeValues(referenceLists, 'typesBilans').map((preset) => (
                 <button
                   key={preset}
                   type="button"
                   onClick={() => addBilan(preset)}
-                  className="px-2.5 py-1 text-[11px] font-semibold bg-white hover:bg-brand-50 text-ink-900 hover:text-brand-700 border border-ink-200 hover:border-brand-500 rounded-lg transition-all cursor-pointer shadow-2xs"
+                  className="btn-secondary btn-sm"
                 >
                   + {preset}
                 </button>
@@ -131,7 +133,7 @@ export const S13BilansParacliniques: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={() => addBilan()}
-                className="px-3 py-1.5 text-xs font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-500/30 rounded-xl transition-all flex items-center gap-1 cursor-pointer"
+                className="btn-secondary btn-sm"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Prescrire un examen
@@ -143,13 +145,13 @@ export const S13BilansParacliniques: React.FC<Props> = ({
             formData.bilans.map((bilan) => (
               <div
                 key={bilan.id}
-                className="p-5 rounded-xl border border-ink-150 bg-ink-25 space-y-4"
+                className="p-5 rounded-lg border border-ink-150 bg-ink-25 space-y-4"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-ink-100 gap-3">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-ink-900">{bilan.type}</span>
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                         bilan.statut === 'Résultat reçu'
                           ? 'bg-emerald-100 text-emerald-700'
                           : bilan.statut === 'Réalisé'
@@ -162,7 +164,7 @@ export const S13BilansParacliniques: React.FC<Props> = ({
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="text-[11px] text-ink-500">
+                    <span className="text-xs text-ink-500">
                       Prescrit le {bilan.datePrescription} par {bilan.prescripteur}
                     </span>
                     {!isReadOnly && (
@@ -180,7 +182,7 @@ export const S13BilansParacliniques: React.FC<Props> = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-ink-900 mb-1">
+                    <label className="field-label">
                       Résultats du laboratoire / imagerie
                     </label>
                     <textarea
@@ -188,13 +190,13 @@ export const S13BilansParacliniques: React.FC<Props> = ({
                       disabled={!canEnterResults}
                       value={bilan.resultat || ''}
                       onChange={(e) => updateBilan(bilan.id, { resultat: e.target.value })}
-                      className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-medium rounded-lg p-2.5 focus:outline-none"
+                      className="clinical-input w-full"
                       placeholder="Valeurs chiffrées, normes, compte-rendu radiologique..."
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-ink-900 mb-1">
+                    <label className="field-label">
                       Interprétation clinique & retentissement
                     </label>
                     <textarea
@@ -202,7 +204,7 @@ export const S13BilansParacliniques: React.FC<Props> = ({
                       disabled={!canEnterResults}
                       value={bilan.interpretation || ''}
                       onChange={(e) => updateBilan(bilan.id, { interpretation: e.target.value })}
-                      className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-medium rounded-lg p-2.5 focus:outline-none"
+                      className="clinical-input w-full"
                       placeholder="Bilan biologique rassurant, élimine une cause organique..."
                     />
                   </div>
@@ -210,7 +212,7 @@ export const S13BilansParacliniques: React.FC<Props> = ({
               </div>
             ))
           ) : (
-            <div className="p-8 text-center bg-ink-25 border border-dashed border-ink-200 rounded-2xl text-xs text-ink-500">
+            <div className="p-8 text-center bg-ink-25 border border-dashed border-ink-200 rounded-xl text-xs text-ink-500">
               Aucun bilan paraclinique prescrit pour ce patient.
             </div>
           )}
@@ -218,6 +220,8 @@ export const S13BilansParacliniques: React.FC<Props> = ({
 
         {/* Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s13"
           isReadOnly={isReadOnly}
           isSaved={isSaved}

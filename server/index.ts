@@ -1,142 +1,185 @@
 /**
  * PsyDossier local server.
  *
- * Serves the built frontend and persists data in a single SQLite file
- * (Node's built-in `node:sqlite`, no native module to install).
+ * Serves the built frontend, persists data in a single SQLite file (Node's built-in
+ * `node:sqlite`, no native module to install) and is the sole authority on access:
+ * authentication, role permissions, dossier lifecycle and the audit journal.
  *
  * Environment:
  *   PORT                     HTTP port (default 3210), bound to 127.0.0.1 only
  *   PSYDOSSIER_DATA          data directory (default ./data)
  *   PSYDOSSIER_DIST          built frontend directory (default ./dist)
  *   PSYDOSSIER_OPEN_BROWSER  "1" to open the default browser once ready
+ *   PSYDOSSIER_DEMO          "1" to seed demo accounts and patients (development)
  */
-import express from 'express';
-import { DatabaseSync } from 'node:sqlite';
+import express, { type Response } from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import { exec } from 'node:child_process';
+import { DossierPsychiatrique, ReferenceLists } from '../src/types';
+import { ROLES_CAN_EXPORT, ROLES_CAN_READ_AUDIT } from '../src/utils/emptyDossier';
+import { getRubriquePermission } from '../src/utils/rules';
+import { DATA_DIR, db, runDailyBackup, transaction } from './db';
+import { listAudit, writeAudit } from './audit';
+import { currentUser, purgeExpiredSessions, registerAuthRoutes, requireAuth, requireRole } from './auth';
+import { allDossiers, createDossier, getDossier, HttpError, redactForRole, updateDossier } from './dossiers';
+import { seedDemo } from './seed';
 
 const HOST = '127.0.0.1';
 const PORT = Number(process.env.PORT) || 3210;
-const DATA_DIR = path.resolve(process.env.PSYDOSSIER_DATA || 'data');
 const DIST_DIR = path.resolve(process.env.PSYDOSSIER_DIST || 'dist');
-const BACKUP_DIR = path.join(DATA_DIR, 'backups');
-const DB_FILE = path.join(DATA_DIR, 'psydossier.db');
-const BACKUPS_TO_KEEP = 30;
 const APP_URL = `http://${HOST}:${PORT}`;
 
-// ── Database ────────────────────────────────────────────────
-fs.mkdirSync(BACKUP_DIR, { recursive: true });
+if (process.env.PSYDOSSIER_DEMO === '1') seedDemo();
 
-const db = new DatabaseSync(DB_FILE);
-db.exec(`
-  PRAGMA journal_mode = WAL;
-  PRAGMA synchronous = FULL;
-
-  CREATE TABLE IF NOT EXISTS dossiers (
-    id         TEXT PRIMARY KEY,
-    data       TEXT NOT NULL,
-    updated_at TEXT NOT NULL
-  );
-
-  CREATE TABLE IF NOT EXISTS audit_logs (
-    id        TEXT PRIMARY KEY,
-    data      TEXT NOT NULL,
-    timestamp TEXT NOT NULL
-  );
-
-  CREATE TABLE IF NOT EXISTS settings (
-    key   TEXT PRIMARY KEY,
-    value TEXT NOT NULL
-  );
-`);
-
-const stmt = {
-  allDossiers: db.prepare('SELECT data FROM dossiers ORDER BY updated_at DESC'),
-  upsertDossier: db.prepare(`
-    INSERT INTO dossiers (id, data, updated_at) VALUES (?, ?, ?)
-    ON CONFLICT(id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at
-  `),
-  allAuditLogs: db.prepare('SELECT data FROM audit_logs ORDER BY timestamp DESC'),
-  upsertAuditLog: db.prepare(`
-    INSERT INTO audit_logs (id, data, timestamp) VALUES (?, ?, ?)
-    ON CONFLICT(id) DO UPDATE SET data = excluded.data
-  `),
-  getSetting: db.prepare('SELECT value FROM settings WHERE key = ?'),
-  setSetting: db.prepare(`
+const settings = {
+  get: db.prepare('SELECT value FROM settings WHERE key = ?'),
+  set: db.prepare(`
     INSERT INTO settings (key, value) VALUES (?, ?)
     ON CONFLICT(key) DO UPDATE SET value = excluded.value
   `),
 };
+/** Values referenced by at least one dossier, per list (F-24: these can only be deactivated). */
+function referentielsUsage() {
+  const dossiers = allDossiers();
+  const uniq = (xs: (string | undefined)[]) => [...new Set(xs.filter((x): x is string => Boolean(x)))];
+  return {
+    religions: uniq(dossiers.map((d) => d.s1Identification.religion)),
+    ethnies: uniq(dossiers.map((d) => d.s1Identification.ethnie)),
+    situationsMatrimoniales: uniq(dossiers.map((d) => d.s1Identification.situationMatrimoniale)),
+    typesBilans: uniq(dossiers.flatMap((d) => d.s13Bilans.bilans.map((b) => b.type))),
+    syndromesFrequents: uniq(dossiers.flatMap((d) => d.s11ResumeSyndromique.syndromesIdentifies ?? [])),
+    diagnosticClassifications: uniq(dossiers.flatMap((d) => d.s12HypothesesDiag.hypotheses.map((h) => h.codeCimDsm))),
+  };
+}
 
-const parseRows = (rows: unknown[]) => rows.map((r) => JSON.parse((r as { data: string }).data));
+const readReferentiels = (): ReferenceLists | null => {
+  const row = settings.get.get('referentiels') as { value: string } | undefined;
+  return row ? JSON.parse(row.value) : null;
+};
 
-// ── Backups: one snapshot per day, keep the most recent ones ──
-function runDailyBackup() {
-  const day = new Date().toISOString().slice(0, 10);
-  const target = path.join(BACKUP_DIR, `psydossier-${day}.db`);
-  if (fs.existsSync(target)) return;
-  try {
-    db.exec(`VACUUM INTO '${target.replace(/'/g, "''")}'`);
-    const old = fs
-      .readdirSync(BACKUP_DIR)
-      .filter((f) => /^psydossier-\d{4}-\d{2}-\d{2}\.db$/.test(f))
-      .sort()
-      .reverse()
-      .slice(BACKUPS_TO_KEEP);
-    old.forEach((f) => fs.rmSync(path.join(BACKUP_DIR, f)));
-    console.log(`[backup] ${target}`);
-  } catch (err) {
-    console.error('[backup] échec :', err);
+function sendError(res: Response, err: unknown) {
+  if (err instanceof HttpError) {
+    const { denied, ...extra } = err.extra as { denied?: Parameters<typeof writeAudit>[2] };
+    if (denied) writeAudit(currentUser(res), 'ACCES_REFUSE', denied);
+    res.status(err.status).json({ error: err.message, ...extra });
+    return;
   }
+  console.error(err);
+  res.status(500).json({ error: 'Erreur interne du serveur.' });
 }
 
 // ── HTTP ────────────────────────────────────────────────────
 const app = express();
 app.disable('x-powered-by');
 app.use(express.json({ limit: '25mb' }));
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  next();
+});
+// No caching of API responses (health data).
+app.use('/api', (_req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store');
+  next();
+});
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, app: 'psydossier' });
 });
 
-app.get('/api/state', (_req, res) => {
-  const ref = stmt.getSetting.get('referentiels') as { value: string } | undefined;
+registerAuthRoutes(app);
+
+app.get('/api/state', requireAuth, (_req, res) => {
+  const user = currentUser(res);
   res.json({
-    dossiers: parseRows(stmt.allDossiers.all()),
-    auditLogs: parseRows(stmt.allAuditLogs.all()),
-    referenceLists: ref ? JSON.parse(ref.value) : null,
+    dossiers: allDossiers().map((d) => redactForRole(d, user)),
+    auditLogs: ROLES_CAN_READ_AUDIT.includes(user.role) ? listAudit() : [],
+    referenceLists: readReferentiels(),
+    referentielsUsage: user.role === 'ADMIN' ? referentielsUsage() : undefined,
   });
 });
 
-app.put('/api/dossiers/:id', (req, res) => {
-  const dossier = req.body;
-  if (!dossier || dossier.id !== req.params.id) {
-    res.status(400).json({ error: 'Identifiant de dossier incohérent' });
+app.put('/api/dossiers/:id', requireAuth, (req, res) => {
+  const user = currentUser(res);
+  const incoming = req.body as DossierPsychiatrique;
+  if (!incoming || incoming.id !== req.params.id) {
+    res.status(400).json({ error: 'Identifiant de dossier incohérent.' });
     return;
   }
-  const updatedAt = dossier.dateDerniereModification || new Date().toISOString();
-  stmt.upsertDossier.run(dossier.id, JSON.stringify(dossier), updatedAt);
-  res.json({ ok: true });
+  const baseVersion = req.header('x-base-version') || undefined;
+  try {
+    const result = transaction(() => {
+      const stored = getDossier(incoming.id);
+      return stored ? updateDossier(stored, incoming, user, baseVersion) : createDossier(incoming, user);
+    });
+    res.json(result);
+  } catch (err) {
+    sendError(res, err);
+  }
 });
 
-app.put('/api/audit-logs/:id', (req, res) => {
-  const entry = req.body;
-  if (!entry || entry.id !== req.params.id) {
-    res.status(400).json({ error: "Identifiant d'audit incohérent" });
+// Client-reported events. Everything else is audited by the server itself.
+app.post('/api/audit', requireAuth, (req, res) => {
+  const user = currentUser(res);
+  const { action, dossierId } = req.body ?? {};
+  const dossier = typeof dossierId === 'string' ? getDossier(dossierId) : undefined;
+  if (!dossier || (action !== 'LECTURE' && action !== 'EXPORT')) {
+    res.status(400).json({ error: 'Événement d’audit invalide.' });
     return;
   }
-  stmt.upsertAuditLog.run(entry.id, JSON.stringify(entry), entry.timestamp || new Date().toISOString());
-  res.json({ ok: true });
+  const ref = { dossierId: dossier.id, numeroOrdre: dossier.s1Identification.numeroOrdre };
+  if (action === 'EXPORT') {
+    if (!ROLES_CAN_EXPORT.includes(user.role)) {
+      writeAudit(user, 'ACCES_REFUSE', { ...ref, details: 'Export refusé : réservé aux rôles cliniques (F-22).' });
+      res.status(403).json({ error: 'L’export est réservé aux rôles cliniques.' });
+      return;
+    }
+    const rubriques: string[] = Array.isArray(req.body.rubriques) ? req.body.rubriques.map(String) : [];
+    const visible = rubriques.filter((r) => getRubriquePermission(user.role, r) !== 'none');
+    const entry = writeAudit(user, 'EXPORT', {
+      ...ref,
+      details: `Export / impression du dossier (${visible.length} rubrique${visible.length > 1 ? 's' : ''} : ${visible.join(', ').toUpperCase()}).`,
+    });
+    res.json({ entry });
+    return;
+  }
+  const entry = writeAudit(user, 'LECTURE', {
+    ...ref,
+    details: `Consultation du dossier patient par ${user.name} (${user.role}).`,
+  });
+  res.json({ entry });
 });
 
-app.put('/api/referentiels', (req, res) => {
-  if (!req.body || typeof req.body !== 'object') {
-    res.status(400).json({ error: 'Référentiels invalides' });
+// F-24: lists are administered by ADMIN; a value used in a dossier can only be deactivated.
+app.put('/api/referentiels', requireAuth, requireRole('ADMIN'), (req, res) => {
+  const user = currentUser(res);
+  const next = req.body as ReferenceLists;
+  if (!next || typeof next !== 'object' || !Array.isArray(next.religions)) {
+    res.status(400).json({ error: 'Référentiels invalides.' });
     return;
   }
-  stmt.setSetting.run('referentiels', JSON.stringify(req.body));
+  const prev = readReferentiels();
+  if (prev) {
+    const used = referentielsUsage();
+    for (const cat of Object.keys(used) as (keyof typeof used)[]) {
+      const before = (prev[cat] as unknown[] | undefined) ?? [];
+      const after = (next[cat] as unknown[] | undefined) ?? [];
+      const keyOf = (v: unknown) => (typeof v === 'string' ? v : (v as { code: string }).code);
+      const afterKeys = new Set(after.map(keyOf));
+      const removedInUse = before.map(keyOf).filter((v) => !afterKeys.has(v) && used[cat].includes(v));
+      if (removedInUse.length) {
+        res.status(409).json({
+          error: `Valeur utilisée dans des dossiers : « ${removedInUse.join(', ')} ». Désactivez-la au lieu de la supprimer.`,
+        });
+        return;
+      }
+    }
+  }
+  settings.set.run('referentiels', JSON.stringify(next));
+  writeAudit(user, 'MODIFICATION', { details: 'Mise à jour des listes de valeurs (référentiels).' });
   res.json({ ok: true });
 });
 
@@ -188,25 +231,17 @@ function handleListenError(err: NodeJS.ErrnoException) {
 
 const server = app.listen(PORT, HOST, () => {
   runDailyBackup();
-  setInterval(runDailyBackup, 60 * 60 * 1000);
+  purgeExpiredSessions();
+  setInterval(() => {
+    runDailyBackup();
+    purgeExpiredSessions();
+  }, 60 * 60 * 1000);
   console.log('');
   console.log('  PsyDossier est prêt');
   console.log(`  Adresse : ${APP_URL}`);
-  console.log(`  Données : ${DB_FILE}`);
+  console.log(`  Données : ${DATA_DIR}`);
   console.log('');
   console.log('  Laissez cette fenêtre ouverte pendant l’utilisation.');
   openBrowser();
 });
 server.on('error', handleListenError);
-
-function shutdown() {
-  server.close();
-  try {
-    db.close();
-  } catch {
-    // already closed
-  }
-  process.exit(0);
-}
-process.on('SIGINT', shutdown);
-process.on('SIGTERM', shutdown);

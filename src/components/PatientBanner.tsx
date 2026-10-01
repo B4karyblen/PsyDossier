@@ -19,6 +19,8 @@ import {
   Layers,
   Stethoscope,
 } from 'lucide-react';
+import { StatusBadge } from './ui/StatusBadge';
+import { ROLES_CAN_EXPORT } from '../utils/emptyDossier';
 
 interface PatientBannerProps {
   dossier: DossierPsychiatrique;
@@ -69,8 +71,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
   }[dossier.statut];
   const StatusIcon = statusChip?.icon;
 
-  const ringColor =
-    stats.percentage === 100 ? '#10B981' : stats.percentage >= 60 ? 'var(--color-brand-500)' : '#F5A524';
+  const ringColor = 'var(--color-brand-500)';
 
   const facts = [
     `${dossier.s1Identification.age} ans`,
@@ -87,7 +88,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
           <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
             <button
               onClick={onCloseDossier}
-              className="hidden sm:flex w-10 h-10 shrink-0 items-center justify-center rounded-xl bg-ink-50 hover:bg-ink-100 border border-ink-150 text-ink-600 hover:text-ink-900 transition-colors cursor-pointer"
+              className="btn-icon hidden sm:inline-flex shrink-0 border border-ink-200 shadow-[var(--shadow-soft)]"
               title="Revenir au registre des patients"
               aria-label="Revenir au registre des patients"
             >
@@ -95,11 +96,11 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
             </button>
 
             <div className="relative shrink-0">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-extrabold text-lg shadow-[0_10px_20px_-10px_rgba(10,132,116,0.8)]">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-ink-100 text-ink-800 flex items-center justify-center font-bold text-base">
                 {initials}
               </div>
               <div
-                className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-[3px] border-white ${
+                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
                   dossier.statut === 'VALIDÉ'
                     ? 'bg-emerald-500'
                     : dossier.statut === 'EN_COURS'
@@ -114,21 +115,16 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl sm:text-[22px] font-extrabold text-ink-900 tracking-tight truncate">
+                <h1 className="text-xl sm:text-2xl font-bold text-ink-900 tracking-tight truncate">
                   {dossier.s1Identification.nom} {dossier.s1Identification.prenoms}
                 </h1>
-                {statusChip && (
-                  <span className={`chip ${statusChip.cls}`}>
-                    {StatusIcon && <StatusIcon className="w-3.5 h-3.5" />}
-                    {statusChip.label}
-                  </span>
-                )}
+                {statusChip && <StatusBadge status={dossier.statut} label={statusChip.label} />}
               </div>
 
-              <div className="flex items-center gap-x-2 gap-y-1 text-[13px] text-ink-500 mt-1 flex-wrap font-medium">
+              <div className="flex items-center gap-x-2 gap-y-1 text-base text-ink-600 mt-1 flex-wrap">
                 <button
                   onClick={handleCopyOrderNumber}
-                  className="!min-h-0 !min-w-0 inline-flex items-center gap-1 font-bold tabular-nums text-ink-700 hover:text-brand-700 transition-colors cursor-pointer"
+                  className="!min-h-0 !min-w-0 inline-flex items-center gap-1 font-semibold tabular-nums text-ink-700 hover:text-ink-900 transition-colors cursor-pointer"
                   title="Copier le N° d'ordre"
                 >
                   {dossier.s1Identification.numeroOrdre}
@@ -143,14 +139,14 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
               </div>
 
               <div className="flex items-center gap-2 mt-2 flex-wrap">
-                <span className="chip bg-ink-100 text-ink-700">
+                <span className="chip chip-neutral">
                   <Stethoscope className="w-3.5 h-3.5 text-ink-500" />
                   {dossier.psychiatreReferent}
                 </span>
                 {diagPrincipal && (
-                  <span className="chip bg-brand-50 text-brand-800 max-w-full sm:max-w-[360px] min-w-0" title={diagPrincipal.libelle}>
-                    {diagPrincipal.codeCimDsm && <span className="tabular-nums">{diagPrincipal.codeCimDsm}</span>}
-                    <span className="truncate font-semibold">{diagPrincipal.libelle}</span>
+                  <span className="chip chip-neutral max-w-full sm:max-w-[360px] min-w-0" title={diagPrincipal.libelle}>
+                    {diagPrincipal.codeCimDsm && <span className="tabular-nums font-semibold text-ink-900">{diagPrincipal.codeCimDsm}</span>}
+                    <span className="truncate font-medium">{diagPrincipal.libelle}</span>
                   </span>
                 )}
               </div>
@@ -158,39 +154,37 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
 
           {/* Completeness & actions */}
-          <div className="flex flex-wrap items-center gap-2.5 2xl:justify-end shrink-0 pt-4 2xl:pt-0 border-t border-ink-100 2xl:border-0">
+          <div className="flex flex-wrap items-center gap-2 2xl:justify-end shrink-0 pt-4 2xl:pt-0 border-t border-ink-100 2xl:border-0">
             <div className="relative">
               <button
                 onClick={() => setShowChecklist(!showChecklist)}
-                className="flex items-center gap-3 bg-ink-25 hover:bg-ink-50 border border-ink-150 pl-2 pr-3 py-1.5 rounded-2xl transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 bg-white hover:bg-ink-50 border border-ink-200 shadow-[var(--shadow-soft)] !min-h-10 pl-2 pr-3 py-1 rounded-lg transition-colors cursor-pointer"
                 title="Afficher la checklist des 17 rubriques"
                 aria-expanded={showChecklist}
               >
                 <span
-                  className="relative w-10 h-10 rounded-full grid place-items-center"
+                  className="relative w-7 h-7 rounded-full grid place-items-center"
                   style={{ background: `conic-gradient(${ringColor} ${stats.percentage * 3.6}deg, var(--color-ink-150) 0deg)` }}
                 >
-                  <span className="absolute inset-[4px] rounded-full bg-white" />
-                  <span className="relative text-[11px] font-extrabold tabular-nums text-ink-900">{stats.percentage}%</span>
+                  <span className="absolute inset-[3px] rounded-full bg-white" />
+                  <span className="sr-only">{stats.percentage}%</span>
                 </span>
-                <span className="text-left">
-                  <span className="block text-[11px] font-bold text-ink-400">Complétude</span>
-                  <span className="block text-sm font-extrabold text-ink-900 tabular-nums">
-                    {stats.completeCount}/{stats.total} rubriques
-                  </span>
+                <span className="text-sm font-bold text-ink-900 tabular-nums">
+                  {stats.completeCount}/{stats.total}
+                  <span className="font-medium text-ink-500"> rubriques</span>
                 </span>
                 <ChevronDown className={`w-4 h-4 text-ink-400 transition-transform ${showChecklist ? 'rotate-180' : ''}`} />
               </button>
 
               {showChecklist && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-ink-150 rounded-2xl shadow-[var(--shadow-float)] z-50 p-3">
+                <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-ink-150 rounded-xl shadow-[var(--shadow-float)] z-50 p-3">
                   <div className="flex items-center justify-between px-1 pb-2 mb-2 border-b border-ink-100">
                     <span className="text-sm font-bold text-ink-900">Checklist des rubriques</span>
-                    <span className="text-[11px] font-bold text-brand-700">
+                    <span className="text-xs font-medium text-ink-500">
                       {stats.total - stats.completeCount} restantes
                     </span>
                   </div>
-                  <div className="max-h-72 overflow-y-auto space-y-0.5 pr-1 text-[13px]">
+                  <div className="max-h-72 overflow-y-auto space-y-0.5 pr-1 text-xs">
                     {RUBRIQUES_CONFIG.map((rub) => {
                       const isComplete = getRubriqueCompleteness(dossier, rub.id) === 'COMPLETE';
                       return (
@@ -203,15 +197,15 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
                           className="w-full !min-h-9 flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg hover:bg-ink-50 transition-colors text-left cursor-pointer"
                         >
                           <span className="flex items-center gap-2 truncate">
-                            <span className="w-7 text-[11px] font-extrabold tabular-nums text-ink-400">{rub.code}</span>
+                            <span className="w-7 text-xs font-bold tabular-nums text-ink-400">{rub.code}</span>
                             <span className="truncate font-semibold text-ink-800">{rub.titre}</span>
                           </span>
                           {isComplete ? (
-                            <span className="w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center text-white shrink-0">
-                              <Check className="w-3 h-3" strokeWidth={3.5} />
+                            <span className="w-4 h-4 rounded-full bg-brand-500 flex items-center justify-center text-white shrink-0">
+                              <Check className="w-2.5 h-2.5" strokeWidth={4} />
                             </span>
                           ) : (
-                            <span className="chip bg-amber-50 text-amber-800 !text-[10px] shrink-0">À compléter</span>
+                            <span className="chip bg-amber-50 text-amber-800 !text-xs shrink-0">À compléter</span>
                           )}
                         </button>
                       );
@@ -222,7 +216,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
             </div>
 
             {dossier.statut === 'VALIDÉ' ? (
-              <button onClick={onOpenAddendumModal} className="btn-dark">
+              <button onClick={onOpenAddendumModal} className="btn-primary">
                 <FilePlus2 className="w-4 h-4" />
                 <span>Addendum</span>
               </button>
@@ -245,12 +239,12 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
                 >
                   <UserCheck className="w-4 h-4" />
                   <span>Valider le dossier</span>
-                  {!isPsychiatre && <span className="text-[11px] text-ink-400 font-semibold">(Psychiatre)</span>}
+                  {!isPsychiatre && <span className="text-xs text-ink-400 font-medium">(Psychiatre)</span>}
                 </button>
               )
             )}
 
-            {['PSYCHIATRE', 'PSYCHOLOGUE', 'INFIRMIER', 'ASSISTANT_SOCIAL', 'ADMIN'].includes(currentUser.role) && (
+            {ROLES_CAN_EXPORT.includes(currentUser.role) && (
               <button onClick={onOpenExportModal} className="btn-secondary" title="Exporter / imprimer le dossier">
                 <Printer className="w-4 h-4 text-ink-500" />
                 <span className="hidden sm:inline">Exporter</span>
@@ -260,7 +254,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
             {dossier.statut !== 'ARCHIVÉ' && ['ADMIN', 'PSYCHIATRE'].includes(currentUser.role) && (
               <button
                 onClick={onArchiveDossier}
-                className="w-11 h-11 flex items-center justify-center text-ink-400 hover:text-rose-700 hover:bg-rose-50 border border-ink-150 hover:border-rose-200 rounded-xl transition-colors cursor-pointer"
+                className="btn-icon border border-ink-200 shadow-[var(--shadow-soft)] hover:!text-rose-700 hover:!bg-rose-50 hover:border-rose-200"
                 title="Archiver ce dossier médical"
                 aria-label="Archiver ce dossier médical"
               >
@@ -270,7 +264,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
 
             {dossier.statut === 'ARCHIVÉ' && currentUser.role === 'PSYCHIATRE' && (
               <button onClick={onReactivateDossier} className="btn-secondary">
-                <RefreshCw className="w-4 h-4 text-brand-600" />
+                <RefreshCw className="w-4 h-4 text-ink-500" />
                 <span>Réactiver</span>
               </button>
             )}
@@ -278,7 +272,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
         </div>
 
         {dossier.statut === 'VALIDÉ' && dossier.validationInfo && (
-          <div className="mt-4 px-3.5 py-2.5 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-between text-[13px] flex-wrap gap-2">
+          <div className="mt-4 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs flex-wrap gap-2">
             <div className="flex items-center gap-2 text-emerald-800 font-semibold">
               <Lock className="w-4 h-4 shrink-0" />
               <span>
@@ -305,11 +299,11 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
           dossier.statut !== 'VALIDÉ' &&
           dossier.statut !== 'ARCHIVÉ' &&
           isPsychiatre && (
-            <div className="mt-4 px-3.5 py-2.5 rounded-xl bg-amber-50 border border-amber-100 flex items-start gap-2 text-[13px] text-amber-900">
+            <div className="mt-4 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 flex items-start gap-2 text-sm text-amber-900">
               <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <span>
                 Prérequis manquants pour la validation légale :{' '}
-                <strong className="font-bold">{validationCheck.missingRequirements.join(' · ')}</strong>
+                <strong className="font-semibold">{validationCheck.missingRequirements.join(' · ')}</strong>
               </span>
             </div>
           )}

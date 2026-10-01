@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { DossierPsychiatrique } from '../types';
+import { DossierPsychiatrique, AppView } from '../types';
 import { RUBRIQUES_CONFIG } from '../utils/rules';
 import {
   Search,
@@ -21,9 +21,11 @@ interface CommandPaletteModalProps {
   onClose: () => void;
   dossiers: DossierPsychiatrique[];
   onSelectDossier: (dossierId: string, targetRubriqueId?: string) => void;
-  onOpenNewPatient: () => void;
-  onChangeView: (view: 'DASHBOARD' | 'REGISTRE' | 'AUDIT' | 'REFERENTIELS') => void;
+  onOpenNewPatient?: () => void;
+  onChangeView: (view: AppView) => void;
   activeDossierId: string | null;
+  canCreateDossier: boolean;
+  canReadAudit: boolean;
 }
 
 export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
@@ -34,6 +36,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   onOpenNewPatient,
   onChangeView,
   activeDossierId,
+  canCreateDossier,
+  canReadAudit,
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -76,16 +80,16 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     }> = [];
 
     // Global actions
-    items.push({
+    if (canCreateDossier) items.push({
       id: 'action-new-patient',
       category: 'ACTION',
       title: 'Nouveau Dossier Patient',
       subtitle: 'Créer une nouvelle admission psychiatrique (S1 à S17)',
       badge: 'Action',
-      icon: <Plus className="w-4 h-4 text-brand-600" />,
+      icon: <Plus className="w-4 h-4 text-primary-600" />,
       action: () => {
         onClose();
-        onOpenNewPatient();
+        onOpenNewPatient?.();
       },
     });
 
@@ -95,7 +99,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       title: 'Tableau de Bord Clinique',
       subtitle: 'Surveillance des indicateurs, vigilance légale et bilans',
       badge: 'Vue',
-      icon: <Activity className="w-4 h-4 text-brand-700" />,
+      icon: <Activity className="w-4 h-4 text-primary-700" />,
       action: () => {
         onClose();
         onChangeView('DASHBOARD');
@@ -115,7 +119,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       },
     });
 
-    items.push({
+    if (canReadAudit) items.push({
       id: 'nav-audit',
       category: 'NAVIGATION',
       title: 'Journal d’Audit & Traçabilité',
@@ -149,7 +153,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         title: `${r.code} · ${r.titre}`,
         subtitle: r.description,
         badge: 'Rubrique',
-        icon: <FileText className="w-4 h-4 text-brand-600" />,
+        icon: <FileText className="w-4 h-4 text-primary-600" />,
         action: () => {
           onClose();
           if (activeDossierId) {
@@ -172,7 +176,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
           diagPrincipal ? diagPrincipal.libelle : d.s2Modalites.modalite
         }`,
         badge: d.statut,
-        icon: <User className="w-4 h-4 text-brand-700" />,
+        icon: <User className="w-4 h-4 text-primary-700" />,
         action: () => {
           onClose();
           onSelectDossier(d.id, 's1');
@@ -214,14 +218,14 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-ink-950/50 backdrop-blur-sm flex items-start justify-center pt-16 sm:pt-24 px-4 overflow-y-auto no-print">
+    <div className="fixed inset-0 z-50 bg-ink-950/30 flex items-start justify-center pt-16 sm:pt-24 px-4 overflow-y-auto no-print">
       <div
-        className="w-full max-w-2xl bg-ink-800 rounded-2xl shadow-2xl border border-ink-700 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-150"
+        className="w-full max-w-xl bg-white rounded-xl shadow-[var(--shadow-float)] border border-ink-200 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input Bar */}
-        <div className="flex items-center px-4 py-3.5 border-b border-ink-700 gap-3 bg-ink-950">
-          <Search className="w-5 h-5 text-brand-600 shrink-0" />
+        <div className="flex items-center px-4 py-3 border-b border-ink-150 gap-3">
+          <Search className="w-4 h-4 text-ink-400 shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -232,24 +236,25 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
             }}
             onKeyDown={handleKeyDown}
             placeholder="Rechercher un patient, un N° d'ordre, une rubrique (S1..S17), ou une action..."
-            className="w-full text-body font-medium text-white placeholder-slate-500 bg-transparent outline-none"
+            aria-label="Recherche rapide"
+            className="w-full text-sm font-medium text-ink-900 placeholder:text-ink-400 bg-transparent outline-none"
           />
           {query ? (
             <button
               onClick={() => setQuery('')}
-              className="text-body-sm text-slate-400 hover:text-white p-1 rounded-md"
+              aria-label="Effacer" className="btn-icon"
             >
               <X className="w-4 h-4" />
             </button>
           ) : (
-            <span className="hidden sm:inline-flex items-center gap-1 text-caption font-semibold text-slate-400 bg-ink-700 px-2 py-0.5 rounded border border-ink-600">
-              ESC pour fermer
+            <span className="kbd hidden sm:inline-flex">
+              Esc
             </span>
           )}
         </div>
 
         {/* Results List */}
-        <div className="max-h-[380px] overflow-y-auto p-2 divide-y divide-ink-700">
+        <div className="max-h-[380px] overflow-y-auto p-1.5">
           {results.length > 0 ? (
             results.map((item, index) => {
               const isSelected = index === selectedIndex;
@@ -258,40 +263,40 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
                   key={item.id}
                   onClick={() => item.action()}
                   onMouseEnter={() => setSelectedIndex(index)}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
+                  className={`flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer transition-colors ${
                     isSelected
-                      ? 'bg-brand-500/15 text-brand-600'
-                      : 'hover:bg-ink-700 text-white'
+                      ? 'bg-ink-100 text-ink-900'
+                      : 'text-ink-800'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
                       className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                         isSelected
-                          ? 'bg-brand-500/20 text-brand-600'
-                          : 'bg-ink-700 text-slate-400'
+                          ? 'bg-white text-ink-700 ring-1 ring-inset ring-ink-200'
+                          : 'bg-ink-50 text-ink-500 ring-1 ring-inset ring-ink-150'
                       }`}
                     >
                       {item.icon}
                     </div>
                     <div className="min-w-0">
-                      <div className="text-body-sm font-bold truncate flex items-center gap-2">
+                      <div className="text-sm font-semibold truncate flex items-center gap-2">
                         <span>{item.title}</span>
                         {item.badge && (
                           <span
                             className={`text-caption font-medium px-1.5 py-0.2 rounded ${
                               item.badge === 'VALIDÉ'
-                                ? 'bg-emerald-500/20 text-emerald-400'
+                                ? 'bg-emerald-50 text-emerald-700'
                                 : item.badge === 'EN_COURS'
-                                ? 'bg-amber-500/20 text-amber-400'
-                                : 'bg-ink-700 text-slate-400'
+                                ? 'bg-amber-50 text-amber-800'
+                                : 'bg-ink-100 text-ink-600'
                             }`}
                           >
                             {item.badge}
                           </span>
                         )}
                       </div>
-                      <div className="text-caption text-slate-400 truncate">
+                      <div className="text-xs text-ink-500 truncate">
                         {item.subtitle}
                       </div>
                     </div>
@@ -299,7 +304,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
 
                   <div className="flex items-center gap-1 shrink-0 ml-3">
                     {isSelected && (
-                      <span className="text-caption font-medium text-brand-600 flex items-center gap-1">
+                      <span className="text-xs font-medium text-ink-500 flex items-center gap-1">
                         Ouvrir <CornerDownLeft className="w-3 h-3" />
                       </span>
                     )}
@@ -308,20 +313,20 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
               );
             })
           ) : (
-            <div className="py-8 text-center text-body-sm text-slate-400">
+            <div className="py-10 text-center text-sm text-ink-500">
               Aucun résultat trouvé pour « {query} ».
             </div>
           )}
         </div>
 
         {/* Footer shortcuts */}
-        <div className="px-4 py-2.5 bg-ink-950 border-t border-ink-700 flex items-center justify-between text-caption text-slate-400">
+        <div className="px-4 py-2 bg-ink-50 border-t border-ink-150 flex items-center justify-between text-xs text-ink-500">
           <div className="flex items-center gap-3">
             <span>↑↓ pour naviguer</span>
             <span>↵ pour sélectionner</span>
             <span>ESC pour fermer</span>
           </div>
-          <span className="font-bold text-brand-600">PsyDossier Navigation Rapide</span>
+          <span className="font-medium text-ink-400">PsyDossier</span>
         </div>
       </div>
     </div>

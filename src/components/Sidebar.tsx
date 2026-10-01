@@ -1,6 +1,6 @@
 import React from 'react';
-import { DossierPsychiatrique, UserProfile, UserRole } from '../types';
-import { CLINICAL_USERS } from '../data/initialData';
+import { DossierPsychiatrique, UserProfile, UserRole, AppView } from '../types';
+import { ROLE_LABELS } from './UsersView';
 import { calculateDossierStats } from '../utils/rules';
 import {
   LayoutGrid,
@@ -14,20 +14,25 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   X,
+  UserCog,
+  LogOut,
+  KeyRound,
 } from 'lucide-react';
 
 interface SidebarProps {
-  activeView: 'DASHBOARD' | 'REGISTRE' | 'DOSSIER' | 'AUDIT' | 'REFERENTIELS';
-  onChangeView: (view: 'DASHBOARD' | 'REGISTRE' | 'DOSSIER' | 'AUDIT' | 'REFERENTIELS') => void;
+  activeView: AppView;
+  onChangeView: (view: AppView) => void;
   activeDossier: DossierPsychiatrique | null;
   activeRubriqueId: string;
   onSelectRubrique?: (rubriqueId: string) => void;
   dossiersCount: number;
   auditCount: number;
-  onOpenNewPatient: () => void;
+  onOpenNewPatient?: () => void;
   onOpenQuickSearch: () => void;
   currentUser: UserProfile;
-  onSelectUser: (user: UserProfile) => void;
+  canReadAudit: boolean;
+  onLogout: () => void;
+  onChangePassword: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
   isMobileOpen: boolean;
@@ -45,7 +50,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenNewPatient,
   onOpenQuickSearch,
   currentUser,
-  onSelectUser,
+  canReadAudit,
+  onLogout,
+  onChangePassword,
   isCollapsed,
   onToggleCollapse,
   isMobileOpen,
@@ -90,13 +97,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const adminItems = [
-    {
-      id: 'AUDIT' as const,
-      label: "Journal d'audit",
-      icon: ShieldCheck,
-      badge: auditCount.toString(),
-      shortcut: '4',
-    },
+    ...(canReadAudit
+      ? [
+          {
+            id: 'AUDIT' as const,
+            label: "Journal d'audit",
+            icon: ShieldCheck,
+            badge: auditCount.toString(),
+            shortcut: '4',
+          },
+        ]
+      : []),
     {
       id: 'REFERENTIELS' as const,
       label: 'Référentiels & CIM-10',
@@ -104,6 +115,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: null,
       shortcut: '5',
     },
+    ...(currentUser.role === 'ADMIN'
+      ? [
+          {
+            id: 'UTILISATEURS' as const,
+            label: 'Utilisateurs & rôles',
+            icon: UserCog,
+            badge: null,
+            shortcut: '6',
+          },
+        ]
+      : []),
   ];
 
   const initials = currentUser.name
@@ -114,47 +136,50 @@ export const Sidebar: React.FC<SidebarProps> = ({
     .slice(0, 2);
 
   const itemClass = (isActive: boolean) =>
-    `w-full flex items-center rounded-xl transition-colors duration-150 cursor-pointer group text-left ${
-      isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2 gap-3'
+    `relative w-full !min-h-10 flex items-center rounded-lg transition-colors duration-150 cursor-pointer group text-left ${
+      isCollapsed ? 'justify-center p-2' : 'px-3 py-2 gap-3'
     } ${
       isActive
-        ? 'bg-brand-50 text-brand-800'
-        : 'text-ink-600 hover:text-ink-900 hover:bg-ink-50'
+        ? 'bg-ink-100 text-ink-900'
+        : 'text-ink-700 hover:text-ink-900 hover:bg-ink-50'
     }`;
 
   const iconWrapClass = (isActive: boolean) =>
-    `w-8 h-8 rounded-[10px] flex items-center justify-center shrink-0 transition-colors ${
-      isActive
-        ? 'bg-brand-500 text-white shadow-[0_6px_14px_-6px_rgba(20,179,155,0.8)]'
-        : 'bg-transparent text-ink-400 group-hover:text-ink-700'
+    `w-5 h-5 flex items-center justify-center shrink-0 transition-colors ${
+      isActive ? 'text-ink-900' : 'text-ink-500 group-hover:text-ink-800'
     }`;
 
   const badgeClass = (isActive: boolean) =>
-    `min-w-6 px-1.5 py-0.5 rounded-md text-[11px] font-bold tabular-nums text-center ${
-      isActive ? 'bg-white text-brand-700 shadow-2xs' : 'bg-ink-100 text-ink-500'
+    `min-w-6 px-1.5 rounded-md text-xs leading-5 font-bold tabular-nums text-center ${
+      isActive ? 'bg-white text-ink-800 ring-1 ring-inset ring-ink-200' : 'bg-ink-100 text-ink-700'
     }`;
+
+  const activeIndicator = (isActive: boolean) =>
+    isActive && !isCollapsed ? (
+      <span aria-hidden="true" className="absolute -left-3 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-brand-500" />
+    ) : null;
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white border-r border-ink-150 select-none">
       {/* 1. Brand */}
-      <div className={`h-16 flex items-center shrink-0 ${isCollapsed ? 'justify-center px-2' : 'justify-between px-5'}`}>
+      <div className={`h-14 flex items-center shrink-0 border-b border-ink-150 ${isCollapsed ? 'justify-center px-2' : 'justify-between px-4'}`}>
         <button
           onClick={() => {
             onChangeView('DASHBOARD');
             onCloseMobile();
           }}
-          className="flex items-center gap-2.5 text-left overflow-hidden cursor-pointer rounded-xl"
+          className="flex items-center gap-2.5 text-left overflow-hidden cursor-pointer rounded-lg"
           aria-label="PsyDossier — Tableau de bord"
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white shadow-[0_8px_18px_-8px_rgba(10,132,116,0.8)] shrink-0">
-            <HeartPulse className="w-[18px] h-[18px]" strokeWidth={2.5} />
+          <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white shrink-0">
+            <HeartPulse className="w-4 h-4" strokeWidth={2.5} />
           </div>
           {!isCollapsed && (
             <div className="min-w-0">
-              <div className="text-[17px] font-extrabold tracking-tight text-ink-900 leading-none">
-                Psy<span className="text-brand-600">Dossier</span>
+              <div className="text-base font-bold tracking-tight text-ink-900 leading-none">
+                PsyDossier
               </div>
-              <p className="text-[11px] text-ink-500 font-semibold truncate mt-1">
+              <p className="text-xs text-ink-600 font-medium truncate mt-1">
                 CHU Point G · Psychiatrie
               </p>
             </div>
@@ -182,14 +207,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* 2. Search */}
-      <div className={`pb-2 ${isCollapsed ? 'px-2' : 'px-4'}`}>
+      <div className={`pt-3 pb-1 ${isCollapsed ? 'px-2' : 'px-3'}`}>
         <button
           onClick={() => {
             onOpenQuickSearch();
             onCloseMobile();
           }}
-          className={`w-full flex items-center rounded-xl bg-ink-50 hover:bg-ink-100 border border-ink-150 text-ink-500 transition-colors cursor-pointer ${
-            isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2 gap-2.5 text-body-sm'
+          className={`w-full !min-h-10 flex items-center rounded-lg bg-ink-50 hover:bg-ink-100 border border-ink-200 text-ink-500 transition-colors cursor-pointer ${
+            isCollapsed ? 'justify-center p-2' : 'px-2.5 py-1.5 gap-2 text-sm'
           }`}
           title="Recherche rapide (⌘K)"
         >
@@ -197,7 +222,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {!isCollapsed && (
             <>
               <span className="font-medium truncate">Rechercher…</span>
-              <kbd className="ml-auto text-[11px] font-bold text-ink-500 bg-white px-1.5 py-0.5 rounded-md border border-ink-150">
+              <kbd className="kbd ml-auto">
                 ⌘K
               </kbd>
             </>
@@ -206,10 +231,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* 3. Navigation */}
-      <nav aria-label="Navigation principale" className={`flex-1 overflow-y-auto py-3 space-y-6 ${isCollapsed ? 'px-2' : 'px-3'}`}>
-        <div className="space-y-1">
+      <nav aria-label="Navigation principale" className={`flex-1 overflow-y-auto py-3 space-y-5 ${isCollapsed ? 'px-2' : 'px-3'}`}>
+        <div className="space-y-0.5">
           {!isCollapsed && (
-            <div className="px-3 pb-1 text-[11px] font-bold text-ink-400 tracking-wide">
+            <div className="px-3 pb-1.5 text-xs font-bold text-ink-500">
               Espace clinique
             </div>
           )}
@@ -220,7 +245,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             const isDossierItem = item.id === 'DOSSIER';
 
             return (
-              <div key={item.id} className="space-y-1">
+              <div key={item.id}>
                 <button
                   onClick={() => {
                     if (isDossierItem && !activeDossier) {
@@ -234,18 +259,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   title={isCollapsed ? item.label : undefined}
                   aria-current={isActive ? 'page' : undefined}
                 >
+                  {activeIndicator(isActive)}
                   <span className={iconWrapClass(isActive)}>
-                    <Icon className="w-[18px] h-[18px]" strokeWidth={2.2} />
+                    <Icon className="w-[18px] h-[18px]" strokeWidth={2} />
                   </span>
 
                   {!isCollapsed && (
                     <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
                       <div className="min-w-0">
-                        <div className={`text-body-sm truncate leading-tight ${isActive ? 'font-bold' : 'font-semibold'}`}>
+                        <div className={`text-sm truncate leading-tight ${isActive ? 'font-bold' : 'font-semibold'}`}>
                           {item.label}
                         </div>
                         {item.sublabel && (
-                          <div className={`text-[11px] font-semibold tabular-nums truncate mt-0.5 ${isActive ? 'text-brand-700' : 'text-ink-400'}`}>
+                          <div className={`text-xs font-medium tabular-nums truncate mt-0.5 text-ink-600`}>
                             {item.sublabel}
                           </div>
                         )}
@@ -264,9 +290,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {!isCollapsed && (
-            <div className="px-3 pb-1 text-[11px] font-bold text-ink-400 tracking-wide">
+            <div className="px-3 pb-1.5 text-xs font-bold text-ink-500">
               Conformité & nomenclatures
             </div>
           )}
@@ -285,12 +311,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 title={isCollapsed ? item.label : undefined}
                 aria-current={isActive ? 'page' : undefined}
               >
+                {activeIndicator(isActive)}
                 <span className={iconWrapClass(isActive)}>
-                  <Icon className="w-[18px] h-[18px]" strokeWidth={2.2} />
+                  <Icon className="w-[18px] h-[18px]" strokeWidth={2} />
                 </span>
                 {!isCollapsed && (
                   <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
-                    <span className={`text-body-sm truncate leading-tight ${isActive ? 'font-bold' : 'font-semibold'}`}>
+                    <span className={`text-sm truncate leading-tight ${isActive ? 'font-bold' : 'font-semibold'}`}>
                       {item.label}
                     </span>
                     {item.badge && <span className={badgeClass(isActive)}>{item.badge}</span>}
@@ -303,11 +330,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* 4. New patient + profile */}
-      <div className={`shrink-0 space-y-3 ${isCollapsed ? 'p-2' : 'p-4'}`}>
+      <div className={`shrink-0 space-y-2 border-t border-ink-150 ${isCollapsed ? 'p-2' : 'p-3'}`}>
         {isCollapsed && (
           <button
             onClick={onToggleCollapse}
-            className="hidden lg:flex w-full items-center justify-center p-2.5 rounded-xl text-ink-400 hover:text-ink-800 hover:bg-ink-100 transition-colors cursor-pointer"
+            className="hidden lg:flex w-full items-center justify-center p-2.5 rounded-lg text-ink-400 hover:text-ink-800 hover:bg-ink-100 transition-colors cursor-pointer"
             title="Agrandir le menu latéral"
             aria-label="Agrandir le menu latéral"
           >
@@ -315,49 +342,48 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         )}
 
-        <div className={`rounded-2xl bg-ink-900 text-white ${isCollapsed ? 'p-1.5 flex justify-center' : 'p-3'}`}>
+        <div className={`${isCollapsed ? 'flex justify-center' : ''}`}>
           <div className="flex items-center gap-2.5">
             <div className="relative shrink-0">
-              <div className="w-9 h-9 rounded-xl bg-brand-500 text-white flex items-center justify-center font-extrabold text-xs">
+              <div className="w-8 h-8 rounded-full bg-primary-900 text-white flex items-center justify-center font-bold text-xs">
                 {initials}
               </div>
               <span
-                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-ink-900"
+                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white"
                 title="Session active"
               />
             </div>
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
-                <div className="text-[13px] font-bold truncate leading-tight">{currentUser.name}</div>
-                <div className="text-[11px] font-semibold text-ink-300 truncate mt-0.5 capitalize">
-                  {currentUser.role.toLowerCase()}
+                <div className="text-sm font-semibold text-ink-900 truncate leading-tight">{currentUser.name}</div>
+                <div className="text-xs font-medium text-ink-500 truncate mt-0.5">
+                  {ROLE_LABELS[currentUser.role]}
                 </div>
               </div>
             )}
           </div>
 
-          {!isCollapsed && (
-            <div className="relative mt-3">
-              <label htmlFor="sidebar-role-switch" className="sr-only">
-                Changer d'utilisateur clinique
-              </label>
-              <select
-                id="sidebar-role-switch"
-                value={currentUser.id}
-                onChange={(e) => {
-                  const found = CLINICAL_USERS.find((u) => u.id === e.target.value);
-                  if (found) onSelectUser(found);
-                }}
-                className="w-full !min-h-9 appearance-none bg-white/10 hover:bg-white/15 border border-white/10 text-white text-xs font-semibold rounded-lg pl-2.5 pr-7 py-2 focus:outline-none focus:ring-2 focus:ring-brand-400 cursor-pointer truncate transition-colors"
-              >
-                {CLINICAL_USERS.map((user) => (
-                  <option key={user.id} value={user.id} className="bg-ink-900 text-white">
-                    {user.name} · {user.role}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-300 pointer-events-none" />
+          {!isCollapsed ? (
+            <div className="mt-2.5 grid grid-cols-2 gap-1.5">
+              <button type="button" onClick={onChangePassword} className="btn-secondary btn-sm !px-2">
+                <KeyRound className="w-4 h-4 text-ink-500" />
+                Mot de passe
+              </button>
+              <button type="button" onClick={onLogout} className="btn-secondary btn-sm !px-2">
+                <LogOut className="w-4 h-4 text-ink-500" />
+                Déconnexion
+              </button>
             </div>
+          ) : (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="btn-icon mt-2 mx-auto flex"
+              title="Se déconnecter"
+              aria-label="Se déconnecter"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           )}
         </div>
       </div>
@@ -369,7 +395,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Desktop Persistent Sidebar */}
       <aside
         className={`hidden lg:flex flex-col shrink-0 sticky top-0 h-screen transition-all duration-300 z-30 ${
-          isCollapsed ? 'w-20' : 'w-72'
+          isCollapsed ? 'w-[72px]' : 'w-[280px]'
         }`}
       >
         {sidebarContent}
@@ -382,7 +408,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="fixed inset-0 bg-ink-950/40 backdrop-blur-sm transition-opacity"
             onClick={onCloseMobile}
           />
-          <div className="relative w-72 max-w-[85vw] h-full shadow-2xl z-10 animate-in slide-in-from-left duration-200">
+          <div className="relative w-[280px] max-w-[85vw] h-full shadow-[var(--shadow-float)] z-10 animate-in slide-in-from-left duration-200">
             {sidebarContent}
           </div>
         </div>

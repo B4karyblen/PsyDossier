@@ -31,7 +31,8 @@ export const RUBRIQUES_CONFIG: RubriqueDefinition[] = [
  */
 export function getRubriquePermission(role: UserRole, rubriqueId: string): 'write' | 'read' | 'none' {
   if (role === 'LECTEUR') return 'read';
-  if (role === 'ADMIN') return 'write'; // Full administrative management & oversight (PRD B2)
+  // ADMIN (PRD B2): reads S1–S2 only, no access to clinical rubriques
+  if (role === 'ADMIN') return rubriqueId === 's1' || rubriqueId === 's2' ? 'read' : 'none';
 
   switch (rubriqueId) {
     case 's1':
@@ -276,6 +277,8 @@ export function calculateDossierStats(dossier: DossierPsychiatrique) {
 export function checkDossierValidationPreconditions(dossier: DossierPsychiatrique): {
   canValidate: boolean;
   missingRequirements: string[];
+  /** Non-blocking (F-20): shown before validation, do not prevent it. */
+  warnings: string[];
 } {
   const missing: string[] = [];
 
@@ -320,16 +323,23 @@ export function checkDossierValidationPreconditions(dossier: DossierPsychiatriqu
     missing.push('S14 : Orientation (Ambulatoire ou Hospitalisation) obligatoire');
   }
 
-  // S17: Pronostic à court, moyen et long terme (BR-017)
-  const hasPronosticCourt = Boolean(dossier.s17Pronostic.courtTerme.appreciation);
-  const hasPronosticMoyen = Boolean(dossier.s17Pronostic.moyenTerme.appreciation);
-  const hasPronosticLong = Boolean(dossier.s17Pronostic.longTerme.appreciation);
-  if (!hasPronosticCourt || !hasPronosticMoyen || !hasPronosticLong) {
-    missing.push('S17 : Pronostic à court, moyen et long terme (BR-017)');
+  // S17 (F-20, BR-010): an empty horizon is a non-blocking warning
+  const warnings: string[] = [];
+  const horizons: Array<[keyof typeof dossier.s17Pronostic, string]> = [
+    ['courtTerme', 'court'],
+    ['moyenTerme', 'moyen'],
+    ['longTerme', 'long'],
+  ];
+  const emptyHorizons = horizons
+    .filter(([key]) => !(dossier.s17Pronostic[key] as { appreciation?: string } | undefined)?.appreciation)
+    .map(([, label]) => label);
+  if (emptyHorizons.length) {
+    warnings.push(`S17 : pronostic à ${emptyHorizons.join(', ')} terme non renseigné (BR-010)`);
   }
 
   return {
     canValidate: missing.length === 0,
     missingRequirements: missing,
+    warnings,
   };
 }

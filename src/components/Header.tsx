@@ -1,13 +1,12 @@
 import React from 'react';
-import { UserProfile, DossierPsychiatrique } from '../types';
-import { Menu, Search, Plus, ChevronRight } from 'lucide-react';
+import { UserProfile, DossierPsychiatrique, AppView } from '../types';
+import { Menu, Search, ChevronRight } from 'lucide-react';
 
 interface HeaderProps {
   currentUser: UserProfile;
-  onSelectUser: (user: UserProfile) => void;
-  activeView: 'DASHBOARD' | 'REGISTRE' | 'DOSSIER' | 'AUDIT' | 'REFERENTIELS';
-  onChangeView: (view: 'DASHBOARD' | 'REGISTRE' | 'DOSSIER' | 'AUDIT' | 'REFERENTIELS') => void;
-  onOpenNewPatient: () => void;
+  activeView: AppView;
+  onChangeView: (view: AppView) => void;
+  onOpenNewPatient?: () => void;
   onOpenQuickSearch: () => void;
   onOpenMobileMenu: () => void;
   activeDossier: DossierPsychiatrique | null;
@@ -17,7 +16,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   currentUser,
-  onSelectUser,
   activeView,
   onChangeView,
   onOpenNewPatient,
@@ -33,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
     AUDIT: "Journal d'audit médico-légal",
     REFERENTIELS: 'Nomenclatures & CIM-10',
     DOSSIER: 'Dossier patient',
+    UTILISATEURS: 'Utilisateurs & rôles',
   };
 
   const initials = currentUser.name
@@ -42,10 +41,10 @@ export const Header: React.FC<HeaderProps> = ({
     .join('')
     .slice(0, 2);
 
-  const crumbBtn = 'hover:text-ink-900 font-semibold transition-colors cursor-pointer !min-h-0 !min-w-0';
+  const crumbBtn = 'text-ink-600 hover:text-ink-900 font-semibold transition-colors cursor-pointer !min-h-0 !min-w-0';
 
   const renderBreadcrumbs = () => (
-    <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-[13px] text-ink-500 min-w-0">
+    <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-sm text-ink-500 min-w-0 shrink-0">
       {activeView === 'DOSSIER' && activeDossier ? (
         <>
           <button onClick={() => onChangeView('REGISTRE')} className={`${crumbBtn} hidden sm:inline`}>
@@ -68,55 +67,49 @@ export const Header: React.FC<HeaderProps> = ({
   );
 
   return (
-    <header className="sticky top-0 z-20 bg-canvas/85 backdrop-blur-xl border-b border-ink-150/70 px-4 sm:px-6 lg:px-8 h-16 flex items-center no-print">
+    <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-ink-150 px-4 sm:px-6 lg:px-8 h-16 flex items-center no-print">
       <div className="w-full flex items-center justify-between gap-3 sm:gap-6">
         <div className="flex items-center gap-2 min-w-0">
           <button
             type="button"
             onClick={onOpenMobileMenu}
-            className="lg:hidden -ml-2 p-2 rounded-xl text-ink-600 hover:text-ink-900 hover:bg-white transition-colors cursor-pointer"
+            className="btn-icon lg:hidden -ml-2"
             aria-label="Ouvrir le menu de navigation"
           >
             <Menu className="w-5 h-5" />
           </button>
 
-          <div className="min-w-0">
+          <div className="min-w-0 flex items-center gap-1.5 text-sm">
             {renderBreadcrumbs()}
-            <h1 className="text-[17px] font-extrabold text-ink-900 tracking-tight truncate leading-tight">
+            <ChevronRight className="w-3.5 h-3.5 text-ink-300 shrink-0" aria-hidden="true" />
+            <h1 className="font-bold text-ink-900 truncate">
               {activeView === 'DOSSIER' && activeRubriqueTitle ? activeRubriqueTitle : viewTitles[activeView]}
             </h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={onOpenQuickSearch}
-            className="hidden md:flex items-center gap-2.5 w-64 xl:w-80 pl-3.5 pr-2 py-2 bg-white hover:border-ink-300 border border-ink-150 rounded-xl text-body-sm text-ink-400 transition-colors cursor-pointer shadow-2xs"
+            className="hidden md:flex !min-h-10 items-center gap-2 w-64 xl:w-80 pl-3 pr-2 py-2 bg-ink-50 hover:bg-ink-100 border border-ink-200 rounded-lg text-sm text-ink-500 transition-colors cursor-pointer"
           >
             <Search className="w-4 h-4 shrink-0" />
-            <span className="truncate font-medium">Patient, N° d'ordre, CIM…</span>
-            <kbd className="ml-auto text-[11px] font-bold bg-ink-50 text-ink-500 px-1.5 py-0.5 rounded-md border border-ink-150 shrink-0">
-              ⌘K
-            </kbd>
+            <span className="truncate font-medium">Rechercher un patient…</span>
+            <kbd className="kbd ml-auto shrink-0">⌘K</kbd>
           </button>
 
           <button
             type="button"
             onClick={onOpenQuickSearch}
-            className="md:hidden p-2 text-ink-600 hover:text-ink-900 hover:bg-white rounded-xl transition-colors cursor-pointer"
+            className="btn-icon md:hidden"
             aria-label="Recherche (⌘K)"
           >
             <Search className="w-5 h-5" />
           </button>
 
-          <button type="button" onClick={onOpenNewPatient} className="btn-primary !py-2 !px-3 sm:!px-4 whitespace-nowrap">
-            <Plus className="w-4 h-4" strokeWidth={2.75} />
-            <span className="hidden sm:inline">Nouveau patient</span>
-          </button>
-
           <div
-            className="hidden sm:flex w-10 h-10 rounded-xl bg-ink-900 text-white items-center justify-center text-xs font-extrabold shrink-0"
+            className="hidden sm:flex w-9 h-9 rounded-full bg-primary-900 text-white items-center justify-center text-xs font-bold shrink-0"
             title={`${currentUser.name} · ${currentUser.role}`}
           >
             {initials}

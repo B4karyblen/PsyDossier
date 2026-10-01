@@ -5,13 +5,10 @@ import {
   Activity,
   Users,
   CheckCircle2,
-  Clock,
   ShieldAlert,
   Building2,
   FileSpreadsheet,
-  TrendingUp,
   Plus,
-  HeartPulse,
   ArrowUpRight,
   ChevronRight,
 } from 'lucide-react';
@@ -20,7 +17,7 @@ interface ClinicalDashboardProps {
   dossiers: DossierPsychiatrique[];
   currentUser: UserProfile;
   onSelectDossier: (dossierId: string, targetRubriqueId?: string) => void;
-  onOpenNewPatient: () => void;
+  onOpenNewPatient?: () => void;
   onNavigateToFilteredRegistre?: (filters: {
     status?: string;
     modalite?: string;
@@ -99,7 +96,6 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
       hint: `${valides.length} validés · ${enCours.length} en cours`,
       icon: Users,
       tile: 'tile-brand',
-      card: 'from-brand-50 to-white',
       onClick: () => onNavigateToFilteredRegistre?.({ status: 'TOUS_ACTIFS' }),
     },
     {
@@ -108,7 +104,6 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
       hint: 'Régime médico-légal spécial',
       icon: ShieldAlert,
       tile: 'tile-rose',
-      card: 'from-rose-50 to-white',
       onClick: () => onNavigateToFilteredRegistre?.({ modalite: 'Soins sans consentement' }),
     },
     {
@@ -117,7 +112,6 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
       hint: `${ambulatoires.length} en ambulatoire`,
       icon: Building2,
       tile: 'tile-violet',
-      card: 'from-violet-50 to-white',
       onClick: () => onNavigateToFilteredRegistre?.({ orientation: 'Hospitalisation' }),
     },
     {
@@ -126,7 +120,6 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
       hint: 'Sur 17 rubriques',
       icon: CheckCircle2,
       tile: 'tile-amber',
-      card: 'from-amber-50 to-white',
       onClick: () => onNavigateToFilteredRegistre?.({ sortBy: 'completude' }),
       progress: avgCompleteness,
     },
@@ -145,33 +138,29 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
     count?: number;
     meta: string;
   }) => (
-    <div className="flex items-center justify-between gap-3">
-      <div className="flex items-center gap-3 min-w-0">
-        <span className={`icon-tile ${tile} !w-9 !h-9`}>
+    <div className="card-header">
+      <div className="flex items-center gap-2.5 min-w-0">
+        <span className={`icon-tile ${tile}`}>
           <Icon className="w-[18px] h-[18px]" />
         </span>
-        <h2 className="text-[15px] font-bold text-ink-900 truncate">
-          {title}
-          {count !== undefined && (
-            <span className="ml-2 align-middle chip bg-ink-100 text-ink-600 tabular-nums">{count}</span>
-          )}
-        </h2>
+        <h2 className="card-title truncate">{title}</h2>
+        {count !== undefined && (
+          <span className="chip chip-neutral tabular-nums">{count}</span>
+        )}
       </div>
-      <span className="text-xs font-semibold text-ink-400 shrink-0 hidden sm:inline">{meta}</span>
+      <span className="text-sm font-medium text-ink-500 shrink-0 hidden sm:inline">{meta}</span>
     </div>
   );
 
   const EmptyState = ({ children }: { children: React.ReactNode }) => (
-    <div className="p-8 text-center text-body-sm text-ink-500 bg-ink-25 rounded-2xl border border-dashed border-ink-200">
-      {children}
-    </div>
+    <div className="px-5 py-10 text-center text-base text-ink-500">{children}</div>
   );
 
   const rowClass =
-    'w-full text-left p-3.5 bg-white border border-ink-150 hover:border-brand-300 hover:bg-brand-50/40 rounded-2xl flex items-center gap-3.5 cursor-pointer transition-colors group';
+    'w-full text-left px-5 py-3.5 flex items-center gap-3.5 cursor-pointer transition-colors hover:bg-ink-50 group';
 
-  const Avatar = ({ name, tone }: { name: string; tone: string }) => (
-    <span className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-extrabold shrink-0 ${tone}`}>
+  const Avatar = ({ name }: { name: string }) => (
+    <span className="w-10 h-10 rounded-full bg-ink-100 text-ink-800 flex items-center justify-center text-sm font-bold shrink-0">
       {name
         .split(' ')
         .map((n) => n[0])
@@ -181,72 +170,66 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
   );
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 space-y-6">
-      {/* Hero */}
-      <section className="hero-brand p-6 sm:p-8">
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-          <div>
-            <p className="text-sm font-semibold text-white/75 first-letter:uppercase">{today}</p>
-            <h1 className="mt-1 text-2xl sm:text-[32px] font-extrabold tracking-tight leading-tight">
-              {greeting}, Dr {firstName}
-            </h1>
-            <p className="mt-1.5 text-sm text-white/80 font-medium max-w-xl">
-              Service de psychiatrie universitaire · {currentUser.title}
-            </p>
-
-            <div className="mt-5 flex flex-wrap items-center gap-2">
-              <span className="chip bg-white/15 text-white backdrop-blur-sm !py-1.5 !px-3">
-                <HeartPulse className="w-3.5 h-3.5" /> {activeDossiers.length} patients suivis
-              </span>
-              <span className="chip bg-white/15 text-white backdrop-blur-sm !py-1.5 !px-3">
-                <TrendingUp className="w-3.5 h-3.5" /> {avgCompleteness}% complétude
-              </span>
-              {bilansEnAttente.length > 0 && (
-                <span className="chip bg-white text-brand-800 !py-1.5 !px-3">
-                  <Clock className="w-3.5 h-3.5" /> {bilansEnAttente.length} bilan{bilansEnAttente.length > 1 ? 's' : ''} en attente
-                </span>
-              )}
-            </div>
-          </div>
-
-          <button
-            onClick={onOpenNewPatient}
-            className="self-start lg:self-auto inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-brand-800 text-sm font-extrabold shadow-[0_10px_24px_-10px_rgba(0,0,0,0.35)] hover:bg-brand-50 transition-colors cursor-pointer"
-          >
-            <Plus className="w-4 h-4" strokeWidth={3} />
-            Admettre un patient
-          </button>
+    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 space-y-6">
+      {/* Page header */}
+      <header className="page-header">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-ink-500 first-letter:uppercase">{today}</p>
+          <h1 className="mt-1 page-title">
+            {greeting}, Dr {firstName}
+          </h1>
+          <p className="page-subtitle">
+            Service de psychiatrie universitaire · {currentUser.title}
+          </p>
         </div>
-      </section>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onNavigateToFilteredRegistre?.({ status: 'TOUS_ACTIFS' })}
+            className="btn-secondary"
+          >
+            <Users className="w-4 h-4 text-ink-500" />
+            Registre
+          </button>
+          {onOpenNewPatient && (
+            <button type="button" onClick={onOpenNewPatient} className="btn-primary">
+              <Plus className="w-4 h-4" strokeWidth={2.5} />
+              Admettre un patient
+            </button>
+          )}
+        </div>
+      </header>
 
-      {/* KPI tiles */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
-        {kpis.map((k) => {
+      {/* KPI strip */}
+      <div className="clinical-card grid grid-cols-2 xl:grid-cols-4 overflow-hidden">
+        {kpis.map((k, i) => {
           const Icon = k.icon;
           return (
             <button
               key={k.label}
               type="button"
               onClick={k.onClick}
-              className={`text-left bg-gradient-to-b ${k.card} border border-ink-150 rounded-[20px] p-4 sm:p-5 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-card)] hover:border-ink-200 transition-shadow cursor-pointer group`}
+              className={`text-left p-5 lg:p-6 hover:bg-ink-50 transition-colors cursor-pointer group border-ink-150 ${
+                i % 2 === 1 ? 'border-l' : ''
+              } ${i >= 2 ? 'border-t xl:border-t-0' : ''} ${i === 2 ? 'xl:border-l' : ''}`}
             >
-              <div className="flex items-start justify-between">
-                <span className={`icon-tile ${k.tile}`}>
-                  <Icon className="w-5 h-5" />
+              <div className="flex items-center justify-between gap-2">
+                <span className="flex items-center gap-2 text-sm font-semibold text-ink-600">
+                  <Icon className="w-[18px] h-[18px] text-ink-500" />
+                  {k.label}
                 </span>
                 <ArrowUpRight className="w-4 h-4 text-ink-300 group-hover:text-ink-700 transition-colors" />
               </div>
-              <div className="mt-4 text-[13px] font-semibold text-ink-500">{k.label}</div>
-              <div className="mt-0.5 text-[28px] sm:text-[32px] font-extrabold text-ink-900 tabular-nums tracking-tight leading-none">
+              <div className="mt-3 text-[32px] font-bold text-ink-900 tabular-nums tracking-tight leading-none">
                 {k.value}
               </div>
-              <div className="mt-2.5 h-[18px] flex items-center">
+              <div className="mt-3 h-[18px] flex items-center">
                 {k.progress !== undefined ? (
-                  <div className="w-full h-1.5 rounded-full bg-ink-100 overflow-hidden">
-                    <div className="h-full rounded-full bg-amber-400" style={{ width: `${k.progress}%` }} />
+                  <div className="progress w-full">
+                    <span style={{ width: `${k.progress}%` }} />
                   </div>
                 ) : (
-                  <span className="text-xs font-semibold text-ink-500 truncate">{k.hint}</span>
+                  <span className="text-sm font-medium text-ink-500 truncate">{k.hint}</span>
                 )}
               </div>
             </button>
@@ -254,34 +237,32 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Soins sans consentement */}
-        <section className="clinical-card p-5 sm:p-6 space-y-4">
+        <section className="clinical-card overflow-hidden">
           <SectionHeader
             icon={ShieldAlert}
             tile="tile-rose"
-            title="Vigilance soins sans consentement"
+            title="Soins sans consentement"
             count={sscList.length}
             meta="Mali / UEMOA"
           />
 
           {sscList.length > 0 ? (
-            <div className="space-y-2.5">
+            <div className="divide-y divide-ink-100">
               {sscList.map((item) => (
                 <button key={item.dossierId} type="button" onClick={() => onSelectDossier(item.dossierId, 's2')} className={rowClass}>
-                  <Avatar name={item.nom} tone="bg-rose-100 text-rose-700" />
+                  <Avatar name={item.nom} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 min-w-0">
-                      <strong className="text-sm font-bold text-ink-900 truncate group-hover:text-brand-700 transition-colors">
-                        {item.nom}
-                      </strong>
-                      <span className="hidden sm:inline text-[11px] font-bold text-ink-400 tabular-nums shrink-0">{item.numeroOrdre}</span>
+                      <strong className="text-base font-semibold text-ink-900 truncate">{item.nom}</strong>
+                      <span className="hidden sm:inline text-xs font-semibold text-ink-500 tabular-nums shrink-0">{item.numeroOrdre}</span>
                     </div>
-                    <div className="text-xs text-ink-500 mt-0.5 font-medium line-clamp-2">
-                      <span className="text-rose-700 font-semibold">{item.type}</span> · {item.demandeur}
+                    <div className="text-sm text-ink-600 mt-0.5 line-clamp-1">
+                      <span className="text-rose-700 font-medium">{item.type}</span> · {item.demandeur}
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-ink-300 group-hover:text-brand-600 shrink-0 transition-colors" />
+                  <ChevronRight className="w-4 h-4 text-ink-300 group-hover:text-ink-700 shrink-0 transition-colors" />
                 </button>
               ))}
             </div>
@@ -291,32 +272,33 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
         </section>
 
         {/* Bilans en attente */}
-        <section className="clinical-card p-5 sm:p-6 space-y-4">
+        <section className="clinical-card overflow-hidden">
           <SectionHeader
             icon={FileSpreadsheet}
             tile="tile-amber"
-            title="Bilans paracliniques en attente"
+            title="Bilans en attente"
             count={bilansEnAttente.length}
             meta="Biologie & imagerie"
           />
 
           {bilansEnAttente.length > 0 ? (
-            <div className="space-y-2.5">
+            <div className="divide-y divide-ink-100">
               {bilansEnAttente.map((bilan) => (
                 <button key={bilan.id} type="button" onClick={() => onSelectDossier(bilan.dossierId, 's13')} className={rowClass}>
-                  <Avatar name={bilan.patientNom} tone="bg-amber-100 text-amber-800" />
+                  <Avatar name={bilan.patientNom} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 min-w-0">
-                      <strong className="text-sm font-bold text-ink-900 truncate group-hover:text-brand-700 transition-colors">
-                        {bilan.patientNom}
-                      </strong>
-                      <span className="hidden sm:inline text-[11px] font-bold text-ink-400 tabular-nums shrink-0">{bilan.numeroOrdre}</span>
+                      <strong className="text-base font-semibold text-ink-900 truncate">{bilan.patientNom}</strong>
+                      <span className="hidden sm:inline text-xs font-semibold text-ink-500 tabular-nums shrink-0">{bilan.numeroOrdre}</span>
                     </div>
-                    <div className="text-xs text-ink-500 mt-0.5 font-medium truncate">
-                      <span className="text-ink-800 font-semibold">{bilan.type}</span> · Prescrit le {bilan.datePrescription}
+                    <div className="text-sm text-ink-600 mt-0.5 truncate">
+                      <span className="text-ink-700 font-medium">{bilan.type}</span> · Prescrit le {bilan.datePrescription}
                     </div>
                   </div>
-                  <span className="chip bg-amber-100 text-amber-800 shrink-0">{bilan.statut}</span>
+                  <span className="chip bg-amber-50 text-amber-800 ring-1 ring-inset ring-amber-200 shrink-0">
+                    <span className="dot" />
+                    {bilan.statut}
+                  </span>
                 </button>
               ))}
             </div>
@@ -327,16 +309,16 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
       </div>
 
       {/* Diagnostics */}
-      <section className="clinical-card p-5 sm:p-6 space-y-4">
+      <section className="clinical-card overflow-hidden">
         <SectionHeader
           icon={Activity}
-          tile="tile-brand"
+          tile="tile-ink"
           title="Diagnostics prédominants"
           meta="CIM-10 / DSM-5 · dossiers actifs"
         />
 
         {sortedDiags.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          <div className="divide-y divide-ink-100">
             {sortedDiags.map(([diag, count]) => {
               const percentage = Math.round((count / (activeDossiers.length || 1)) * 100);
               const code = diag.startsWith('[') ? diag.slice(1, diag.indexOf(']')) : null;
@@ -346,25 +328,17 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
                   key={diag}
                   type="button"
                   onClick={() => onNavigateToFilteredRegistre?.({ search: label })}
-                  className="text-left p-4 bg-ink-25 border border-ink-150 hover:border-brand-300 hover:bg-brand-50/50 rounded-2xl cursor-pointer transition-colors group"
+                  className="w-full text-left px-5 py-3.5 grid grid-cols-[4.5rem_1fr_auto] sm:grid-cols-[4.5rem_1fr_10rem_3rem] items-center gap-4 hover:bg-ink-50 cursor-pointer transition-colors"
                   title={`Filtrer les dossiers avec le diagnostic : ${diag}`}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      {code && <span className="chip bg-brand-100 text-brand-800 tabular-nums">{code}</span>}
-                      <p className="mt-2 text-sm font-bold text-ink-900 line-clamp-2 group-hover:text-brand-800">{label}</p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <div className="text-xl font-extrabold text-ink-900 tabular-nums leading-none">{count}</div>
-                      <div className="text-[11px] font-semibold text-ink-400 mt-1">cas</div>
-                    </div>
-                  </div>
-                  <div className="w-full bg-ink-100 h-1.5 rounded-full overflow-hidden mt-3">
-                    <div
-                      className="bg-gradient-to-r from-brand-400 to-brand-600 h-full rounded-full transition-all"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
+                  <span className="chip chip-neutral tabular-nums justify-self-start">{code || '—'}</span>
+                  <span className="text-base font-medium text-ink-900 truncate">{label}</span>
+                  <span className="progress hidden sm:block">
+                    <span style={{ width: `${percentage}%` }} />
+                  </span>
+                  <span className="text-base font-bold text-ink-900 tabular-nums text-right">
+                    {count} <span className="text-sm font-medium text-ink-500">cas</span>
+                  </span>
                 </button>
               );
             })}

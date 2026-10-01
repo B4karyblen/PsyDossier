@@ -12,20 +12,22 @@ import {
   Tag,
   Stethoscope,
   Sparkles,
+  EyeOff,
 } from 'lucide-react';
 
 interface ReferentielsViewProps {
   referenceLists: ReferenceLists;
   onUpdateReferenceLists: (updated: ReferenceLists) => void;
   currentUserRole: UserRole;
-  onSwitchToAdmin?: () => void;
+  /** Values used by dossiers (from the server): deactivate instead of delete (F-24). */
+  usage?: Record<string, string[]>;
 }
 
 export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
   referenceLists,
   onUpdateReferenceLists,
   currentUserRole,
-  onSwitchToAdmin,
+  usage = {},
 }) => {
   const [activeTab, setActiveTab] = useState<'syndromes' | 'cim' | 'bilans' | 'ethnies' | 'religions' | 'matrimoniales'>('syndromes');
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,6 +37,61 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
   const [isSaved, setIsSaved] = useState(false);
 
   const isAdmin = currentUserRole === 'ADMIN';
+
+  type Category = 'religions' | 'ethnies' | 'situationsMatrimoniales' | 'typesBilans' | 'syndromesFrequents' | 'diagnosticClassifications';
+  const isInactive = (cat: Category, v: string) => (referenceLists.inactive?.[cat] ?? []).includes(v);
+  const isUsed = (cat: Category, v: string) => (usage[cat] ?? []).includes(v);
+
+  const setInactive = (cat: Category, v: string, inactive: boolean) => {
+    const current = referenceLists.inactive?.[cat] ?? [];
+    onUpdateReferenceLists({
+      ...referenceLists,
+      inactive: {
+        ...referenceLists.inactive,
+        [cat]: inactive ? [...current, v] : current.filter((x) => x !== v),
+      },
+    });
+  };
+
+  /** Delete if unused; a value used by dossiers can only be deactivated (F-24). */
+  const renderActions = (cat: Category, v: string) => {
+    if (isInactive(cat, v)) {
+      return (
+        <span className="flex items-center gap-1.5 shrink-0">
+          <span className="chip chip-neutral">Désactivé</span>
+          <button type="button" onClick={() => setInactive(cat, v, false)} className="btn-ghost btn-sm !px-2">
+            Réactiver
+          </button>
+        </span>
+      );
+    }
+    if (isUsed(cat, v)) {
+      return (
+        <button
+          type="button"
+          onClick={() => setInactive(cat, v, true)}
+          className="btn-ghost btn-sm !px-2 shrink-0"
+          title="Valeur utilisée dans des dossiers : elle ne peut pas être supprimée, seulement désactivée."
+        >
+          <EyeOff className="w-4 h-4" />
+          Désactiver
+        </button>
+      );
+    }
+    return (
+      <button
+        type="button"
+        onClick={() =>
+          cat === 'diagnosticClassifications' ? removeCimItem(v) : removeItem(cat, v)
+        }
+        className="btn-icon !w-9 !h-9 !min-h-9 !min-w-9 shrink-0 hover:!text-rose-700 hover:!bg-rose-50"
+        title="Supprimer (valeur non utilisée)"
+        aria-label={`Supprimer ${v}`}
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+    );
+  };
 
   const handleAddItem = (category: 'religions' | 'ethnies' | 'situationsMatrimoniales' | 'typesBilans' | 'syndromesFrequents') => {
     if (!isAdmin || !newItemText.trim()) return;
@@ -70,7 +127,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
   const removeItem = (category: 'religions' | 'ethnies' | 'situationsMatrimoniales' | 'typesBilans' | 'syndromesFrequents', val: string) => {
     if (!isAdmin) return;
     const confirmed = window.confirm(
-      `Supprimer "${val}" de la liste ?\n\nAttention : si cette valeur est utilisée dans des dossiers existants, elle y restera mais ne sera plus disponible pour les nouvelles sélections.`
+      `Supprimer « ${val} » de la liste ? Cette valeur n’est utilisée dans aucun dossier.`
     );
     if (!confirmed) return;
     const updated = {
@@ -84,7 +141,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
     if (!isAdmin) return;
     const item = referenceLists.diagnosticClassifications.find((c) => c.code === code);
     const confirmed = window.confirm(
-      `Supprimer [${code}] ${item?.label || ''} de la classification ?\n\nAttention : si ce code est utilisé dans des dossiers existants, il y restera mais ne sera plus disponible pour les nouvelles sélections.`
+      `Supprimer [${code}] ${item?.label || ''} de la classification ? Ce code n’est utilisé dans aucun dossier.`
     );
     if (!confirmed) return;
     const updated = {
@@ -129,10 +186,10 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
           <div className="flex items-center gap-2.5">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-extrabold text-ink-900 tracking-tight">
+                <h2 className="text-2xl font-bold text-ink-900 tracking-tight">
                   Référentiels & nomenclatures
                 </h2>
-                <span className="hidden sm:inline-flex chip bg-ink-100 text-ink-600">
+                <span className="hidden sm:inline-flex chip chip-neutral">
                   <Tag className="w-3 h-3" /> F-24
                 </span>
               </div>
@@ -150,15 +207,6 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                 <Lock className="w-3.5 h-3.5" />
                 <span>Lecture seule · modifications réservées à l'administrateur</span>
               </div>
-              {onSwitchToAdmin && (
-                <button
-                  type="button"
-                  onClick={onSwitchToAdmin}
-                  className="btn-secondary !py-2"
-                >
-                  Basculer en Admin (M. Touré)
-                </button>
-              )}
             </div>
           ) : (
             <div className="chip bg-emerald-100 text-emerald-800 !py-2 !px-3.5">
@@ -170,14 +218,14 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
       </div>
 
       {isSaved && (
-        <div className="p-3 bg-emerald-100 border border-emerald-300 rounded-xl text-body-sm text-emerald-700 font-bold flex items-center gap-2 animate-in fade-in duration-200">
+        <div className="p-3 bg-emerald-100 border border-emerald-300 rounded-lg text-body-sm text-emerald-700 font-bold flex items-center gap-2 animate-in fade-in duration-200">
           <CheckCircle2 className="w-4 h-4 text-emerald-700" />
           Référentiel mis à jour et synchronisé avec succès.
         </div>
       )}
 
       {/* 2. Tabs Bar */}
-      <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-ink-100 rounded-2xl border border-ink-150">
+      <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-ink-100 rounded-xl border border-ink-150">
         {[
           { id: 'syndromes', label: 'Syndromes Fréquents', count: referenceLists.syndromesFrequents.length },
           { id: 'cim', label: 'Classifications CIM-10', count: referenceLists.diagnosticClassifications.length },
@@ -193,16 +241,16 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               setActiveTab(tab.id as any);
               setSearchTerm('');
             }}
-            className={`px-3.5 py-2 text-body-sm font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
+            className={`px-3.5 py-2 text-body-sm font-bold rounded-lg transition-all cursor-pointer flex items-center gap-2 ${
               activeTab === tab.id
-                ? 'bg-white text-brand-700 shadow-xs border border-ink-150'
+                ? 'bg-white text-primary-700 shadow-xs border border-ink-150'
                 : 'text-ink-500 hover:text-ink-900 hover:bg-white/50'
             }`}
           >
             <span>{tab.label}</span>
             <span
               className={`px-1.5 py-0.2 rounded text-caption font-mono font-bold ${
-                activeTab === tab.id ? 'bg-brand-50 text-brand-700' : 'bg-ink-150 text-ink-500'
+                activeTab === tab.id ? 'bg-primary-50 text-primary-700' : 'bg-ink-150 text-ink-500'
               }`}
             >
               {tab.count}
@@ -216,7 +264,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
         {/* Category Header + Search Filter */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-ink-100">
           <div>
-            <h2 className="text-h2 font-extrabold text-ink-900">
+            <h2 className="text-h2 font-bold text-ink-900">
               {activeTab === 'syndromes' && 'Nomenclature des Syndromes Psychiatriques Fréquents'}
               {activeTab === 'cim' && 'Nomenclature CIM-10 / DSM-5'}
               {activeTab === 'bilans' && 'Référentiel des Bilans Paracliniques Types'}
@@ -248,37 +296,28 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredSyndromes.map((s) => (
                 <div
                   key={s}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{s}</span>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem('syndromesFrequents', s)}
-                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                      title="Supprimer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {isAdmin && renderActions('syndromesFrequents', s)}
                 </div>
               ))}
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
                   onChange={(e) => setNewItemText(e.target.value)}
                   placeholder="Intitulé du nouveau syndrome (ex: Syndrome de Cotard)..."
-                  className="clinical-input flex-1 text-xs"
+                  className="clinical-input flex-1"
                 />
                 <button
                   type="button"
                   onClick={() => handleAddItem('syndromesFrequents')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="btn-primary shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter au référentiel
@@ -295,30 +334,21 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredCim.map((item) => (
                 <div
                   key={item.code}
-                  className="clinical-subcard p-3.5 flex items-start justify-between text-body-sm hover:border-brand-500/40 transition-colors group"
+                  className="clinical-subcard p-3.5 flex items-start justify-between text-body-sm hover:border-primary-500/40 transition-colors group"
                 >
                   <div className="flex items-start gap-2.5">
-                    <span className="text-mono font-extrabold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-500/30 shrink-0">
+                    <span className="text-mono font-bold text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-500/30 shrink-0">
                       {item.code}
                     </span>
                     <span className="font-bold text-ink-900 leading-snug">{item.label}</span>
                   </div>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => removeCimItem(item.code)}
-                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer shrink-0 ml-2"
-                      title="Supprimer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {isAdmin && renderActions('diagnosticClassifications', item.code)}
                 </div>
               ))}
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
                 <input
                   type="text"
                   value={newCimCode}
@@ -337,7 +367,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   type="button"
                   onClick={handleAddCim}
                   disabled={!newCimCode.trim() || !newCimLabel.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  className="btn-primary shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter le code
@@ -354,24 +384,16 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredBilans.map((b) => (
                 <div
                   key={b}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{b}</span>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem('typesBilans', b)}
-                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {isAdmin && renderActions('typesBilans', b)}
                 </div>
               ))}
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
@@ -383,7 +405,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   type="button"
                   onClick={() => handleAddItem('typesBilans')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="btn-primary shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter le bilan
@@ -400,24 +422,16 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredEthnies.map((e) => (
                 <div
                   key={e}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{e}</span>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem('ethnies', e)}
-                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {isAdmin && renderActions('ethnies', e)}
                 </div>
               ))}
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
@@ -429,7 +443,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   type="button"
                   onClick={() => handleAddItem('ethnies')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="btn-primary shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter
@@ -446,24 +460,16 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredReligions.map((r) => (
                 <div
                   key={r}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{r}</span>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem('religions', r)}
-                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {isAdmin && renderActions('religions', r)}
                 </div>
               ))}
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
@@ -475,7 +481,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   type="button"
                   onClick={() => handleAddItem('religions')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="btn-primary shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter
@@ -492,24 +498,16 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredMatrimoniales.map((m) => (
                 <div
                   key={m}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{m}</span>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem('situationsMatrimoniales', m)}
-                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {isAdmin && renderActions('situationsMatrimoniales', m)}
                 </div>
               ))}
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
@@ -521,7 +519,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   type="button"
                   onClick={() => handleAddItem('situationsMatrimoniales')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="btn-primary shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter

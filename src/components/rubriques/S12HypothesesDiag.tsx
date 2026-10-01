@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
+import { activeClassifications } from '../../utils/referentiels';
 import { S12HypothesesDiagData, HypotheseDiagnostiqueItem, ReferenceLists, UserRole } from '../../types';
 import { Plus, Trash2, AlertCircle, Lock, BookOpen, Stethoscope, Sparkles } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -22,7 +24,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
   onPrev,
   referenceLists,
 }) => {
-  const [formData, setFormData] = useState<S12HypothesesDiagData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S12HypothesesDiagData>(data);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -90,27 +92,27 @@ export const S12HypothesesDiag: React.FC<Props> = ({
   };
 
   return (
-    <div className="clinical-card p-6 sm:p-7 space-y-6">
+    <div className="clinical-card p-5 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S12 · SYNTHÈSE
             </span>
             <span className="text-xs text-ink-500">Obligatoire pour validation</span>
           </div>
-          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
+          <h2 className="text-h2 text-ink-900 mt-2">
             Hypothèses Diagnostiques (CIM-10 / DSM-5)
           </h2>
-          <p className="text-xs text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Diagnostic principal et diagnostics différentiels argumentés (BR-014 : exclusivité Psychiatre)
           </p>
         </div>
       </div>
 
       {!isPsychiatre && (
-        <div className="p-3 bg-amber-100 border border-amber-500/30 text-amber-700 rounded-xl text-xs font-semibold flex items-center gap-2">
+        <div className="p-3 bg-amber-100 border border-amber-500/30 text-amber-700 rounded-lg text-xs font-semibold flex items-center gap-2">
           <Lock className="w-4 h-4 shrink-0" />
           <span>
             Règle BR-014 : La formulation des hypothèses diagnostiques est réservée au Médecin Psychiatre (lecture seule pour {currentUserRole}).
@@ -119,7 +121,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
       )}
 
       {error && (
-        <div className="p-3.5 bg-rose-100 border border-rose-500/30 rounded-xl flex items-center gap-2.5 text-xs text-rose-700 font-medium">
+        <div className="p-3.5 bg-rose-100 border border-rose-500/30 rounded-lg flex items-center gap-2.5 text-xs text-rose-700 font-medium">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -128,22 +130,22 @@ export const S12HypothesesDiag: React.FC<Props> = ({
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Quick CIM-10 Presets from Referentiels */}
         {!effectiveReadOnly && (
-          <div className="bg-ink-25 border border-ink-150 rounded-2xl p-4 space-y-2.5">
+          <div className="bg-ink-25 border border-ink-150 rounded-xl p-4 space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-ink-900 flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-brand-600" />
+                <BookOpen className="w-3.5 h-3.5 text-primary-600" />
                 Nomenclatures CIM-10 Fréquentes (Cliquer pour insérer) :
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {referenceLists.diagnosticClassifications.slice(0, 10).map((preset) => (
+              {activeClassifications(referenceLists).slice(0, 10).map((preset) => (
                 <button
                   key={preset.code}
                   type="button"
                   onClick={() => addHypothese(preset)}
-                  className="px-2.5 py-1 text-[11px] font-semibold bg-white hover:bg-brand-50 text-ink-900 hover:text-brand-700 border border-ink-200 hover:border-brand-500 rounded-lg transition-all cursor-pointer shadow-2xs"
+                  className="btn-secondary btn-sm"
                 >
-                  <span className="font-mono text-[10px] text-brand-700 mr-1">[{preset.code}]</span>
+                  <span className="font-mono text-xs text-primary-700 mr-1">[{preset.code}]</span>
                   {preset.label}
                 </button>
               ))}
@@ -161,7 +163,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={() => addHypothese()}
-                className="px-3 py-1.5 text-xs font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-500/30 rounded-xl transition-all flex items-center gap-1 cursor-pointer"
+                className="btn-secondary btn-sm"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Ajouter une hypothèse
@@ -173,9 +175,9 @@ export const S12HypothesesDiag: React.FC<Props> = ({
             formData.hypotheses.map((hyp, index) => (
               <div
                 key={hyp.id}
-                className={`p-5 rounded-2xl border transition-all ${
+                className={`p-5 rounded-xl border transition-all ${
                   hyp.type === 'Principale'
-                    ? 'bg-brand-50/40 border-brand-500/50 shadow-xs'
+                    ? 'bg-primary-50/40 border-primary-500/50 shadow-xs'
                     : 'bg-ink-25 border-ink-150'
                 }`}
               >
@@ -217,7 +219,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                   <div className="md:col-span-1">
-                    <label className="block text-xs font-semibold text-ink-900 mb-1">
+                    <label className="field-label">
                       Code CIM-10 / DSM-5
                     </label>
                     <input
@@ -225,13 +227,13 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                       disabled={effectiveReadOnly}
                       value={hyp.codeCimDsm || ''}
                       onChange={(e) => updateHypothese(hyp.id, { codeCimDsm: e.target.value.toUpperCase() })}
-                      className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-mono font-bold rounded-lg px-3 py-2 uppercase"
+                      className="clinical-input w-full font-mono uppercase"
                       placeholder="Ex: F20.0"
                     />
                   </div>
 
                   <div className="md:col-span-3">
-                    <label className="block text-xs font-semibold text-ink-900 mb-1">
+                    <label className="field-label">
                       Libellé nosologique / Diagnostic <span className="text-rose-500">*</span>
                     </label>
                     <input
@@ -239,14 +241,14 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                       disabled={effectiveReadOnly}
                       value={hyp.libelle}
                       onChange={(e) => updateHypothese(hyp.id, { libelle: e.target.value })}
-                      className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-bold text-ink-900 rounded-lg px-3 py-2"
+                      className="clinical-input w-full"
                       placeholder="Ex: Schizophrénie paranoïde"
                     />
                   </div>
                 </div>
 
                 <div className="mt-3">
-                  <label className="block text-xs font-semibold text-ink-900 mb-1">
+                  <label className="field-label">
                     Arguments cliniques & critères remplis
                   </label>
                   <textarea
@@ -254,21 +256,21 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                     disabled={effectiveReadOnly}
                     value={hyp.argumentsCliniques}
                     onChange={(e) => updateHypothese(hyp.id, { argumentsCliniques: e.target.value })}
-                    className="w-full bg-white border border-ink-200 focus:border-brand-500 text-xs font-medium rounded-lg p-3 focus:outline-none"
+                    className="clinical-input w-full"
                     placeholder="Critères remplis, durée des symptômes, évolution, arguments en faveur..."
                   />
                 </div>
               </div>
             ))
           ) : (
-            <div className="p-8 text-center bg-ink-25 border border-dashed border-ink-200 rounded-2xl text-xs text-ink-500 space-y-2">
+            <div className="p-8 text-center bg-ink-25 border border-dashed border-ink-200 rounded-xl text-xs text-ink-500 space-y-2">
               <Stethoscope className="w-8 h-8 text-ink-400 mx-auto" />
               <p>Aucune hypothèse diagnostique formalisée pour le moment.</p>
               {!effectiveReadOnly && (
                 <button
                   type="button"
                   onClick={() => addHypothese()}
-                  className="px-3 py-1.5 text-xs font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors cursor-pointer"
+                  className="px-3 py-1.5 text-xs font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors cursor-pointer"
                 >
                   + Ajouter une première hypothèse
                 </button>
@@ -279,6 +281,8 @@ export const S12HypothesesDiag: React.FC<Props> = ({
 
         {/* Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s12"
           isReadOnly={effectiveReadOnly}
           isSaved={isSaved}

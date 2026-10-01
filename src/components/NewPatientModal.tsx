@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { DossierPsychiatrique, ReferenceLists } from '../types';
+import { createEmptyDossier } from '../utils/emptyDossier';
+import { activeValues } from '../utils/referentiels';
 import {
   X,
   Plus,
@@ -24,6 +26,8 @@ interface NewPatientModalProps {
   onSelectExistingDossier: (dossierId: string) => void;
   referenceLists: ReferenceLists;
   currentUserName: string;
+  /** S3 is only filled at admission by roles allowed to write it (PRD B2). */
+  canWriteMotif: boolean;
 }
 
 export const NewPatientModal: React.FC<NewPatientModalProps> = ({
@@ -34,13 +38,13 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
   onSelectExistingDossier,
   referenceLists,
   currentUserName,
+  canWriteMotif,
 }) => {
   if (!isOpen) return null;
 
-  // Generate unique order number
+  // Provisional number; the server assigns the definitive unique one on save (BR-001)
   const currentYear = new Date().getFullYear();
-  const nextNum = existingDossiers.length + 1;
-  const autoNumeroOrdre = `PSY-${currentYear}-${String(nextNum).padStart(4, '0')}`;
+  const autoNumeroOrdre = `PSY-${currentYear}-····`;
 
   const [nom, setNom] = useState('');
   const [prenoms, setPrenoms] = useState('');
@@ -82,21 +86,24 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
 
     const now = new Date().toISOString();
 
-    const newDossier: DossierPsychiatrique = {
-      id: 'dossier-' + Date.now(),
-      statut: plainteInitiale.trim() ? 'EN_COURS' : 'BROUILLON',
-      dateCreation: now,
-      dateDerniereModification: now,
+    const blank = createEmptyDossier({
+      id: 'dossier-' + crypto.randomUUID(),
+      numeroOrdre: autoNumeroOrdre,
+      now,
+      sexe,
       psychiatreReferent: currentUserName,
-      serviceHospitalier: 'Service de Psychiatrie Universitaire',
-      addenda: [],
+      intervenant: currentUserName,
+    });
+    const motif = canWriteMotif ? plainteInitiale.trim() : '';
+    const newDossier: DossierPsychiatrique = {
+      ...blank,
+      statut: motif ? 'EN_COURS' : 'BROUILLON',
       s1Identification: {
-        numeroOrdre: autoNumeroOrdre,
+        ...blank.s1Identification,
         nom: nom.trim().toUpperCase(),
         prenoms: prenoms.trim(),
         age: Number(age),
         dateNaissance: dateNaissance || undefined,
-        sexe,
         profession,
         situationMatrimoniale,
         religion,
@@ -108,110 +115,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
         modalite,
         soinsSansConsentementType: modalite === 'Soins sans consentement' ? "À la demande d'un tiers" : undefined,
       },
-      s3Motif: {
-        plaintePrincipale: plainteInitiale.trim(),
-        sourcePlainte: 'Patient et entourage',
-      },
-      s4HistoireMaladie: {
-        modeInstallation: '',
-        facteursDeclenchants: [],
-      },
-      s5Representation: {
-        categories: [],
-      },
-      s6Antecedents: {
-        personnels: {
-          medicaux: { aucun: false, details: '' },
-          chirurgicaux: { aucun: false, details: '' },
-          gynecoObstetricaux: sexe === 'Féminin' ? { aucun: false, details: '' } : undefined,
-          psychiatriques: { aucun: false, details: '' },
-          addictifs: { aucun: false, details: '' },
-          judiciaires: { aucun: false, details: '' },
-        },
-        familiaux: {
-          medicaux: { aucun: false, details: '' },
-          chirurgicaux: { aucun: false, details: '' },
-          psychiatriques: { aucun: false, details: '' },
-          addictifs: { aucun: false, details: '' },
-        },
-      },
-      s7Biographie: {
-        ascendants: {
-          pere: { nom: '', vivant: true },
-          mere: { nom: '', vivant: true },
-        },
-        collateraux: {
-          fratrie: [],
-        },
-        conceptionGrossesseAccouchement: '',
-        developpementPsychomoteur: {},
-        scolarite: {},
-        developpementProfessionnel: '',
-        developpementSexuelEtSentimentale: {
-          conjoints: [],
-          enfants: [],
-        },
-        evenementsMarquants: { positifs: [], negatifs: [] },
-      },
-      s8EnqueteSociale: {
-        autodescription: '',
-        heterodescription: '',
-        relationsSociales: '',
-        loisirs: '',
-        conduitesAddictives: '',
-      },
-      s9Demande: {
-        demandeConsciente: '',
-        demandeInconsciente: '',
-      },
-      s10ExamenClinique: {
-        somatique: {
-          nonRealise: false,
-          constantes: {},
-          appareils: {},
-        },
-        psychiatrique: {},
-      },
-      s11ResumeSyndromique: {
-        syndromesIdentifies: [],
-        resume: '',
-      },
-      s12HypothesesDiag: {
-        hypotheses: [],
-      },
-      s13Bilans: {
-        bilans: [],
-      },
-      s14PriseEnCharge: {
-        orientation: '',
-        traitementMedicamenteux: [],
-        psychotherapie: {},
-      },
-      s15Evolution: {
-        entrees: [
-          {
-            id: 'init-evo-' + Date.now(),
-            dateHeure: now,
-            auteurNom: currentUserName,
-            auteurRole: 'SECRETARIAT',
-            note: 'Création du dossier médical et initialisation de l’identité.',
-          },
-        ],
-      },
-      s16ProjetTherapeutique: {
-        versionCourante: 1,
-        objectifsCourtTerme: '',
-        objectifsMoyenTerme: '',
-        moyensEtStrategies: '',
-        echeancesEtRevisions: '',
-        intervenants: [currentUserName],
-        historiqueVersions: [],
-      },
-      s17Pronostic: {
-        courtTerme: { appreciation: '', details: '' },
-        moyenTerme: { appreciation: '', details: '' },
-        longTerme: { appreciation: '', details: '' },
-      },
+      s3Motif: { ...blank.s3Motif, plaintePrincipale: motif },
     };
 
     onCreateDossier(newDossier);
@@ -219,19 +123,19 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-ink-950/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="clinical-card w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200 !rounded-3xl !border-ink-150 shadow-[var(--shadow-float)]">
+    <div className="fixed inset-0 z-50 bg-ink-950/40 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="clinical-card w-full max-w-3xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200 !rounded-2xl !border-ink-150 shadow-[var(--shadow-float)]">
         {/* Header */}
-        <div className="bg-gradient-to-r from-ink-25 via-white to-brand-50 border-b border-ink-150 px-6 sm:px-7 py-4.5 flex items-center justify-between">
+        <div className="bg-white border-b border-ink-150 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center border border-brand-500/20 shadow-xs">
-              <UserPlus className="w-5 h-5 text-brand-700" />
+            <div className="icon-tile tile-primary !w-9 !h-9">
+              <UserPlus className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-extrabold text-ink-900 tracking-tight">
+              <h2 className="text-base font-semibold text-ink-900">
                 Admission & Création de Patient
               </h2>
-              <p className="text-xs text-ink-500 font-medium">
+              <p className="text-sm text-ink-500">
                 Génération immédiate du N° d'ordre et ouverture du dossier médical (S1 / S2)
               </p>
             </div>
@@ -240,7 +144,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
             aria-label="Fermer"
             type="button"
             onClick={onClose}
-            className="text-ink-400 hover:text-ink-900 p-2 rounded-xl hover:bg-ink-100 transition-colors cursor-pointer"
+            className="btn-icon"
           >
             <X className="w-5 h-5" />
           </button>
@@ -248,10 +152,10 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
 
         {/* Duplicate warning (B5) */}
         {potentialDuplicate && (
-          <div className="mx-6 sm:mx-7 mt-5 p-4 bg-amber-100 border border-amber-500/40 rounded-2xl flex items-start gap-3.5 shadow-xs">
+          <div className="mx-6 sm:mx-7 mt-5 p-4 bg-amber-100 border border-amber-500/40 rounded-xl flex items-start gap-3.5 shadow-xs">
             <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
             <div className="text-xs space-y-1.5 flex-1">
-              <span className="font-extrabold text-amber-700 block text-sm">
+              <span className="font-bold text-amber-700 block text-sm">
                 Doublon potentiel détecté dans le registre
               </span>
               <p className="text-amber-800 leading-relaxed">
@@ -264,12 +168,12 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
                     onClose();
                     onSelectExistingDossier(potentialDuplicate.id);
                   }}
-                  className="px-3 py-1.5 bg-white text-amber-700 border border-amber-500 font-extrabold rounded-lg text-xs hover:bg-amber-100 shadow-2xs cursor-pointer flex items-center gap-1.5"
+                  className="btn-secondary btn-sm"
                 >
                   <span>Ouvrir le dossier existant</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
-                <span className="text-[11px] text-amber-800 font-medium">
+                <span className="text-xs text-amber-800 font-medium">
                   ou poursuivre la création d'un nouveau dossier distinct ci-dessous.
                 </span>
               </div>
@@ -278,7 +182,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
         )}
 
         {error && (
-          <div className="mx-6 sm:mx-7 mt-5 p-3.5 bg-rose-100 border border-rose-500/30 rounded-xl text-xs text-rose-700 font-bold flex items-center gap-2">
+          <div className="mx-6 sm:mx-7 mt-5 p-3.5 bg-rose-100 border border-rose-500/30 rounded-lg text-xs text-rose-700 font-bold flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -292,26 +196,26 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               <span className="text-sm font-bold text-ink-900">
                 1. Identification & N° d'Ordre Médical
               </span>
-              <span className="text-[10px] font-mono font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-500/20">
-                BR-001 Attribué
+              <span className="text-xs font-mono font-bold text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-500/20">
+                Attribué à l’enregistrement
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label className="block text-xs font-bold text-ink-900 mb-1">
+                <label className="field-label">
                   N° Ordre Patient
                 </label>
                 <input
                   type="text"
                   readOnly
                   value={autoNumeroOrdre}
-                  className="clinical-input bg-ink-100 font-mono text-xs font-bold cursor-not-allowed text-brand-700"
+                  className="clinical-input font-mono cursor-not-allowed"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-ink-900 mb-1">
+                <label className="field-label">
                   Nom de famille <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -320,12 +224,12 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
                   value={nom}
                   onChange={(e) => setNom(e.target.value)}
                   placeholder="Ex: TRAORÉ"
-                  className="clinical-input text-xs font-bold uppercase"
+                  className="clinical-input uppercase"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-ink-900 mb-1">
+                <label className="field-label">
                   Prénoms <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -334,14 +238,14 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
                   value={prenoms}
                   onChange={(e) => setPrenoms(e.target.value)}
                   placeholder="Ex: Fousseyni"
-                  className="clinical-input text-xs font-semibold"
+                  className="clinical-input"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label className="block text-xs font-bold text-ink-900 mb-1">
+                <label className="field-label">
                   Âge (années) <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -352,18 +256,18 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
                   value={age}
                   onChange={(e) => setAge(e.target.value === '' ? '' : parseInt(e.target.value))}
                   placeholder="Ex: 28"
-                  className="clinical-input text-xs font-semibold tabular-nums"
+                  className="clinical-input tabular-nums"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-ink-900 mb-1">
+                <label className="field-label">
                   Sexe biologique <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={sexe}
                   onChange={(e) => setSexe(e.target.value as 'Masculin' | 'Féminin')}
-                  className="clinical-input text-xs font-semibold"
+                  className="clinical-input"
                 >
                   <option value="Masculin">Masculin</option>
                   <option value="Féminin">Féminin</option>
@@ -371,14 +275,14 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-ink-900 mb-1">
+                <label className="field-label">
                   Date de naissance (si connue)
                 </label>
                 <input
                   type="date"
                   value={dateNaissance}
                   onChange={(e) => setDateNaissance(e.target.value)}
-                  className="clinical-input text-xs font-medium"
+                  className="clinical-input font-medium"
                 />
               </div>
             </div>
@@ -390,7 +294,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               <span className="text-sm font-bold text-ink-900">
                 2. Modalité de Consultation Initiale <span className="text-rose-500">*</span>
               </span>
-              <span className="text-[10px] font-bold text-ink-500">Règle BR-004</span>
+              <span className="text-xs font-bold text-ink-500">Règle BR-004</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -407,20 +311,20 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
                     key={m.id}
                     type="button"
                     onClick={() => setModalite(m.id)}
-                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                    className={`p-3 rounded-lg border text-left transition-all cursor-pointer flex flex-col justify-between ${
                       isSelected
-                        ? 'border-brand-500 bg-brand-50/60 shadow-xs ring-1 ring-brand-500'
+                        ? 'border-primary-500 bg-primary-50/60 shadow-xs ring-1 ring-primary-500'
                         : 'border-ink-150 bg-white hover:border-ink-200'
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className={`text-xs font-extrabold ${isSelected ? 'text-brand-700' : 'text-ink-900'}`}>
+                        <span className={`text-xs font-bold ${isSelected ? 'text-primary-700' : 'text-ink-900'}`}>
                           {m.label}
                         </span>
-                        {isSelected && <CheckCircle2 className="w-4 h-4 text-brand-600" />}
+                        {isSelected && <CheckCircle2 className="w-4 h-4 text-primary-600" />}
                       </div>
-                      <p className="text-[11px] text-ink-500 mt-1 leading-snug">{m.desc}</p>
+                      <p className="text-xs text-ink-500 mt-1 leading-snug">{m.desc}</p>
                     </div>
                   </button>
                 );
@@ -429,21 +333,23 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
           </div>
 
           {/* Subcard 3: Motif & plainte d'admission */}
+          {canWriteMotif && (
           <div className="clinical-subcard p-4 sm:p-5 space-y-3">
             <div className="flex items-center justify-between pb-1 border-b border-ink-100">
               <span className="text-sm font-bold text-ink-900">
                 3. Motif d’Admission & Plainte Principale (S3)
               </span>
-              <span className="text-[10px] text-brand-700 font-bold">Initialise statut EN COURS si saisi</span>
+              <span className="text-xs text-primary-700 font-bold">Initialise statut EN COURS si saisi</span>
             </div>
             <textarea
               rows={2}
               value={plainteInitiale}
               onChange={(e) => setPlainteInitiale(e.target.value)}
               placeholder="Formulation littérale de la plainte principale recueillie lors de l'accueil..."
-              className="clinical-input text-xs leading-relaxed"
+              className="clinical-input leading-relaxed"
             />
           </div>
+          )}
 
           {/* Subcard 4: Coordonnées & Données Sociales */}
           <div className="clinical-subcard p-4 sm:p-5 space-y-3">
@@ -452,25 +358,25 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-bold text-ink-900 mb-1">Profession</label>
+                <label className="field-label">Profession</label>
                 <input
                   type="text"
                   value={profession}
                   onChange={(e) => setProfession(e.target.value)}
                   placeholder="Ex: Commerçant"
-                  className="clinical-input text-xs"
+                  className="clinical-input"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-ink-900 mb-1">Ethnie</label>
+                <label className="field-label">Ethnie</label>
                 <select
                   value={ethnie}
                   onChange={(e) => setEthnie(e.target.value)}
-                  className="clinical-input text-xs"
+                  className="clinical-input"
                 >
                   <option value="">Sélectionner...</option>
-                  {referenceLists.ethnies.map((e) => (
+                  {activeValues(referenceLists, 'ethnies').map((e) => (
                     <option key={e} value={e}>
                       {e}
                     </option>
@@ -479,13 +385,13 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-ink-900 mb-1">Téléphone</label>
+                <label className="field-label">Téléphone</label>
                 <input
                   type="tel"
                   value={telephone}
                   onChange={(e) => setTelephone(e.target.value)}
                   placeholder="+223 ..."
-                  className="clinical-input text-xs font-mono"
+                  className="clinical-input font-mono"
                 />
               </div>
             </div>
@@ -496,13 +402,13 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 text-xs font-bold text-ink-500 hover:text-ink-900 bg-ink-100 hover:bg-ink-150 rounded-xl transition-colors cursor-pointer"
+              className="btn-secondary"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="clinical-btn-primary px-5 py-2.5 text-xs flex items-center gap-2 cursor-pointer shadow-sm shadow-brand-500/20"
+              className="btn-primary"
             >
               <Plus className="w-4 h-4" />
               <span>Créer & Ouvrir le Dossier Médical</span>
