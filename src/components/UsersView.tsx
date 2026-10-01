@@ -310,6 +310,7 @@ export const UsersView: React.FC<{ currentUserId: string }> = ({ currentUserId }
                       <div className="font-semibold text-ink-900">
                         {u.name}
                         {u.id === currentUserId && <span className="chip chip-neutral ml-2">Vous</span>}
+                        {u.isOwner && <span className="chip bg-brand-50 text-brand-800 ring-1 ring-inset ring-brand-200 ml-2">Médecin titulaire</span>}
                       </div>
                       <div className="text-sm text-ink-500">
                         {u.login}
@@ -332,7 +333,7 @@ export const UsersView: React.FC<{ currentUserId: string }> = ({ currentUserId }
                         <button type="button" className="btn-icon" onClick={() => setEditing(u)} aria-label={`Modifier ${u.name}`} title="Modifier">
                           <Pencil className="w-4 h-4" />
                         </button>
-                        {u.id !== currentUserId && (
+                        {u.id !== currentUserId && !u.isOwner && (
                           <>
                             <button type="button" className="btn-icon" onClick={() => resetAccess(u)} aria-label={`Réinitialiser l’accès de ${u.name}`} title="Nouveau code d’activation">
                               <KeyRound className="w-4 h-4" />

@@ -225,10 +225,11 @@ export const SignInScreen: React.FC<{ onAuth: OnAuth }> = ({ onAuth }) => {
   );
 };
 
-// ── First start: initial administrator ──────────────────────
+// ── First start: the doctor's own account ───────────────────
 
 export const SetupScreen: React.FC<{ onAuth: OnAuth }> = ({ onAuth }) => {
   const [name, setName] = useState('');
+  const [service, setService] = useState('');
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -244,7 +245,7 @@ export const SetupScreen: React.FC<{ onAuth: OnAuth }> = ({ onAuth }) => {
     setBusy(true);
     setError('');
     try {
-      const { user } = await api.setup({ name: name.trim(), login: login.trim(), password });
+      const { user } = await api.setup({ name: name.trim(), service: service.trim(), login: login.trim(), password });
       onAuth(user);
     } catch (err) {
       setError(errorText(err));
@@ -255,18 +256,22 @@ export const SetupScreen: React.FC<{ onAuth: OnAuth }> = ({ onAuth }) => {
 
   return (
     <AuthCard
-      title="Configuration initiale"
-      subtitle="Créez le compte administrateur. Il servira à créer les comptes du personnel."
+      title="Bienvenue"
+      subtitle="Créez votre compte. Il protège l’accès aux dossiers de vos patients sur ce poste."
     >
       <form onSubmit={submit} className="space-y-4">
         <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-primary-50 border border-primary-100 text-sm text-primary-800">
           <ShieldCheck className="w-4 h-4 mt-0.5 shrink-0" />
-          <span>L’administrateur gère les comptes et les listes de valeurs ; il n’a pas accès au contenu clinique.</span>
+          <span>Les données restent sur cet ordinateur. Notez votre mot de passe en lieu sûr : il ne peut pas être récupéré.</span>
         </div>
         {error && <ErrorBox message={error} />}
         <div>
           <label htmlFor="setup-name" className="field-label">Nom complet</label>
-          <input id="setup-name" value={name} onChange={(e) => setName(e.target.value)} autoFocus required className="clinical-input" />
+          <input id="setup-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex. : Dr Aminata Konaté" autoFocus required className="clinical-input" />
+        </div>
+        <div>
+          <label htmlFor="setup-service" className="field-label">Cabinet ou service <span className="font-normal text-ink-500">(facultatif)</span></label>
+          <input id="setup-service" value={service} onChange={(e) => setService(e.target.value)} placeholder="Ex. : Cabinet de psychiatrie, Bamako" className="clinical-input" />
         </div>
         <div>
           <label htmlFor="setup-login" className="field-label">Identifiant</label>
@@ -283,7 +288,7 @@ export const SetupScreen: React.FC<{ onAuth: OnAuth }> = ({ onAuth }) => {
           <PasswordInput id="setup-pw2" value={confirm} onChange={setConfirm} autoComplete="new-password" />
         </div>
         <button type="submit" disabled={busy} className="btn-primary btn-lg w-full">
-          {busy ? 'Création…' : 'Créer le compte administrateur'}
+          {busy ? 'Création…' : 'Créer mon compte'}
         </button>
       </form>
     </AuthCard>

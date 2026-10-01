@@ -20,9 +20,17 @@ import { exec } from 'node:child_process';
 import { DossierPsychiatrique, ReferenceLists } from '../src/types';
 import { ROLES_CAN_EXPORT, ROLES_CAN_READ_AUDIT } from '../src/utils/emptyDossier';
 import { getRubriquePermission } from '../src/utils/rules';
-import { DATA_DIR, db, runDailyBackup, transaction } from './db';
+import { BACKUP_DIR, DATA_DIR, db, runDailyBackup, transaction } from './db';
 import { listAudit, writeAudit } from './audit';
-import { currentUser, purgeExpiredSessions, registerAuthRoutes, requireAuth, requireRole } from './auth';
+import {
+  canManage,
+  currentUser,
+  migrateOwner,
+  purgeExpiredSessions,
+  registerAuthRoutes,
+  requireAuth,
+  requireManager,
+} from './auth';
 import { allDossiers, createDossier, getDossier, HttpError, redactForRole, updateDossier } from './dossiers';
 import { seedDemo } from './seed';
 
@@ -32,6 +40,7 @@ const DIST_DIR = path.resolve(process.env.PSYDOSSIER_DIST || 'dist');
 const APP_URL = `http://${HOST}:${PORT}`;
 
 if (process.env.PSYDOSSIER_DEMO === '1') seedDemo();
+migrateOwner();
 
 const settings = {
   get: db.prepare('SELECT value FROM settings WHERE key = ?'),
@@ -98,7 +107,8 @@ app.get('/api/state', requireAuth, (_req, res) => {
     dossiers: allDossiers().map((d) => redactForRole(d, user)),
     auditLogs: ROLES_CAN_READ_AUDIT.includes(user.role) ? listAudit() : [],
     referenceLists: readReferentiels(),
-    referentielsUsage: user.role === 'ADMIN' ? referentielsUsage() : undefined,
+    referentielsUsage: canManage(user) ? referentielsUsage() : undefined,
+    lastExternalBackup: canManage(user) ? readLastExternalBackup() : undefined,
   });
 });
 
@@ -154,7 +164,7 @@ app.post('/api/audit', requireAuth, (req, res) => {
 });
 
 // F-24: lists are administered by ADMIN; a value used in a dossier can only be deactivated.
-app.put('/api/referentiels', requireAuth, requireRole('ADMIN'), (req, res) => {
+app.put('/api/referentiels', requireAuth, requireManager, (req, res) => {
   const user = currentUser(res);
   const next = req.body as ReferenceLists;
   if (!next || typeof next !== 'object' || !Array.isArray(next.religions)) {
@@ -181,6 +191,37 @@ app.put('/api/referentiels', requireAuth, requireRole('ADMIN'), (req, res) => {
   settings.set.run('referentiels', JSON.stringify(next));
   writeAudit(user, 'MODIFICATION', { details: 'Mise à jour des listes de valeurs (référentiels).' });
   res.json({ ok: true });
+});
+
+// Backup to take off the PC (USB key): a consistent snapshot of the whole database.
+const LAST_BACKUP_KEY = 'last_external_backup';
+function readLastExternalBackup(): string | null {
+  const row = settings.get.get(LAST_BACKUP_KEY) as { value: string } | undefined;
+  return row?.value ?? null;
+}
+
+app.get('/api/backup', requireAuth, requireManager, (_req, res) => {
+  const user = currentUser(res);
+  const now = new Date();
+  const name = `psydossier-sauvegarde-${now.toISOString().slice(0, 16).replace(/[:T]/g, '-')}.db`;
+  const tmp = path.join(BACKUP_DIR, `export-${process.pid}-${now.getTime()}.tmp.db`);
+  try {
+    db.exec(`VACUUM INTO '${tmp.replace(/'/g, "''")}'`);
+  } catch (err) {
+    console.error('[sauvegarde] échec :', err);
+    res.status(500).json({ error: 'La sauvegarde n’a pas pu être créée.' });
+    return;
+  }
+  res.download(tmp, name, (err) => {
+    fs.rm(tmp, { force: true }, () => {});
+    if (err) {
+      console.error('[sauvegarde] téléchargement interrompu :', err.message);
+      if (!res.headersSent) res.status(500).json({ error: 'La sauvegarde n’a pas pu être envoyée.' });
+      return;
+    }
+    settings.set.run(LAST_BACKUP_KEY, now.toISOString());
+    writeAudit(user, 'SAUVEGARDE', { details: `Sauvegarde complète téléchargée (${name}).` });
+  });
 });
 
 app.use('/api', (_req, res) => {

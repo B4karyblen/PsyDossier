@@ -87,19 +87,24 @@ INSTALLATION
   Astuce : clic droit sur « Demarrer PsyDossier.bat » > Envoyer vers >
   Bureau (créer un raccourci).
 
-PREMIER DÉMARRAGE — COMPTES
-  1. Au premier lancement, créer le compte ADMINISTRATEUR (nom, identifiant,
-     mot de passe de 8 caractères minimum).
-  2. Menu « Utilisateurs & rôles » > « Nouveau compte » pour chaque membre
-     du personnel (psychiatre, psychologue, infirmier, assistant social,
-     secrétariat, lecteur). Un code d'activation est affiché : le remettre
-     à la personne (valable 7 jours).
-  3. La personne clique « Activer avec mon code » sur l'écran de connexion
-     et choisit son mot de passe.
-  - Un compte n'est jamais supprimé : il est désactivé (traçabilité).
-  - Mot de passe oublié : l'administrateur clique sur la clé (« Nouveau code
-    d'activation ») à côté du compte.
-  - Les sessions se ferment après 30 minutes d'inactivité.
+PREMIER DÉMARRAGE
+  1. Au premier lancement, créer votre compte : nom, identifiant et mot de
+     passe (8 caractères minimum). Notez le mot de passe en lieu sûr :
+     il ne peut pas être récupéré.
+  2. Vous êtes le médecin titulaire : vous gérez aussi les listes (CIM-10,
+     religions, ethnies…) et les sauvegardes.
+  - La session se verrouille après 2 heures d'inactivité.
+  - Plus tard, pour ajouter un(e) collaborateur(trice) (secrétariat,
+    psychologue…) : Ctrl+K > « Gérer les comptes ». Un code d'activation
+    lui permet de choisir son mot de passe.
+
+SAUVEGARDE SUR CLÉ USB (au moins une fois par semaine)
+  1. Brancher la clé USB.
+  2. Menu « Sauvegarde » > « Télécharger la sauvegarde ».
+  3. Enregistrer le fichier psydossier-sauvegarde-....db sur la clé.
+  Un rappel s'affiche sur le tableau de bord si la dernière sauvegarde
+  date de plus de 7 jours. Gardez la clé en lieu sûr : elle contient
+  des données de santé non chiffrées.
 
 UTILISATION
   - Laisser la fenêtre noire « PsyDossier » ouverte pendant l'utilisation.
@@ -116,8 +121,8 @@ RESTAURER UNE SAUVEGARDE
   1. Fermer la fenêtre PsyDossier.
   2. Supprimer data\\psydossier.db, data\\psydossier.db-wal et data\\psydossier.db-shm
      s'ils existent.
-  3. Copier la sauvegarde voulue depuis data\\backups\\ vers data\\
-     et la renommer en psydossier.db.
+  3. Copier la sauvegarde voulue (depuis la clé USB, ou depuis data\\backups\\)
+     vers data\\ et la renommer en psydossier.db.
   4. Relancer « Demarrer PsyDossier.bat ».
 
 MISE À JOUR

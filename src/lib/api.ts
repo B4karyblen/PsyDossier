@@ -6,6 +6,8 @@ export interface ServerState {
   referenceLists: ReferenceLists | null;
   /** ADMIN only: list values referenced by dossiers (can be deactivated, not deleted). */
   referentielsUsage?: Record<string, string[]>;
+  /** ADMIN / owner only: when a full backup was last downloaded (ISO), or null if never. */
+  lastExternalBackup?: string | null;
 }
 
 /** The signed-in user, as resolved by the server session. */
@@ -16,7 +18,12 @@ export interface SessionUser {
   role: UserRole;
   title: string;
   service: string;
+  /** The doctor who installed PsyDossier: also manages lists, accounts and backups. */
+  isOwner: boolean;
 }
+
+/** Manages lists, accounts and backups. */
+export const canManage = (u: Pick<SessionUser, 'role' | 'isOwner'>) => u.role === 'ADMIN' || u.isOwner;
 
 export interface AuthStatus {
   setupRequired: boolean;
@@ -58,7 +65,7 @@ const post = <T>(url: string, body?: unknown) =>
 export const api = {
   // Session
   status: () => request<AuthStatus>('/api/auth/status'),
-  setup: (b: { name: string; login: string; password: string; title?: string }) =>
+  setup: (b: { name: string; login: string; password: string; title?: string; service?: string }) =>
     post<{ user: SessionUser }>('/api/auth/setup', b),
   login: (login: string, password: string) => post<{ user: SessionUser }>('/api/auth/login', { login, password }),
   activate: (login: string, code: string, password: string) =>
@@ -80,7 +87,24 @@ export const api = {
   saveReferenceLists: (r: ReferenceLists) =>
     request<{ ok: true }>('/api/referentiels', { method: 'PUT', body: JSON.stringify(r) }),
 
-  // Accounts (ADMIN)
+  /** Downloads a full database snapshot; resolves with the suggested file name and contents. */
+  downloadBackup: async (): Promise<{ name: string; blob: Blob }> => {
+    let res: Response;
+    try {
+      res = await fetch('/api/backup', { credentials: 'same-origin' });
+    } catch {
+      throw new ApiError(0, 'Serveur local injoignable.');
+    }
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new ApiError(res.status, (body as { error?: string }).error || `Erreur ${res.status}`, body);
+    }
+    const disposition = res.headers.get('Content-Disposition') || '';
+    const name = /filename="?([^";]+)"?/.exec(disposition)?.[1] || 'psydossier-sauvegarde.db';
+    return { name, blob: await res.blob() };
+  },
+
+  // Accounts (ADMIN / owner)
   listUsers: () => request<UserAccount[]>('/api/users'),
   createUser: (u: { login: string; name: string; role: UserRole; title: string; service: string }) =>
     post<{ user: UserAccount; setupCode: string }>('/api/users', u),

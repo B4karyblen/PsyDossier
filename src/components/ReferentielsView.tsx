@@ -21,6 +21,8 @@ interface ReferentielsViewProps {
   currentUserRole: UserRole;
   /** Values used by dossiers (from the server): deactivate instead of delete (F-24). */
   usage?: Record<string, string[]>;
+  /** ADMIN or the owning doctor. */
+  canEdit: boolean;
 }
 
 export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
@@ -28,6 +30,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
   onUpdateReferenceLists,
   currentUserRole,
   usage = {},
+  canEdit,
 }) => {
   const [activeTab, setActiveTab] = useState<'syndromes' | 'cim' | 'bilans' | 'ethnies' | 'religions' | 'matrimoniales'>('syndromes');
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,7 +39,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
   const [newCimLabel, setNewCimLabel] = useState('');
   const [isSaved, setIsSaved] = useState(false);
 
-  const isAdmin = currentUserRole === 'ADMIN';
+  const isAdmin = canEdit;
 
   type Category = 'religions' | 'ethnies' | 'situationsMatrimoniales' | 'typesBilans' | 'syndromesFrequents' | 'diagnosticClassifications';
   const isInactive = (cat: Category, v: string) => (referenceLists.inactive?.[cat] ?? []).includes(v);
@@ -205,13 +208,13 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             <div className="flex flex-wrap items-center gap-2">
               <div className="chip bg-amber-100 text-amber-800 !py-2 !px-3.5">
                 <Lock className="w-3.5 h-3.5" />
-                <span>Lecture seule · modifications réservées à l'administrateur</span>
+                <span>Lecture seule · modifications réservées au médecin titulaire</span>
               </div>
             </div>
           ) : (
             <div className="chip bg-emerald-100 text-emerald-800 !py-2 !px-3.5">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Mode Administrateur actif : modifications autorisées</span>
+              <span>Modifications autorisées</span>
             </div>
           )}
         </div>

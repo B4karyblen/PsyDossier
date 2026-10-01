@@ -28,6 +28,8 @@ export interface UserAccount {
   service: string;
   active: boolean;
   hasPassword: boolean;
+  /** The doctor who installed PsyDossier (cannot be deactivated). */
+  isOwner: boolean;
   createdAt: string;
   lastLoginAt?: string;
 }
@@ -58,7 +60,8 @@ export type AuditAction =
   | 'CONNEXION'
   | 'ECHEC_CONNEXION'
   | 'DECONNEXION'
-  | 'GESTION_COMPTE';
+  | 'GESTION_COMPTE'
+  | 'SAUVEGARDE';
 
 /** One changed field in a MODIFICATION audit entry (BR-012). */
 export interface AuditFieldChange {

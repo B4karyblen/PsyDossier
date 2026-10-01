@@ -14,6 +14,8 @@ import {
   X,
   Clock,
   CheckCircle2,
+  HardDrive,
+  UserCog,
 } from 'lucide-react';
 
 interface CommandPaletteModalProps {
@@ -26,6 +28,8 @@ interface CommandPaletteModalProps {
   activeDossierId: string | null;
   canCreateDossier: boolean;
   canReadAudit: boolean;
+  canManage: boolean;
+  onOpenBackup: () => void;
 }
 
 export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
@@ -38,6 +42,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   activeDossierId,
   canCreateDossier,
   canReadAudit,
+  canManage,
+  onOpenBackup,
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -118,6 +124,33 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         onChangeView('REGISTRE');
       },
     });
+
+    if (canManage) {
+      items.push({
+        id: 'action-backup',
+        category: 'ACTION',
+        title: 'Sauvegarde sur clé USB',
+        subtitle: 'Télécharger une copie complète de la base pour la garder hors de l’ordinateur',
+        badge: 'Action',
+        icon: <HardDrive className="w-4 h-4 text-ink-700" />,
+        action: () => {
+          onClose();
+          onOpenBackup();
+        },
+      });
+      items.push({
+        id: 'nav-accounts',
+        category: 'NAVIGATION',
+        title: 'Gérer les comptes',
+        subtitle: 'Ajouter un(e) collaborateur(trice) : secrétariat, psychologue, infirmier…',
+        badge: 'Paramètres',
+        icon: <UserCog className="w-4 h-4 text-ink-700" />,
+        action: () => {
+          onClose();
+          onChangeView('UTILISATEURS');
+        },
+      });
+    }
 
     if (canReadAudit) items.push({
       id: 'nav-audit',
