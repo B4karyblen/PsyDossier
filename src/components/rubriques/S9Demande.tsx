@@ -34,20 +34,20 @@ export const S9Demande: React.FC<Props> = ({
   };
 
   return (
-    <div className="clinical-card p-6 sm:p-7 space-y-6">
+    <div className="clinical-card p-5 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
+            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
               S9 · PSYCHODYNAMIQUE
             </span>
             <span className="text-xs text-ink-500">Analyse de la demande</span>
           </div>
-          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
+          <h2 className="text-h2 text-ink-900 mt-2">
             Demande du Patient (Manifeste & Latente)
           </h2>
-          <p className="text-xs text-ink-500 mt-0.5">
+          <p className="text-sm text-ink-500 mt-0.5">
             Distinction clinique entre la demande manifeste consciente et la demande inconsciente sous-jacente
           </p>
         </div>
@@ -55,14 +55,14 @@ export const S9Demande: React.FC<Props> = ({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Subcard 1: Demande manifeste */}
-        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-3">
+        <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-3">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
-            <MessageSquare className="w-4 h-4 text-brand-600" />
-            <h3 className="text-sm font-bold text-ink-900">
+            <MessageSquare className="w-4 h-4 text-primary-600" />
+            <h3 className="text-sm font-semibold text-ink-900">
               1. Demande Manifeste / Consciente
             </h3>
           </div>
-          <label className="block text-xs font-semibold text-ink-900">
+          <label className="block text-sm font-medium text-ink-700">
             Ce que le patient exprime et réclame explicitement
           </label>
           <textarea
@@ -70,17 +70,17 @@ export const S9Demande: React.FC<Props> = ({
             disabled={isReadOnly}
             value={formData.demandeConsciente || ''}
             onChange={(e) => setFormData({ ...formData, demandeConsciente: e.target.value })}
-            className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-xl p-3.5 focus:outline-none leading-relaxed"
+            className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3.5 focus:outline-none leading-relaxed"
             placeholder="Ex: « Je veux retrouver le sommeil et calmer mon angoisse pour pouvoir retravailler »..."
           />
         </div>
 
         {/* Subcard 2: Demande inconsciente */}
-        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-3">
+        <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-3">
           <div className="flex items-center justify-between pb-2 border-b border-ink-100">
             <div className="flex items-center gap-2">
-              <Compass className="w-4 h-4 text-brand-600" />
-              <h3 className="text-sm font-bold text-ink-900">
+              <Compass className="w-4 h-4 text-primary-600" />
+              <h3 className="text-sm font-semibold text-ink-900">
                 2. Demande Inconsciente / Latente (B2 : Psychiatre & Psychologue)
               </h3>
             </div>
@@ -90,7 +90,7 @@ export const S9Demande: React.FC<Props> = ({
               </span>
             )}
           </div>
-          <label className="block text-xs font-semibold text-ink-900">
+          <label className="block text-sm font-medium text-ink-700">
             Analyse psychodynamique des enjeux relationnels, bénéfices secondaires et transfert
           </label>
           <textarea
@@ -98,13 +98,13 @@ export const S9Demande: React.FC<Props> = ({
             disabled={!canEditInconsciente}
             value={formData.demandeInconsciente || ''}
             onChange={(e) => setFormData({ ...formData, demandeInconsciente: e.target.value })}
-            className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-xl p-3.5 focus:outline-none leading-relaxed"
+            className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3.5 focus:outline-none leading-relaxed"
             placeholder="Ex: Recherche de dépendance maternelle, décharge de responsabilité, besoin de punition, identification au parent perdu..."
           />
         </div>
 
         {/* Subcard 3: Demande de l'entourage */}
-        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-3">
+        <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-3">
           <label className="block text-sm font-bold text-ink-900">
             3. Demande Exprimée par l’Entourage / Accompagnateurs
           </label>
@@ -113,7 +113,7 @@ export const S9Demande: React.FC<Props> = ({
             disabled={isReadOnly}
             value={formData.demandeEntourage || ''}
             onChange={(e) => setFormData({ ...formData, demandeEntourage: e.target.value })}
-            className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-xl p-3.5 focus:outline-none"
+            className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3.5 focus:outline-none"
             placeholder="Attente de la famille (soulagement du fardeau, sédation, placement, reprise du rôle familial...)"
           />
         </div>

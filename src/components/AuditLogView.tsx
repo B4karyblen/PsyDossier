@@ -59,7 +59,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
       case 'VALIDATION':
         return 'bg-emerald-100 text-emerald-700 border-emerald-300';
       case 'MODIFICATION':
-        return 'bg-brand-50 text-brand-700 border-brand-200';
+        return 'bg-primary-50 text-primary-700 border-primary-200';
       case 'CREATION':
         return 'bg-violet-100 text-violet-700 border-violet-300';
       case 'ADDENDUM':
@@ -67,7 +67,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
       case 'ARCHIVAGE':
         return 'bg-rose-100 text-rose-700 border-rose-200';
       case 'REACTIVATION':
-        return 'bg-brand-100 text-brand-800 border-brand-300';
+        return 'bg-primary-100 text-primary-800 border-primary-300';
       case 'EXPORT':
         return 'bg-ink-100 text-ink-700 border-ink-200';
       case 'LECTURE':
@@ -83,8 +83,8 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-extrabold text-ink-900 tracking-tight">Journal d'audit & traçabilité</h2>
-            <span className="chip bg-brand-100 text-brand-800">
+            <h2 className="text-2xl font-bold text-ink-900 tracking-tight">Journal d'audit & traçabilité</h2>
+            <span className="chip bg-primary-100 text-primary-800">
               <Lock className="w-3 h-3" /> Inaltérable
             </span>
           </div>
@@ -110,7 +110,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
               </span>
               <div>
                 <div className="text-[13px] font-semibold text-ink-500">{m.label}</div>
-                <div className="text-2xl font-extrabold text-ink-900 tabular-nums leading-tight">{m.value}</div>
+                <div className="text-2xl font-bold text-ink-900 tabular-nums leading-tight">{m.value}</div>
               </div>
             </div>
           );
@@ -137,7 +137,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
               <select
                 value={actionFilter}
                 onChange={(e) => setActionFilter(e.target.value)}
-                className="clinical-input pr-8 text-body-sm font-semibold bg-white cursor-pointer"
+                className="clinical-input pr-8 text-body-sm bg-white cursor-pointer"
               >
                 <option value="TOUTES">Toutes les actions ({logs.length})</option>
                 <option value="VALIDATION">Validation officielle</option>
@@ -158,7 +158,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                   setSearchTerm('');
                   setActionFilter('TOUTES');
                 }}
-                className="px-3 py-2 text-body-sm font-bold text-ink-500 hover:text-ink-900 bg-ink-100 hover:bg-ink-150 rounded-xl transition-colors cursor-pointer"
+                className="px-3 py-2 text-body-sm font-bold text-ink-500 hover:text-ink-900 bg-ink-100 hover:bg-ink-150 rounded-lg transition-colors cursor-pointer"
               >
                 Effacer
               </button>
@@ -179,12 +179,12 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                 onClick={() => setActionFilter(act)}
                 className={`px-3.5 !min-h-9 rounded-full text-[13px] font-bold transition-colors cursor-pointer ${
                   isSelected
-                    ? 'bg-ink-900 text-white shadow-xs'
+                    ? 'bg-primary-900 text-white'
                     : 'bg-ink-25 text-ink-500 hover:bg-ink-100 hover:text-ink-900 border border-ink-150'
                 }`}
               >
                 {act === 'TOUTES' ? 'Tous' : act.charAt(0) + act.slice(1).toLowerCase()}
-                <span className={`ml-1.5 text-caption font-mono ${isSelected ? 'text-brand-300' : 'text-ink-400'}`}>
+                <span className={`ml-1.5 text-caption font-mono ${isSelected ? 'text-primary-300' : 'text-ink-400'}`}>
                   {count}
                 </span>
               </button>
@@ -223,7 +223,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                           setSearchTerm('');
                           setActionFilter('TOUTES');
                         }}
-                        className="mt-2 px-3 py-1.5 text-body-sm font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors cursor-pointer"
+                        className="mt-2 px-3 py-1.5 text-body-sm font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors cursor-pointer"
                       >
                         Afficher tout le journal
                       </button>
@@ -254,12 +254,12 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                       {/* User */}
                       <td className="py-3.5 px-4 sm:px-6 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-md bg-ink-100 text-ink-900 flex items-center justify-center text-caption font-extrabold border border-ink-150">
+                          <div className="w-6 h-6 rounded-md bg-ink-100 text-ink-900 flex items-center justify-center text-caption font-bold border border-ink-150">
                             {log.userName.charAt(0)}
                           </div>
                           <div>
                             <div className="font-bold text-ink-900 leading-tight">{log.userName}</div>
-                            <div className="text-caption text-brand-700 font-mono font-semibold">{log.userRole}</div>
+                            <div className="text-caption text-primary-700 font-mono font-semibold">{log.userRole}</div>
                           </div>
                         </div>
                       </td>
@@ -269,7 +269,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                         <button
                           type="button"
                           onClick={() => onSelectDossier?.(log.dossierId)}
-                          className="text-mono font-bold text-ink-900 hover:text-brand-700 hover:underline flex items-center gap-1 group-hover:translate-x-0.5 transition-transform cursor-pointer"
+                          className="text-mono font-bold text-ink-900 hover:text-primary-700 hover:underline flex items-center gap-1 group-hover:translate-x-0.5 transition-transform cursor-pointer"
                           title="Ouvrir le dossier patient"
                         >
                           <span>{log.patientNumeroOrdre}</span>
@@ -279,7 +279,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
 
                       {/* Action */}
                       <td className="py-3.5 px-4 sm:px-6 whitespace-nowrap">
-                        <span className={`px-2.5 py-0.5 rounded-md text-caption font-extrabold tracking-wide border shadow-2xs ${getActionBadge(log.action)}`}>
+                        <span className={`px-2.5 py-0.5 rounded-md text-caption font-bold tracking-wide border shadow-2xs ${getActionBadge(log.action)}`}>
                           {log.action}
                         </span>
                       </td>

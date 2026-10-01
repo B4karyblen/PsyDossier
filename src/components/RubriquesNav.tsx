@@ -36,25 +36,19 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
   return (
     <aside
       aria-label="Rubriques du dossier"
-      className="w-full lg:w-72 shrink-0 clinical-card p-4 h-fit self-start lg:sticky lg:top-20 no-print"
+      className="w-full lg:w-64 shrink-0 clinical-card p-3 h-fit self-start lg:sticky lg:top-[72px] no-print"
     >
       {/* Progress header */}
-      <div className="rounded-2xl bg-ink-900 text-white p-4">
+      <div className="px-2 pt-1 pb-3 border-b border-ink-150">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold">Plan type · 17 rubriques</h2>
-          <span className="text-xs font-extrabold tabular-nums text-brand-300">
-            {completedCount}/17
+          <h2 className="text-sm font-semibold text-ink-900">Plan type</h2>
+          <span className="text-xs font-medium tabular-nums text-ink-500">
+            {completedCount}/17 · {percentage}%
           </span>
         </div>
-        <div className="mt-3 h-2 rounded-full bg-white/10 overflow-hidden">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-brand-300 to-brand-500 transition-all"
-            style={{ width: `${percentage}%` }}
-          />
+        <div className="progress mt-2.5">
+          <span style={{ width: `${percentage}%` }} />
         </div>
-        <p className="text-[11px] font-medium text-ink-300 mt-2">
-          {percentage}% des rubriques complètes
-        </p>
       </div>
 
       {/* Mobile toggle */}
@@ -62,7 +56,7 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
         type="button"
         onClick={() => setIsMobileOpen((v) => !v)}
         aria-expanded={isMobileOpen}
-        className="lg:hidden mt-3 w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl bg-brand-50 text-brand-800 text-sm font-bold cursor-pointer"
+        className="lg:hidden mt-3 w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-ink-200 bg-white text-ink-900 text-sm font-semibold cursor-pointer"
       >
         <span className="truncate">
           {activeRubrique ? `${activeRubrique.code} · ${activeRubrique.titre}` : 'Choisir une rubrique'}
@@ -71,10 +65,10 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
       </button>
 
       {/* Rubrique blocks */}
-      <div className={`mt-4 space-y-4 lg:max-h-[calc(100vh-260px)] overflow-y-auto -mr-2 pr-2 ${isMobileOpen ? 'block' : 'hidden'} lg:block`}>
+      <div className={`mt-3 space-y-3 lg:max-h-[calc(100vh-200px)] overflow-y-auto -mr-2 pr-2 ${isMobileOpen ? 'block' : 'hidden'} lg:block`}>
         {blocks.map((block) => (
           <div key={block.title}>
-            <div className="px-2 pb-1.5 text-[11px] font-bold text-ink-400 tracking-wide">{block.title}</div>
+            <div className="px-2 pb-1 text-xs font-medium text-ink-400">{block.title}</div>
 
             <div className="space-y-0.5">
               {block.items.map((rubrique) => {
@@ -90,20 +84,20 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
                   </span>
                 ) : completeness === 'COMPLETE' ? (
                   <span
-                    className="w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center text-white"
+                    className="w-4 h-4 rounded-full bg-brand-500 flex items-center justify-center text-white"
                     title="Rubrique complète"
                   >
-                    <Check className="w-3 h-3" strokeWidth={3.5} />
+                    <Check className="w-2.5 h-2.5" strokeWidth={4} />
                   </span>
                 ) : completeness === 'PARTIELLE' ? (
                   <span
-                    className="w-5 h-5 rounded-full border-2 border-amber-400 bg-amber-50 flex items-center justify-center"
+                    className="w-4 h-4 rounded-full border-[1.5px] border-amber-400 bg-amber-50 flex items-center justify-center"
                     title="Rubrique en cours de saisie"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                   </span>
                 ) : (
-                  <span className="block w-5 h-5 rounded-full border-2 border-ink-200" title="Non commencée" />
+                  <span className="block w-4 h-4 rounded-full border-[1.5px] border-ink-300" title="Non commencée" />
                 );
 
                 return (
@@ -114,17 +108,17 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
                       setIsMobileOpen(false);
                     }}
                     aria-current={isActive ? 'step' : undefined}
-                    className={`w-full !min-h-10 flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13px] text-left transition-colors cursor-pointer ${
+                    className={`w-full !min-h-8 flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] text-left transition-colors cursor-pointer ${
                       isActive
-                        ? 'bg-brand-50 text-brand-800 font-bold ring-1 ring-inset ring-brand-200'
+                        ? 'bg-ink-100 text-ink-900 font-semibold'
                         : isHidden
                         ? 'text-ink-400 hover:bg-ink-50 font-medium'
-                        : 'text-ink-700 hover:text-ink-900 hover:bg-ink-50 font-semibold'
+                        : 'text-ink-600 hover:text-ink-900 hover:bg-ink-50 font-medium'
                     }`}
                   >
                     <span
-                      className={`w-8 shrink-0 text-[11px] font-extrabold tabular-nums ${
-                        isActive ? 'text-brand-700' : 'text-ink-400'
+                      className={`w-7 shrink-0 text-[11px] font-semibold tabular-nums ${
+                        isActive ? 'text-ink-700' : 'text-ink-400'
                       }`}
                     >
                       {rubrique.code}

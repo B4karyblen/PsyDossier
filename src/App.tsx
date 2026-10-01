@@ -441,7 +441,7 @@ export default function App() {
     return (
       <div className="min-h-screen bg-canvas flex items-center justify-center p-6 font-sans">
         <div className="clinical-card max-w-md w-full p-8 text-center">
-          <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white">
+          <div className="mx-auto w-12 h-12 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white">
             <HeartPulse className="w-6 h-6" strokeWidth={2.5} />
           </div>
           {loadStatus === 'loading' ? (
@@ -450,7 +450,7 @@ export default function App() {
             </p>
           ) : (
             <>
-              <h1 className="mt-5 text-lg font-extrabold text-ink-900">Serveur local injoignable</h1>
+              <h1 className="mt-5 text-lg font-bold text-ink-900">Serveur local injoignable</h1>
               <p className="mt-2 text-sm text-ink-500">
                 Vérifiez que la fenêtre « PsyDossier » est toujours ouverte, ou relancez
                 « Demarrer PsyDossier ».
@@ -800,7 +800,7 @@ export default function App() {
           <div className="flex items-center gap-3 text-[11px]">
             <span>Session active : <strong className="text-ink-900">{currentUser.name}</strong></span>
             <span aria-hidden="true">·</span>
-            <span>Rôle : <span className="font-mono text-brand-700">{currentUser.role}</span></span>
+            <span>Rôle : <span className="font-mono text-primary-700">{currentUser.role}</span></span>
           </div>
         </div>
       </footer>

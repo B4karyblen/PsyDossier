@@ -48,22 +48,22 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
   const diagPrincipal = dossier.s12HypothesesDiag.hypotheses?.find(h => h.type === 'Principale');
 
   return (
-    <div className="fixed inset-0 z-50 bg-ink-950/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto print:static print:bg-white print:p-0 print:overflow-visible">
-      <div className="clinical-card w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[92vh] !rounded-3xl !border-ink-150 shadow-[var(--shadow-float)] print:max-h-none print:shadow-none print:border-none print:m-0 print:w-full print:max-w-none print:overflow-visible">
+    <div className="fixed inset-0 z-50 bg-ink-950/40 flex items-center justify-center p-4 overflow-y-auto print:static print:bg-white print:p-0 print:overflow-visible">
+      <div className="clinical-card w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[92vh] !rounded-2xl !border-ink-150 shadow-[var(--shadow-float)] print:max-h-none print:shadow-none print:border-none print:m-0 print:w-full print:max-w-none print:overflow-visible">
         {/* Header - Screen only */}
-        <div className="bg-gradient-to-r from-ink-25 via-white to-brand-50 border-b border-ink-150 px-6 sm:px-7 py-4 flex items-center justify-between no-print shrink-0">
+        <div className="bg-white border-b border-ink-150 px-6 sm:px-7 py-4 flex items-center justify-between no-print shrink-0">
           <div>
-            <h2 className="text-h2 font-extrabold text-white tracking-tight">
+            <h2 className="text-base font-semibold text-ink-900">
               Exportation & Impression Clinique
             </h2>
-            <p className="text-body-sm text-slate-400 font-medium">
+            <p className="text-sm text-ink-500">
               Standard 17 Rubriques · Document officiel sous secret médical (Art. 226-13)
             </p>
           </div>
           <div className="flex items-center gap-2.5">
             <button
               onClick={handlePrint}
-              className="clinical-btn-primary px-4 py-2 text-xs flex items-center gap-2 cursor-pointer shadow-sm shadow-brand-500/20"
+              className="btn-primary"
             >
               <Printer className="w-4 h-4" />
               <span>Imprimer / Exporter PDF</span>
@@ -71,7 +71,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
             <button
             aria-label="Fermer"
               onClick={onClose}
-              className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-ink-700 transition-colors cursor-pointer"
+              className="btn-icon"
             >
               <X className="w-5 h-5" />
             </button>
@@ -79,14 +79,14 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
         </div>
 
         {/* Rubrique selection bar - Screen only */}
-        <div className="p-4 sm:px-7 bg-ink-100 border-b border-ink-150 text-xs no-print shrink-0 space-y-2.5">
+        <div className="p-4 sm:px-6 bg-ink-50 border-b border-ink-150 text-xs no-print shrink-0 space-y-2.5">
           <div className="flex items-center justify-between">
-            <span className="font-extrabold text-white">
+            <span className="font-semibold text-ink-900">
               Rubriques à inclure dans l'export officiel ({selectedRubriques.length} / {RUBRIQUES_CONFIG.length}) :
             </span>
             <button
               onClick={toggleAll}
-              className="text-brand-700 hover:underline font-bold text-xs cursor-pointer"
+              className="text-primary-700 hover:underline font-bold text-xs cursor-pointer"
             >
               {selectedRubriques.length === RUBRIQUES_CONFIG.length ? 'Désélectionner tout' : 'Tout sélectionner (17)'}
             </button>
@@ -101,11 +101,11 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
                   onClick={() => toggleRubrique(r.id)}
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-mono border transition-all flex items-center gap-1.5 cursor-pointer ${
                     checked
-                      ? 'bg-ink-800 text-white border-ink-800 font-bold shadow-2xs'
-                      : 'bg-ink-700 text-slate-400 border-ink-600 hover:border-brand-500/50'
+                      ? 'bg-primary-50 text-primary-900 border-primary-200 font-semibold'
+                      : 'bg-white text-ink-600 border-ink-200 hover:border-ink-300'
                   }`}
                 >
-                  {checked ? <CheckSquare className="w-3.5 h-3.5 text-brand-600" /> : <Square className="w-3.5 h-3.5 text-ink-400" />}
+                  {checked ? <CheckSquare className="w-3.5 h-3.5 text-primary-700" /> : <Square className="w-3.5 h-3.5 text-ink-400" />}
                   <span>{r.code}</span>
                 </button>
               );
@@ -138,7 +138,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
               <div className="font-mono text-base font-bold text-ink-900 px-2 py-1 bg-ink-100 inline-block border border-ink-150">
                 N° {dossier.s1Identification.numeroOrdre}
               </div>
-              <div className="text-xs font-bold text-brand-700 mt-1">
+              <div className="text-xs font-bold text-primary-700 mt-1">
                 Statut : {dossier.statut}
               </div>
             </div>
@@ -169,7 +169,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S1: Identification */}
           {selectedRubriques.includes('s1') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S1. Identification & Données socio-démographiques
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
@@ -186,7 +186,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S2: Modalités */}
           {selectedRubriques.includes('s2') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S2. Modalités de consultation
               </h3>
               <p><strong>Régime :</strong> {dossier.s2Modalites.modalite}</p>
@@ -202,7 +202,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S3: Motif */}
           {selectedRubriques.includes('s3') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S3. Motif de consultation actuel
               </h3>
               <p className="leading-relaxed bg-ink-25 p-2.5 rounded border border-ink-100">
@@ -217,7 +217,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S4: Histoire de la maladie */}
           {selectedRubriques.includes('s4') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S4. Histoire de la maladie (Anamnèse)
               </h3>
               <div className="grid grid-cols-2 gap-2">
@@ -237,7 +237,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S5: Représentation socio-culturelle */}
           {selectedRubriques.includes('s5') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S5. Représentation socio-culturelle de la maladie
               </h3>
               <p><strong>Catégories évoquées :</strong> {dossier.s5Representation.categories?.join(', ') || 'Aucune catégorie spécifique'}</p>
@@ -253,7 +253,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S6: Antécédents */}
           {selectedRubriques.includes('s6') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S6. Antécédents
               </h3>
               <div className="grid grid-cols-2 gap-4">
@@ -286,7 +286,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S10: Examen clinique */}
           {selectedRubriques.includes('s10') && (
             <section className="space-y-2 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S10. Examen Clinique
               </h3>
               <div className="grid grid-cols-2 gap-4">
@@ -312,7 +312,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S11: Résumé syndromique */}
           {selectedRubriques.includes('s11') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S11. Résumé Syndromique
               </h3>
               <p className="bg-ink-25 p-3 rounded border border-ink-100 leading-relaxed">
@@ -324,13 +324,13 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S12: Hypothèses diagnostiques */}
           {selectedRubriques.includes('s12') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S12. Hypothèses Diagnostiques
               </h3>
               <div className="space-y-1">
                 {dossier.s12HypothesesDiag.hypotheses?.map((h) => (
                   <div key={h.id} className="flex items-start gap-2">
-                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${h.type === 'Principale' ? 'bg-brand-600 text-white' : 'bg-ink-100 text-ink-900'}`}>
+                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${h.type === 'Principale' ? 'bg-primary-900 text-white' : 'bg-ink-100 text-ink-900'}`}>
                       {h.type}
                     </span>
                     <div>
@@ -346,7 +346,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S14: Prise en charge */}
           {selectedRubriques.includes('s14') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S14. Prise en charge & Prescriptions
               </h3>
               <p><strong>Orientation :</strong> {dossier.s14PriseEnCharge.orientation}</p>
@@ -381,7 +381,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S17: Pronostic */}
           {selectedRubriques.includes('s17') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S17. Pronostic
               </h3>
               <div className="grid grid-cols-3 gap-2">
@@ -404,7 +404,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S7: Biographie */}
           {selectedRubriques.includes('s7') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S7. Éléments de Biographie
               </h3>
               {dossier.s7Biographie.ascendants?.pere && (
@@ -434,7 +434,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S8: Enquête sociale */}
           {selectedRubriques.includes('s8') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S8. Enquête Sociale
               </h3>
               {dossier.s8EnqueteSociale.autodescription && (
@@ -458,7 +458,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S9: Demande */}
           {selectedRubriques.includes('s9') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S9. Demande du Patient
               </h3>
               {dossier.s9Demande.demandeConsciente && (
@@ -473,7 +473,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S13: Bilans paracliniques */}
           {selectedRubriques.includes('s13') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S13. Bilans Paracliniques
               </h3>
               {dossier.s13Bilans.bilans?.length > 0 ? (
@@ -499,7 +499,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S15: Évolution clinique */}
           {selectedRubriques.includes('s15') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S15. Évolution Clinique
               </h3>
               {dossier.s15Evolution.entrees?.length > 0 ? (
@@ -523,7 +523,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           {/* S16: Projet thérapeutique */}
           {selectedRubriques.includes('s16') && (
             <section className="space-y-1.5 border-b border-ink-100 pb-3">
-              <h3 className="font-bold text-brand-700 text-xs uppercase tracking-wide">
+              <h3 className="font-bold text-primary-700 text-xs uppercase tracking-wide">
                 S16. Projet Thérapeutique
               </h3>
               {dossier.s16ProjetTherapeutique.objectifsCourtTerme && (

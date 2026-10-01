@@ -72,27 +72,27 @@ export const S4HistoireMaladie: React.FC<Props> = ({
   };
 
   return (
-    <div className="clinical-card p-6 sm:p-7 space-y-6">
+    <div className="clinical-card p-5 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
+            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
               S4 · ANAMNÈSE
             </span>
             <span className="text-xs text-ink-500">Chrono-clinique</span>
           </div>
-          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
+          <h2 className="text-h2 text-ink-900 mt-2">
             Histoire de la Maladie
           </h2>
-          <p className="text-xs text-ink-500 mt-0.5">
+          <p className="text-sm text-ink-500 mt-0.5">
             Début des troubles, mode d'installation, facteurs déclenchants et évolution de l'épisode actuel
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="p-3.5 bg-rose-100 border border-rose-500/30 rounded-xl flex items-center gap-2.5 text-xs text-rose-700 font-medium">
+        <div className="p-3.5 bg-rose-100 border border-rose-500/30 rounded-lg flex items-center gap-2.5 text-xs text-rose-700 font-medium">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -100,17 +100,17 @@ export const S4HistoireMaladie: React.FC<Props> = ({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Subcard 1: Début et Mode d'installation */}
-        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-4">
+        <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
-            <Clock className="w-4 h-4 text-brand-600" />
-            <h3 className="text-sm font-bold text-ink-900">
+            <Clock className="w-4 h-4 text-primary-600" />
+            <h3 className="text-sm font-semibold text-ink-900">
               Début & Mode d'Installation
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Date de début des troubles actuels
               </label>
               <input
@@ -118,12 +118,12 @@ export const S4HistoireMaladie: React.FC<Props> = ({
                 disabled={isReadOnly}
                 value={formData.dateDebut || ''}
                 onChange={(e) => setFormData({ ...formData, dateDebut: e.target.value })}
-                className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-lg px-3 py-2 focus:outline-none tabular-nums"
+                className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)] tabular-nums"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Mode d'installation <span className="text-rose-500">*</span>
               </label>
               <div className="flex gap-4 pt-1.5">
@@ -135,7 +135,7 @@ export const S4HistoireMaladie: React.FC<Props> = ({
                       disabled={isReadOnly}
                       checked={formData.modeInstallation === mode}
                       onChange={() => setFormData({ ...formData, modeInstallation: mode })}
-                      className="text-brand-600 focus:ring-brand-500"
+                      className="text-primary-600 focus:ring-primary-500"
                     />
                     <span>{mode}</span>
                   </label>
@@ -146,9 +146,9 @@ export const S4HistoireMaladie: React.FC<Props> = ({
         </div>
 
         {/* Subcard 2: Facteurs déclenchants */}
-        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-3.5">
+        <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-3.5">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
-            <Zap className="w-4 h-4 text-brand-600" />
+            <Zap className="w-4 h-4 text-primary-600" />
             <label className="block text-sm font-bold text-ink-900">
               Facteurs Déclenchants Potentiels (Cocher les options applicables)
             </label>
@@ -163,10 +163,10 @@ export const S4HistoireMaladie: React.FC<Props> = ({
                   type="button"
                   disabled={isReadOnly}
                   onClick={() => toggleFacteur(facteur)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     selected
-                      ? 'bg-brand-500 text-white shadow-xs'
-                      : 'bg-white text-ink-900 border border-ink-200 hover:border-brand-500'
+                      ? 'bg-primary-900 text-white'
+                      : 'bg-white text-ink-900 border border-ink-200 hover:border-primary-500'
                   } ${isReadOnly ? 'cursor-not-allowed opacity-80' : ''}`}
                 >
                   {selected ? '✓ ' : '+ '} {facteur}
@@ -177,7 +177,7 @@ export const S4HistoireMaladie: React.FC<Props> = ({
 
           {formData.facteursDeclenchants.includes('Autre') && (
             <div className="pt-2">
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Précision pour le facteur « Autre » <span className="text-rose-500">*</span> (BR-008)
               </label>
               <input
@@ -190,7 +190,7 @@ export const S4HistoireMaladie: React.FC<Props> = ({
                     facteursDeclenchantsAutrePrecision: e.target.value,
                   })
                 }
-                className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
+                className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)]"
                 placeholder="Ex: Conflit foncier, sorcellerie perçue, maladie physique..."
               />
             </div>
@@ -198,16 +198,16 @@ export const S4HistoireMaladie: React.FC<Props> = ({
         </div>
 
         {/* Subcard 3: Récit clinique & Évolution */}
-        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-4">
+        <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
-            <History className="w-4 h-4 text-brand-600" />
-            <h3 className="text-sm font-bold text-ink-900">
+            <History className="w-4 h-4 text-primary-600" />
+            <h3 className="text-sm font-semibold text-ink-900">
               Chronologie & Récit de l'Épisode
             </h3>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-ink-900 mb-1">
+            <label className="block text-sm font-medium text-ink-700 mb-1">
               Récit chronologique et itinéraire thérapeutique
             </label>
             <textarea
@@ -215,13 +215,13 @@ export const S4HistoireMaladie: React.FC<Props> = ({
               disabled={isReadOnly}
               value={formData.itineraireTherapeutique || ''}
               onChange={(e) => setFormData({ ...formData, itineraireTherapeutique: e.target.value })}
-              className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-xl p-3.5 focus:outline-none leading-relaxed"
+              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3.5 focus:outline-none leading-relaxed"
               placeholder="Décrire l'apparition des premiers signes, leur succession dans le temps, les modifications comportementales, les consultations ou thérapeutiques déjà essayées..."
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-ink-900 mb-1">
+            <label className="block text-sm font-medium text-ink-700 mb-1">
               Retentissement socio-professionnel & familial
             </label>
             <input
@@ -231,7 +231,7 @@ export const S4HistoireMaladie: React.FC<Props> = ({
               onChange={(e) =>
                 setFormData({ ...formData, retentissementSocioProfessionnel: e.target.value })
               }
-              className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-lg px-3 py-2 focus:outline-none"
+              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)]"
               placeholder="Ex: Arrêt de travail, déscolarisation, rupture des liens familiaux..."
             />
           </div>

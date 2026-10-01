@@ -139,19 +139,19 @@ export const S7Biographie: React.FC<Props> = ({
   const hasFratrieMismatch = declaredBroCount > 0 && listBroCount > 0 && declaredBroCount !== listBroCount;
 
   return (
-    <div className="clinical-card p-6 sm:p-7 space-y-6">
+    <div className="clinical-card p-5 sm:p-6 space-y-6">
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
+            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
               S7 · DÉVELOPPEMENT
             </span>
             <span className="text-xs text-ink-500">8 sections de vie</span>
           </div>
-          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
+          <h2 className="text-h2 text-ink-900 mt-2">
             Éléments de Biographie Clinique
           </h2>
-          <p className="text-xs text-ink-500 mt-0.5">
+          <p className="text-sm text-ink-500 mt-0.5">
             Histoire de vie, ascendants, collatéraux, scolarité, parcours affectif et événements marquants
           </p>
         </div>
@@ -166,8 +166,8 @@ export const S7Biographie: React.FC<Props> = ({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* 1. Ascendants */}
-        <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
-          <h3 className="text-sm font-bold text-ink-900">
+        <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
+          <h3 className="text-sm font-semibold text-ink-900">
             1. Ascendants
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -231,7 +231,7 @@ export const S7Biographie: React.FC<Props> = ({
                         pere: { ...formData.ascendants.pere, vivant: e.target.checked }
                       }
                     })}
-                    className="rounded text-brand-600"
+                    className="rounded text-primary-600"
                   />
                   <span>Vivant</span>
                 </label>
@@ -298,7 +298,7 @@ export const S7Biographie: React.FC<Props> = ({
                         mere: { ...formData.ascendants.mere, vivant: e.target.checked }
                       }
                     })}
-                    className="rounded text-brand-600"
+                    className="rounded text-primary-600"
                   />
                   <span>Vivante</span>
                 </label>
@@ -308,16 +308,16 @@ export const S7Biographie: React.FC<Props> = ({
         </div>
 
         {/* 2. Collatéraux & Fratrie utérine */}
-        <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
+        <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-ink-900">
+            <h3 className="text-sm font-semibold text-ink-900">
               2. Collatéraux & Fratrie utérine
             </h3>
             {!isReadOnly && (
               <button
                 type="button"
                 onClick={addFrereSoeur}
-                className="text-[11px] font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 px-2.5 py-1 rounded flex items-center gap-1"
+                className="text-[11px] font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 px-2.5 py-1 rounded flex items-center gap-1"
               >
                 <Plus className="w-3 h-3" />
                 Ajouter un frère/sœur
@@ -327,7 +327,7 @@ export const S7Biographie: React.FC<Props> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Place du patient dans la fratrie utérine (rang)
               </label>
               <input
@@ -348,7 +348,7 @@ export const S7Biographie: React.FC<Props> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Nombre total de frères et sœurs déclarés
               </label>
               <input
@@ -422,7 +422,7 @@ export const S7Biographie: React.FC<Props> = ({
                       disabled={isReadOnly}
                       checked={frere.vivant}
                       onChange={(e) => updateFrereSoeur(frere.id, { vivant: e.target.checked })}
-                      className="rounded text-brand-600"
+                      className="rounded text-primary-600"
                     />
                     <span>Vivant</span>
                   </label>
@@ -442,8 +442,8 @@ export const S7Biographie: React.FC<Props> = ({
         </div>
 
         {/* 3. Conception, grossesse & accouchement */}
-        <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-2">
-          <h3 className="text-sm font-bold text-ink-900">
+        <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-2">
+          <h3 className="text-sm font-semibold text-ink-900">
             3. Conception, grossesse et accouchement du patient
           </h3>
           <textarea
@@ -451,19 +451,19 @@ export const S7Biographie: React.FC<Props> = ({
             disabled={isReadOnly}
             value={formData.conceptionGrossesseAccouchement || ''}
             onChange={(e) => setFormData({ ...formData, conceptionGrossesseAccouchement: e.target.value })}
-            className="w-full bg-white border border-ink-150 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-lg p-2.5 focus:outline-none"
+            className="w-full bg-white border border-ink-150 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-2.5 focus:outline-none"
             placeholder="Désir d'enfant, déroulement de la grossesse, terme, voie basse/césarienne, réanimation néonatale..."
           />
         </div>
 
         {/* 4. Développement psychomoteur */}
-        <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
-          <h3 className="text-sm font-bold text-ink-900">
+        <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
+          <h3 className="text-sm font-semibold text-ink-900">
             4. Développement psychomoteur
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Âge de la marche
               </label>
               <input
@@ -479,7 +479,7 @@ export const S7Biographie: React.FC<Props> = ({
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Âge d'acquisition du langage
               </label>
               <input
@@ -495,7 +495,7 @@ export const S7Biographie: React.FC<Props> = ({
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Propreté sphinctérienne
               </label>
               <input
@@ -514,13 +514,13 @@ export const S7Biographie: React.FC<Props> = ({
         </div>
 
         {/* 5. Scolarité */}
-        <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
-          <h3 className="text-sm font-bold text-ink-900">
+        <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
+          <h3 className="text-sm font-semibold text-ink-900">
             5. Scolarité
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Âge de début de scolarisation
               </label>
               <input
@@ -536,7 +536,7 @@ export const S7Biographie: React.FC<Props> = ({
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Niveau scolaire atteint
               </label>
               <input
@@ -552,7 +552,7 @@ export const S7Biographie: React.FC<Props> = ({
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Diplômes obtenus
               </label>
               <input
@@ -570,7 +570,7 @@ export const S7Biographie: React.FC<Props> = ({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Échecs ou redoublements
               </label>
               <input
@@ -586,7 +586,7 @@ export const S7Biographie: React.FC<Props> = ({
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Vécu psychologique des échecs
               </label>
               <input
@@ -605,8 +605,8 @@ export const S7Biographie: React.FC<Props> = ({
         </div>
 
         {/* 6. Développement ultérieur et parcours professionnel */}
-        <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-2">
-          <h3 className="text-sm font-bold text-ink-900">
+        <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-2">
+          <h3 className="text-sm font-semibold text-ink-900">
             6. Développement ultérieur et parcours professionnel
           </h3>
           <textarea
@@ -620,9 +620,9 @@ export const S7Biographie: React.FC<Props> = ({
         </div>
 
         {/* 7. Développement sexuel et sentimental (BR-003: Ménarche vs Spermarche) */}
-        <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
+        <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-ink-900">
+            <h3 className="text-sm font-semibold text-ink-900">
               7. Développement sexuel et adaptation sentimentale
             </h3>
             <div className="flex items-center gap-2">
@@ -631,14 +631,14 @@ export const S7Biographie: React.FC<Props> = ({
                   <button
                     type="button"
                     onClick={addConjoint}
-                    className="text-[11px] font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 px-2 py-0.5 rounded"
+                    className="text-[11px] font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 px-2 py-0.5 rounded"
                   >
                     + Conjoint(e)
                   </button>
                   <button
                     type="button"
                     onClick={addEnfant}
-                    className="text-[11px] font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 px-2 py-0.5 rounded"
+                    className="text-[11px] font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 px-2 py-0.5 rounded"
                   >
                     + Enfant
                   </button>
@@ -651,8 +651,8 @@ export const S7Biographie: React.FC<Props> = ({
             {/* Conditionnel au sexe (BR-003) */}
             {patientSexe === 'Féminin' ? (
               <div>
-                <label className="block text-xs font-semibold text-ink-900 mb-1">
-                  Âge de la ménarche (premières règles) <span className="text-brand-700 font-mono text-[10px]">(Féminin)</span>
+                <label className="block text-sm font-medium text-ink-700 mb-1">
+                  Âge de la ménarche (premières règles) <span className="text-primary-700 font-mono text-[10px]">(Féminin)</span>
                 </label>
                 <input
                   type="text"
@@ -671,8 +671,8 @@ export const S7Biographie: React.FC<Props> = ({
               </div>
             ) : (
               <div>
-                <label className="block text-xs font-semibold text-ink-900 mb-1">
-                  Âge de la spermarche (premières éjaculations) <span className="text-brand-700 font-mono text-[10px]">(Masculin)</span>
+                <label className="block text-sm font-medium text-ink-700 mb-1">
+                  Âge de la spermarche (premières éjaculations) <span className="text-primary-700 font-mono text-[10px]">(Masculin)</span>
                 </label>
                 <input
                   type="text"
@@ -692,7 +692,7 @@ export const S7Biographie: React.FC<Props> = ({
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Premier rapport sexuel (conditions & vécu)
               </label>
               <input
@@ -713,7 +713,7 @@ export const S7Biographie: React.FC<Props> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-ink-900 mb-1">
+            <label className="block text-sm font-medium text-ink-700 mb-1">
               Principales relations amoureuses et histoire du couple
             </label>
             <input
@@ -822,8 +822,8 @@ export const S7Biographie: React.FC<Props> = ({
         </div>
 
         {/* 8. Événements marquants positifs et négatifs */}
-        <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
-          <h3 className="text-sm font-bold text-ink-900">
+        <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
+          <h3 className="text-sm font-semibold text-ink-900">
             8. Événements marquants de la vie
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -73,25 +73,25 @@ export const S10ExamenClinique: React.FC<Props> = ({
   const isTachycardie = constantes.pouls && constantes.pouls > 100;
 
   return (
-    <div className="clinical-card p-6 sm:p-7 space-y-6">
+    <div className="clinical-card p-5 sm:p-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-ink-100 gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
+            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
               S10 · CLINIQUE
             </span>
             <span className="text-xs text-ink-500">Obligatoire pour validation</span>
           </div>
-          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
+          <h2 className="text-h2 text-ink-900 mt-2">
             Examen Clinique (Somatique & Psychiatrique)
           </h2>
-          <p className="text-xs text-ink-500 mt-0.5">
+          <p className="text-sm text-ink-500 mt-0.5">
             Constantes vitales somatiques et sémiologie psychiatrique structurée
           </p>
         </div>
 
         {/* Tab switcher */}
-        <div className="flex items-center p-1 bg-ink-100 rounded-xl border border-ink-200 shrink-0 self-start sm:self-auto">
+        <div className="flex items-center p-1 bg-ink-100 rounded-lg border border-ink-200 shrink-0 self-start sm:self-auto">
           <button
             type="button"
             onClick={() => setActiveTab('somatique')}
@@ -101,7 +101,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                 : 'text-ink-500 hover:text-ink-900'
             }`}
           >
-            <Activity className="w-3.5 h-3.5 text-brand-600" />
+            <Activity className="w-3.5 h-3.5 text-primary-600" />
             <span>A. Examen Somatique</span>
           </button>
           <button
@@ -113,7 +113,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                 : 'text-ink-500 hover:text-ink-900'
             }`}
           >
-            <Brain className="w-3.5 h-3.5 text-brand-700" />
+            <Brain className="w-3.5 h-3.5 text-primary-700" />
             <span>B. Examen Psychiatrique</span>
           </button>
         </div>
@@ -146,7 +146,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
             )}
 
             {/* Non réalisé option */}
-            <div className="p-3 bg-ink-25 border border-ink-150 rounded-xl flex flex-wrap items-center justify-between gap-3">
+            <div className="p-3 bg-ink-25 border border-ink-150 rounded-lg flex flex-wrap items-center justify-between gap-3">
               <label className="flex items-center gap-2 text-xs font-bold text-ink-900 cursor-pointer">
                 <input
                   type="checkbox"
@@ -159,7 +159,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                       nonRealise: e.target.checked
                     }
                   })}
-                  className="rounded text-brand-600 focus:ring-brand-500"
+                  className="rounded text-primary-600 focus:ring-primary-500"
                 />
                 <span>Examen somatique impossible / non réalisé à ce stade</span>
               </label>
@@ -185,9 +185,9 @@ export const S10ExamenClinique: React.FC<Props> = ({
             {!formData.somatique.nonRealise && (
               <>
                 {/* Constantes vitales */}
-                <div className="p-4 bg-ink-100 border border-ink-150 rounded-xl space-y-3">
+                <div className="p-4 bg-ink-100 border border-ink-150 rounded-lg space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-ink-900">
+                    <h3 className="text-sm font-semibold text-ink-900">
                       Constantes Vitales
                     </h3>
                     <span className="text-[11px] text-ink-500">
@@ -365,7 +365,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
 
                 {/* État général */}
                 <div>
-                  <label className="block text-xs font-semibold text-ink-900 mb-1">
+                  <label className="block text-sm font-medium text-ink-700 mb-1">
                     État général (nutrition, hydratation, conjonctives, plis cutanés)
                   </label>
                   <input
@@ -382,8 +382,8 @@ export const S10ExamenClinique: React.FC<Props> = ({
                 </div>
 
                 {/* Examen des appareils */}
-                <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
-                  <h3 className="text-sm font-bold text-ink-900">
+                <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
+                  <h3 className="text-sm font-semibold text-ink-900">
                     Examen des Appareils Somatiques
                   </h3>
 
@@ -485,13 +485,13 @@ export const S10ExamenClinique: React.FC<Props> = ({
             )}
 
             {/* 1. Présentation générale */}
-            <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
-              <h3 className="text-sm font-bold text-ink-900">
+            <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
+              <h3 className="text-sm font-semibold text-ink-900">
                 1. Présentation générale
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-ink-900 mb-1">
+                  <label className="block text-sm font-medium text-ink-700 mb-1">
                     Tenue vestimentaire et hygiène
                   </label>
                   <input
@@ -508,7 +508,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-ink-900 mb-1">
+                  <label className="block text-sm font-medium text-ink-700 mb-1">
                     Mimique et regard
                   </label>
                   <input
@@ -525,7 +525,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-ink-900 mb-1">
+                  <label className="block text-sm font-medium text-ink-700 mb-1">
                     Contact et relation avec le soignant
                   </label>
                   <input
@@ -542,7 +542,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-ink-900 mb-1">
+                  <label className="block text-sm font-medium text-ink-700 mb-1">
                     Psychomotricité et comportement moteur
                   </label>
                   <input
@@ -562,7 +562,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
 
             {/* 2. Conduites */}
             <div>
-              <label className="block text-xs font-semibold text-ink-900 mb-1">
+              <label className="block text-sm font-medium text-ink-700 mb-1">
                 Conduites instinctuelles & comportementales (Alimentation, sommeil, impulsions)
               </label>
               <textarea
@@ -579,8 +579,8 @@ export const S10ExamenClinique: React.FC<Props> = ({
             </div>
 
             {/* 3. Fonctions supérieures */}
-            <div className="p-4 bg-ink-25 border border-ink-150 rounded-xl space-y-3">
-              <h3 className="text-sm font-bold text-ink-900">
+            <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
+              <h3 className="text-sm font-semibold text-ink-900">
                 Fonctions supérieures & sémiologie cognitive
               </h3>
 

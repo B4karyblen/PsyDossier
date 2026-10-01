@@ -129,7 +129,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
           <div className="flex items-center gap-2.5">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-extrabold text-ink-900 tracking-tight">
+                <h2 className="text-2xl font-bold text-ink-900 tracking-tight">
                   Référentiels & nomenclatures
                 </h2>
                 <span className="hidden sm:inline-flex chip bg-ink-100 text-ink-600">
@@ -170,14 +170,14 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
       </div>
 
       {isSaved && (
-        <div className="p-3 bg-emerald-100 border border-emerald-300 rounded-xl text-body-sm text-emerald-700 font-bold flex items-center gap-2 animate-in fade-in duration-200">
+        <div className="p-3 bg-emerald-100 border border-emerald-300 rounded-lg text-body-sm text-emerald-700 font-bold flex items-center gap-2 animate-in fade-in duration-200">
           <CheckCircle2 className="w-4 h-4 text-emerald-700" />
           Référentiel mis à jour et synchronisé avec succès.
         </div>
       )}
 
       {/* 2. Tabs Bar */}
-      <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-ink-100 rounded-2xl border border-ink-150">
+      <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-ink-100 rounded-xl border border-ink-150">
         {[
           { id: 'syndromes', label: 'Syndromes Fréquents', count: referenceLists.syndromesFrequents.length },
           { id: 'cim', label: 'Classifications CIM-10', count: referenceLists.diagnosticClassifications.length },
@@ -193,16 +193,16 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               setActiveTab(tab.id as any);
               setSearchTerm('');
             }}
-            className={`px-3.5 py-2 text-body-sm font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 ${
+            className={`px-3.5 py-2 text-body-sm font-bold rounded-lg transition-all cursor-pointer flex items-center gap-2 ${
               activeTab === tab.id
-                ? 'bg-white text-brand-700 shadow-xs border border-ink-150'
+                ? 'bg-white text-primary-700 shadow-xs border border-ink-150'
                 : 'text-ink-500 hover:text-ink-900 hover:bg-white/50'
             }`}
           >
             <span>{tab.label}</span>
             <span
               className={`px-1.5 py-0.2 rounded text-caption font-mono font-bold ${
-                activeTab === tab.id ? 'bg-brand-50 text-brand-700' : 'bg-ink-150 text-ink-500'
+                activeTab === tab.id ? 'bg-primary-50 text-primary-700' : 'bg-ink-150 text-ink-500'
               }`}
             >
               {tab.count}
@@ -216,7 +216,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
         {/* Category Header + Search Filter */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-ink-100">
           <div>
-            <h2 className="text-h2 font-extrabold text-ink-900">
+            <h2 className="text-h2 font-bold text-ink-900">
               {activeTab === 'syndromes' && 'Nomenclature des Syndromes Psychiatriques Fréquents'}
               {activeTab === 'cim' && 'Nomenclature CIM-10 / DSM-5'}
               {activeTab === 'bilans' && 'Référentiel des Bilans Paracliniques Types'}
@@ -248,7 +248,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredSyndromes.map((s) => (
                 <div
                   key={s}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{s}</span>
                   {isAdmin && (
@@ -266,13 +266,13 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
                   onChange={(e) => setNewItemText(e.target.value)}
                   placeholder="Intitulé du nouveau syndrome (ex: Syndrome de Cotard)..."
-                  className="clinical-input flex-1 text-xs"
+                  className="clinical-input flex-1"
                 />
                 <button
                   type="button"
@@ -295,10 +295,10 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredCim.map((item) => (
                 <div
                   key={item.code}
-                  className="clinical-subcard p-3.5 flex items-start justify-between text-body-sm hover:border-brand-500/40 transition-colors group"
+                  className="clinical-subcard p-3.5 flex items-start justify-between text-body-sm hover:border-primary-500/40 transition-colors group"
                 >
                   <div className="flex items-start gap-2.5">
-                    <span className="text-mono font-extrabold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-500/30 shrink-0">
+                    <span className="text-mono font-bold text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-500/30 shrink-0">
                       {item.code}
                     </span>
                     <span className="font-bold text-ink-900 leading-snug">{item.label}</span>
@@ -318,7 +318,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
                 <input
                   type="text"
                   value={newCimCode}
@@ -354,7 +354,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredBilans.map((b) => (
                 <div
                   key={b}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{b}</span>
                   {isAdmin && (
@@ -371,7 +371,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
@@ -400,7 +400,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredEthnies.map((e) => (
                 <div
                   key={e}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{e}</span>
                   {isAdmin && (
@@ -417,7 +417,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
@@ -446,7 +446,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredReligions.map((r) => (
                 <div
                   key={r}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{r}</span>
                   {isAdmin && (
@@ -463,7 +463,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}
@@ -492,7 +492,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
               {filteredMatrimoniales.map((m) => (
                 <div
                   key={m}
-                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-brand-500/40 transition-colors group"
+                  className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{m}</span>
                   {isAdmin && (
@@ -509,7 +509,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
             </div>
 
             {isAdmin && (
-              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-2xl flex flex-col sm:flex-row gap-2 mt-4">
+              <div className="p-4 bg-ink-25 border border-dashed border-ink-200 rounded-xl flex flex-col sm:flex-row gap-2 mt-4">
                 <input
                   type="text"
                   value={newItemText}

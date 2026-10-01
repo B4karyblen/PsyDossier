@@ -36,8 +36,8 @@ export const RubriqueFooterNav: React.FC<RubriqueFooterNavProps> = ({
             title={`Revenir à ${prevRubrique.code} : ${prevRubrique.titre}`}
           >
             <ChevronLeft className="w-4 h-4 text-ink-500" />
-            <span className="hidden sm:inline font-semibold text-ink-500">Précédent</span>
-            <span className="font-bold text-brand-700">{prevRubrique.code}</span>
+            <span className="hidden sm:inline font-medium text-ink-500">Précédent</span>
+            <span className="font-semibold text-ink-900">{prevRubrique.code}</span>
           </button>
         ) : (
           <div />
@@ -47,7 +47,7 @@ export const RubriqueFooterNav: React.FC<RubriqueFooterNavProps> = ({
       {/* Center Save Action & Feedback */}
       <div className="flex items-center gap-3">
         {isSaved && (
-          <span className="chip bg-emerald-100 text-emerald-800 !py-1.5">
+          <span className="chip bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200">
             <CheckCircle2 className="w-3.5 h-3.5" />
             Enregistré avec succès
           </span>
@@ -74,8 +74,8 @@ export const RubriqueFooterNav: React.FC<RubriqueFooterNavProps> = ({
             className="btn-secondary group"
             title={`Passer à ${nextRubrique.code} : ${nextRubrique.titre}`}
           >
-            <span className="hidden sm:inline font-semibold text-ink-500">Suivant</span>
-            <span className="font-bold text-brand-700">{nextRubrique.code}</span>
+            <span className="hidden sm:inline font-medium text-ink-500">Suivant</span>
+            <span className="font-semibold text-ink-900">{nextRubrique.code}</span>
             <ChevronRight className="w-4 h-4 text-ink-500 group-hover:translate-x-0.5 transition-transform" />
           </button>
         ) : (

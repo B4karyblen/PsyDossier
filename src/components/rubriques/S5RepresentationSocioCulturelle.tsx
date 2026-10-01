@@ -49,20 +49,20 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
   };
 
   return (
-    <div className="clinical-card p-6 sm:p-7 space-y-6">
+    <div className="clinical-card p-5 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-brand-100 text-brand-800 tabular-nums">
+            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
               S5 · ANAMNÈSE
             </span>
             <span className="text-xs text-ink-500">Psychiatrie transculturelle</span>
           </div>
-          <h2 className="text-xl font-extrabold text-ink-900 tracking-tight mt-2">
+          <h2 className="text-h2 text-ink-900 mt-2">
             Représentation Socio-Culturelle de la Maladie
           </h2>
-          <p className="text-xs text-ink-500 mt-0.5">
+          <p className="text-sm text-ink-500 mt-0.5">
             Compréhension profane, étiologies traditionnelles formulées par le patient et son entourage
           </p>
         </div>
@@ -70,9 +70,9 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Subcard 1: Catégories étiologiques traditionnelles */}
-        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-3.5">
+        <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-3.5">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
-            <Globe2 className="w-4 h-4 text-brand-600" />
+            <Globe2 className="w-4 h-4 text-primary-600" />
             <label className="block text-sm font-bold text-ink-900">
               Étiologies & Croyances Évoquées par le Milieu Culturel
             </label>
@@ -87,10 +87,10 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
                   type="button"
                   disabled={isReadOnly}
                   onClick={() => toggleCategory(cat)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     selected
-                      ? 'bg-brand-500 text-white shadow-xs'
-                      : 'bg-white text-ink-900 border border-ink-200 hover:border-brand-500'
+                      ? 'bg-primary-900 text-white'
+                      : 'bg-white text-ink-900 border border-ink-200 hover:border-primary-500'
                   } ${isReadOnly ? 'cursor-not-allowed opacity-80' : ''}`}
                 >
                   {selected ? '✓ ' : '+ '} {cat}
@@ -101,16 +101,16 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
         </div>
 
         {/* Subcard 2: Explications du patient */}
-        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-4">
+        <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
-            <MessageCircle className="w-4 h-4 text-brand-600" />
-            <h3 className="text-sm font-bold text-ink-900">
+            <MessageCircle className="w-4 h-4 text-primary-600" />
+            <h3 className="text-sm font-semibold text-ink-900">
               Explications Profanes Détaillées
             </h3>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-ink-900 mb-1">
+            <label className="block text-sm font-medium text-ink-700 mb-1">
               Explication de la maladie selon le patient
             </label>
             <textarea
@@ -118,13 +118,13 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
               disabled={isReadOnly}
               value={formData.explicationPatient || ''}
               onChange={(e) => setFormData({ ...formData, explicationPatient: e.target.value })}
-              className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-xl p-3 focus:outline-none"
+              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3 focus:outline-none"
               placeholder="Comment le patient interprète-t-il sa souffrance ? (Ex: Attaque mystique, punition, malchance, fatigue intellectuelle...)"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-ink-900 mb-1">
+            <label className="block text-sm font-medium text-ink-700 mb-1">
               Explication de la maladie selon la famille / entourage
             </label>
             <textarea
@@ -132,14 +132,14 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
               disabled={isReadOnly}
               value={formData.explicationFamille || ''}
               onChange={(e) => setFormData({ ...formData, explicationFamille: e.target.value })}
-              className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-xl p-3 focus:outline-none"
+              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3 focus:outline-none"
               placeholder="Interprétation avancée par les parents, conjoints, tuteurs..."
             />
           </div>
         </div>
 
         {/* Subcard 3: Recours antérieurs & Précisions */}
-        <div className="bg-ink-25 border border-ink-150 rounded-2xl p-5 space-y-2">
+        <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-2">
           <label className="block text-sm font-bold text-ink-900">
             Recours Thérapeutiques Antérieurs & Précisions
           </label>
@@ -148,7 +148,7 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
             disabled={isReadOnly}
             value={formData.precisions || ''}
             onChange={(e) => setFormData({ ...formData, precisions: e.target.value })}
-            className="w-full bg-white border border-ink-200 focus:border-brand-500 text-ink-900 text-xs font-medium rounded-xl p-3 focus:outline-none"
+            className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3 focus:outline-none"
             placeholder="Noter les soins traditionnels déjà reçus, lavages, décoctions, rituels religieux, scarifications, ou précisions socioculturelles..."
           />
         </div>
