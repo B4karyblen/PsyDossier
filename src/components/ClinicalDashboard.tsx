@@ -17,7 +17,7 @@ interface ClinicalDashboardProps {
   dossiers: DossierPsychiatrique[];
   currentUser: UserProfile;
   onSelectDossier: (dossierId: string, targetRubriqueId?: string) => void;
-  onOpenNewPatient: () => void;
+  onOpenNewPatient?: () => void;
   onNavigateToFilteredRegistre?: (filters: {
     status?: string;
     modalite?: string;
@@ -191,10 +191,12 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
             <Users className="w-4 h-4 text-ink-500" />
             Registre
           </button>
-          <button type="button" onClick={onOpenNewPatient} className="btn-primary">
-            <Plus className="w-4 h-4" strokeWidth={2.5} />
-            Admettre un patient
-          </button>
+          {onOpenNewPatient && (
+            <button type="button" onClick={onOpenNewPatient} className="btn-primary">
+              <Plus className="w-4 h-4" strokeWidth={2.5} />
+              Admettre un patient
+            </button>
+          )}
         </div>
       </header>
 

@@ -24,7 +24,7 @@ import {
 interface PatientListProps {
   dossiers: DossierPsychiatrique[];
   onSelectDossier: (dossierId: string, targetRubriqueId?: string) => void;
-  onOpenNewPatient: () => void;
+  onOpenNewPatient?: () => void;
   currentUserRole: UserRole;
   initialFilters?: {
     status?: string;
@@ -248,10 +248,12 @@ export const PatientList: React.FC<PatientListProps> = ({
             </button>
           </div>
 
-          <button onClick={onOpenNewPatient} className="btn-primary">
-            <Plus className="w-4 h-4" strokeWidth={2.5} />
-            <span>Nouveau dossier</span>
-          </button>
+          {onOpenNewPatient && (
+            <button onClick={onOpenNewPatient} className="btn-primary">
+              <Plus className="w-4 h-4" strokeWidth={2.5} />
+              <span>Nouveau dossier</span>
+            </button>
+          )}
         </div>
       </header>
 
@@ -624,13 +626,12 @@ export const PatientList: React.FC<PatientListProps> = ({
                 Réinitialiser les filtres
               </button>
             )}
-            <button
-              onClick={onOpenNewPatient}
-              className="btn-primary"
-            >
-              <Plus className="w-4 h-4" />
-              Nouveau patient
-            </button>
+            {onOpenNewPatient && (
+              <button onClick={onOpenNewPatient} className="btn-primary">
+                <Plus className="w-4 h-4" />
+                Nouveau patient
+              </button>
+            )}
           </div>
         </div>
       )}

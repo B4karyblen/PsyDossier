@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
 import { S15EvolutionData, EntreeEvolution, UserRole } from '../../types';
 import { Plus, Clock, User, ShieldCheck, CornerDownRight, Sparkles } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -22,7 +23,7 @@ export const S15EvolutionClinique: React.FC<Props> = ({
   onNext,
   onPrev,
 }) => {
-  const [formData, setFormData] = useState<S15EvolutionData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S15EvolutionData>(data);
   const [newNote, setNewNote] = useState('');
   const [isSaved, setIsSaved] = useState(false);
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
@@ -346,6 +347,8 @@ export const S15EvolutionClinique: React.FC<Props> = ({
 
       {/* Footer Navigation */}
       <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
         currentRubriqueId="s15"
         isReadOnly={isReadOnly}
         isSaved={isSaved}

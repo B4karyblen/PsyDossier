@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
+import { activeClassifications } from '../../utils/referentiels';
 import { S12HypothesesDiagData, HypotheseDiagnostiqueItem, ReferenceLists, UserRole } from '../../types';
 import { Plus, Trash2, AlertCircle, Lock, BookOpen, Stethoscope, Sparkles } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -22,7 +24,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
   onPrev,
   referenceLists,
 }) => {
-  const [formData, setFormData] = useState<S12HypothesesDiagData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S12HypothesesDiagData>(data);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -136,7 +138,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {referenceLists.diagnosticClassifications.slice(0, 10).map((preset) => (
+              {activeClassifications(referenceLists).slice(0, 10).map((preset) => (
                 <button
                   key={preset.code}
                   type="button"
@@ -279,6 +281,8 @@ export const S12HypothesesDiag: React.FC<Props> = ({
 
         {/* Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s12"
           isReadOnly={effectiveReadOnly}
           isSaved={isSaved}

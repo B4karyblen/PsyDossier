@@ -9,5 +9,6 @@ coverage/
 
 # Local database and Windows release
 data/
+data-demo/
 release/
 .cache/

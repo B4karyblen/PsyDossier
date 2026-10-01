@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
 import { S8EnqueteSocialeData } from '../../types';
 import { UserCheck, Users, Heart, Palette } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -18,7 +19,7 @@ export const S8EnqueteSociale: React.FC<Props> = ({
   onNext,
   onPrev,
 }) => {
-  const [formData, setFormData] = useState<S8EnqueteSocialeData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S8EnqueteSocialeData>(data);
   const [isSaved, setIsSaved] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -141,6 +142,8 @@ export const S8EnqueteSociale: React.FC<Props> = ({
 
         {/* Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s8"
           isReadOnly={isReadOnly}
           isSaved={isSaved}

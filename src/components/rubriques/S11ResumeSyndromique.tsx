@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
+import { activeValues } from '../../utils/referentiels';
 import { S11ResumeSyndromiqueData, ReferenceLists } from '../../types';
 import { AlertCircle, Plus, Check, FileSpreadsheet, Sparkles } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -20,7 +22,7 @@ export const S11ResumeSyndromique: React.FC<Props> = ({
   onPrev,
   referenceLists,
 }) => {
-  const [formData, setFormData] = useState<S11ResumeSyndromiqueData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S11ResumeSyndromiqueData>(data);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [customSyndrome, setCustomSyndrome] = useState('');
@@ -104,7 +106,7 @@ export const S11ResumeSyndromique: React.FC<Props> = ({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {(referenceLists.syndromesFrequents || []).map((syndrome) => {
+            {activeValues(referenceLists, 'syndromesFrequents').map((syndrome) => {
               const selected = formData.syndromesIdentifies.includes(syndrome);
               return (
                 <button
@@ -174,6 +176,8 @@ export const S11ResumeSyndromique: React.FC<Props> = ({
 
         {/* Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s11"
           isReadOnly={isReadOnly}
           isSaved={isSaved}

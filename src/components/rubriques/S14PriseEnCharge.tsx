@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
 import { S14PriseEnChargeData, PrescriptionItem, UserRole } from '../../types';
 import { Plus, Trash2, AlertCircle, Pill, Building2, HeartHandshake, Lock } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -23,7 +24,7 @@ export const S14PriseEnCharge: React.FC<Props> = ({
   onPrev,
 }) => {
 
-  const [formData, setFormData] = useState<S14PriseEnChargeData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S14PriseEnChargeData>(data);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -424,6 +425,8 @@ export const S14PriseEnCharge: React.FC<Props> = ({
 
         {/* Action buttons */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s14"
           isReadOnly={isReadOnly}
           isSaved={isSaved}

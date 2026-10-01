@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
 import { S4HistoireMaladieData } from '../../types';
 import { AlertCircle, Clock, Zap, History, Sparkles } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -27,7 +28,7 @@ export const S4HistoireMaladie: React.FC<Props> = ({
   onNext,
   onPrev,
 }) => {
-  const [formData, setFormData] = useState<S4HistoireMaladieData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S4HistoireMaladieData>(data);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -239,6 +240,8 @@ export const S4HistoireMaladie: React.FC<Props> = ({
 
         {/* Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s4"
           isReadOnly={isReadOnly}
           isSaved={isSaved}

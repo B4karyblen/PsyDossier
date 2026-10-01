@@ -26,17 +26,18 @@ import {
   S15EvolutionData,
   S16ProjetTherapeutiqueData,
   S17PronosticData,
+  AppView,
 } from './types';
-import {
-  CLINICAL_USERS,
-  INITIAL_DOSSIERS,
-  INITIAL_AUDIT_LOGS,
-  INITIAL_REFERENCE_LISTS,
-} from './data/initialData';
+import { INITIAL_REFERENCE_LISTS } from './data/initialData';
 import { getRubriquePermission, RUBRIQUES_CONFIG } from './utils/rules';
+import { ROLES_CAN_CREATE_DOSSIER, ROLES_CAN_EXPORT, ROLES_CAN_READ_AUDIT } from './utils/emptyDossier';
 import { AlertTriangle, HeartPulse } from 'lucide-react';
-import { api } from './lib/api';
+import { api, ApiError, SessionUser } from './lib/api';
 import { useServerSync } from './lib/useServerSync';
+import { confirmDiscard } from './lib/dirtyGuard';
+import { SessionExpiredDialog, SetupScreen, SignInScreen } from './components/auth/AuthScreens';
+import { UsersView, ChangePasswordDialog } from './components/UsersView';
+import { useToast } from './components/ui/Toaster';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { PatientBanner } from './components/PatientBanner';
@@ -70,43 +71,202 @@ import { S15EvolutionClinique } from './components/rubriques/S15EvolutionCliniqu
 import { S16ProjetTherapeutique } from './components/rubriques/S16ProjetTherapeutique';
 import { S17Pronostic } from './components/rubriques/S17Pronostic';
 
-export default function App() {
-  const [currentUser, setCurrentUser] = useState<UserProfile>(CLINICAL_USERS[0]); // Dr. Oumar Diallo (Psychiatre)
+const SplashCard: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="min-h-screen bg-canvas flex items-center justify-center p-6 font-sans">
+    <div className="clinical-card max-w-md w-full p-8 text-center">
+      <div className="mx-auto w-12 h-12 rounded-xl bg-brand-500 flex items-center justify-center text-white">
+        <HeartPulse className="w-6 h-6" strokeWidth={2.5} />
+      </div>
+      {children}
+    </div>
+  </div>
+);
 
-  // Data is persisted by the local server (SQLite). See server/index.ts.
+/** Resolves the session before anything else is shown (PRD F-00). */
+export default function App() {
+  const [auth, setAuth] = useState<
+    { status: 'checking' } | { status: 'unreachable' } | { status: 'setup' } | { status: 'signin' } | { status: 'ready'; user: SessionUser }
+  >({ status: 'checking' });
+
+  const check = React.useCallback(() => {
+    setAuth({ status: 'checking' });
+    api
+      .status()
+      .then((s) =>
+        setAuth(s.user ? { status: 'ready', user: s.user } : s.setupRequired ? { status: 'setup' } : { status: 'signin' })
+      )
+      .catch(() => setAuth({ status: 'unreachable' }));
+  }, []);
+
+  React.useEffect(check, [check]);
+
+  const onAuth = (user: SessionUser) => setAuth({ status: 'ready', user });
+
+  switch (auth.status) {
+    case 'checking':
+      return (
+        <SplashCard>
+          <p className="mt-5 text-base font-semibold text-ink-600" role="status">Chargement…</p>
+        </SplashCard>
+      );
+    case 'unreachable':
+      return (
+        <SplashCard>
+          <h1 className="mt-5 text-lg font-bold text-ink-900">Serveur local injoignable</h1>
+          <p className="mt-2 text-base text-ink-600">
+            Vérifiez que la fenêtre « PsyDossier » est toujours ouverte, ou relancez « Demarrer PsyDossier ».
+          </p>
+          <button type="button" onClick={check} className="btn-primary mt-6">Réessayer</button>
+        </SplashCard>
+      );
+    case 'setup':
+      return <SetupScreen onAuth={onAuth} />;
+    case 'signin':
+      return <SignInScreen onAuth={onAuth} />;
+    case 'ready':
+      return <Workspace key={auth.user.id} user={auth.user} onSignedOut={() => setAuth({ status: 'signin' })} />;
+  }
+}
+
+function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () => void }) {
+  const notify = useToast();
+  const currentUser: UserProfile = React.useMemo(
+    () => ({ id: user.id, name: user.name, role: user.role, title: user.title, service: user.service, email: '' }),
+    [user]
+  );
+  const canReadAudit = ROLES_CAN_READ_AUDIT.includes(currentUser.role);
+  const canCreateDossier = ROLES_CAN_CREATE_DOSSIER.includes(currentUser.role);
+  const openNewPatient = canCreateDossier ? () => setIsNewPatientModalOpen(true) : undefined;
+
+  // Data is persisted by the local server (SQLite), which enforces permissions. See server/.
   const [dossiers, setDossiers] = useState<DossierPsychiatrique[]>([]);
 
   const [activeDossierId, setActiveDossierId] = useState<string | null>(null);
   const [activeRubriqueId, setActiveRubriqueId] = useState<string>('s1');
-  const [activeView, setActiveView] = useState<'DASHBOARD' | 'REGISTRE' | 'DOSSIER' | 'AUDIT' | 'REFERENTIELS'>('DASHBOARD');
+  const [activeView, setActiveView] = useState<AppView>(currentUser.role === 'ADMIN' ? 'UTILISATEURS' : 'DASHBOARD');
   const [registreFilters, setRegistreFilters] = useState<React.ComponentProps<typeof PatientList>['initialFilters']>(null);
 
   const [auditLogs, setAuditLogs] = useState<AuditEntry[]>([]);
   const [referenceLists, setReferenceLists] = useState<ReferenceLists>(INITIAL_REFERENCE_LISTS);
+  const [referentielsUsage, setReferentielsUsage] = useState<Record<string, string[]>>({});
 
   const [loadStatus, setLoadStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-  const { setBaseline, pendingCount } = useServerSync(dossiers, auditLogs, referenceLists, loadStatus === 'ready');
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+
+  const appendAudit = React.useCallback(
+    (entries: AuditEntry[]) => {
+      if (canReadAudit && entries.length) setAuditLogs((prev) => [...entries, ...prev]);
+    },
+    [canReadAudit]
+  );
+
+  const replaceDossier = (d: DossierPsychiatrique) =>
+    setDossiers((prev) => (prev.some((x) => x.id === d.id) ? prev.map((x) => (x.id === d.id ? d : x)) : [d, ...prev]));
+
+  const { setBaseline, adoptServerCopy, adoptReferentiels, resume, pendingCount } = useServerSync(
+    dossiers,
+    referenceLists,
+    loadStatus === 'ready',
+    {
+      onSaved: (result, superseded) => {
+        if (!superseded) replaceDossier(result.dossier);
+        appendAudit(result.audit);
+        const saved = result.audit.filter((e) => e.action === 'MODIFICATION').map((e) => e.rubriqueNom);
+        if (saved.length) notify({ title: 'Rubrique enregistrée', message: saved.join(', ') });
+      },
+      onRejected: async (dossierId, error) => {
+        const missing = (error.body.missing as string[] | undefined)?.join(' · ');
+        if (error.status === 409 && error.body.current) {
+          const current = error.body.current as DossierPsychiatrique;
+          adoptServerCopy(current);
+          replaceDossier(current);
+          notify({
+            tone: 'error',
+            title: 'Conflit de modification',
+            message: 'Ce dossier a été modifié par un autre utilisateur. La version la plus récente a été rechargée ; ressaisissez vos changements.',
+          });
+          return;
+        }
+        notify({ tone: 'error', title: 'Enregistrement refusé', message: missing ? `${error.message} ${missing}` : error.message });
+        // Restore the server's copy of the refused dossier.
+        try {
+          const state = await api.loadState();
+          const server = state.dossiers.find((d) => d.id === dossierId);
+          if (server) {
+            adoptServerCopy(server);
+            replaceDossier(server);
+          } else {
+            setDossiers((prev) => prev.filter((d) => d.id !== dossierId));
+          }
+          if (canReadAudit) setAuditLogs(state.auditLogs);
+        } catch {
+          /* next load will reconcile */
+        }
+      },
+      onUnauthorized: () => setSessionExpired(true),
+      onReferentielsRejected: async (error) => {
+        notify({ tone: 'error', title: 'Référentiels non enregistrés', message: error.message });
+        try {
+          const state = await api.loadState();
+          const refs = state.referenceLists ?? INITIAL_REFERENCE_LISTS;
+          adoptReferentiels(refs);
+          setReferenceLists(refs);
+        } catch {
+          /* ignore */
+        }
+      },
+    }
+  );
 
   const loadFromServer = React.useCallback(async () => {
     setLoadStatus('loading');
     try {
       const state = await api.loadState();
       setBaseline(state);
-      const isNewDatabase = state.dossiers.length === 0 && state.auditLogs.length === 0 && !state.referenceLists;
-      // Demo patients are only seeded in development; a fresh install starts with an empty registry.
-      const seedDemo = isNewDatabase && import.meta.env.DEV;
-      setDossiers(seedDemo ? INITIAL_DOSSIERS : state.dossiers);
-      setAuditLogs(seedDemo ? INITIAL_AUDIT_LOGS : state.auditLogs);
-      setReferenceLists(state.referenceLists ?? INITIAL_REFERENCE_LISTS);
+      const refs = state.referenceLists ?? INITIAL_REFERENCE_LISTS;
+      adoptReferentiels(refs);
+      setDossiers(state.dossiers);
+      setAuditLogs(state.auditLogs);
+      setReferenceLists(refs);
+      setReferentielsUsage(state.referentielsUsage ?? {});
       setLoadStatus('ready');
-    } catch {
-      setLoadStatus('error');
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) onSignedOut();
+      else setLoadStatus('error');
     }
-  }, [setBaseline]);
+  }, [setBaseline, adoptReferentiels, onSignedOut]);
 
   React.useEffect(() => {
     loadFromServer();
   }, [loadFromServer]);
+
+  /** Client-reported audit events (dossier opened, export). */
+  const logEvent = React.useCallback(
+    async (action: 'LECTURE' | 'EXPORT', dossierId: string, rubriques?: string[]): Promise<boolean> => {
+      try {
+        const { entry } = await api.logEvent(action, dossierId, rubriques);
+        appendAudit([entry]);
+        return true;
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 401) setSessionExpired(true);
+        else if (err instanceof ApiError) notify({ tone: 'error', title: 'Action refusée', message: err.message });
+        return false;
+      }
+    },
+    [appendAudit, notify]
+  );
+
+  const handleLogout = async () => {
+    if (pendingCount > 0 && !window.confirm('Des modifications ne sont pas encore enregistrées sur le serveur. Se déconnecter quand même ?')) {
+      return;
+    }
+    try {
+      await api.logout();
+    } finally {
+      onSignedOut();
+    }
+  };
 
   // Sidebar layout state
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
@@ -162,72 +322,39 @@ export default function App() {
   // Currently active dossier
   const activeDossier = dossiers.find((d) => d.id === activeDossierId) || null;
 
-  // Helper to log audit actions
-  const logAudit = (
-    action: AuditEntry['action'],
-    patientNumeroOrdre: string,
-    dossierId: string,
-    details: string,
-    rubriqueId?: string,
-    rubriqueNom?: string
-  ) => {
-    const newLog: AuditEntry = {
-      id: 'log-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
-      timestamp: new Date().toISOString(),
-      userId: currentUser.id,
-      userName: currentUser.name,
-      userRole: currentUser.role,
-      patientId: dossierId,
-      patientNumeroOrdre,
-      dossierId,
-      action,
-      rubriqueId,
-      rubriqueNom,
-      details,
+  const updateActiveDossier = (patch: Partial<DossierPsychiatrique>) => {
+    if (!activeDossier) return;
+    const updated: DossierPsychiatrique = {
+      ...activeDossier,
+      ...patch,
+      dateDerniereModification: new Date().toISOString(),
     };
-    setAuditLogs((prev) => [newLog, ...prev]);
+    setDossiers((prev) => prev.map((d) => (d.id === activeDossier.id ? updated : d)));
   };
 
-  // Open a dossier
+  // Open a dossier (BR-016: every consultation is journalised by the server)
   const handleSelectDossier = (dossierId: string, targetRubriqueId?: string) => {
     const target = dossiers.find((d) => d.id === dossierId);
-    if (!target) return;
+    if (!target || !confirmDiscard()) return;
 
     setActiveDossierId(dossierId);
     setActiveView('DOSSIER');
     setActiveRubriqueId(targetRubriqueId || 's1');
-
-    // Audit log (BR-016: traçabilité de chaque consultation de dossier)
-    logAudit(
-      'LECTURE',
-      target.s1Identification.numeroOrdre,
-      target.id,
-      `Consultation du dossier patient par ${currentUser.name} (${currentUser.role}).`
-    );
+    logEvent('LECTURE', target.id);
   };
 
-  // Create a new patient
+  // Create a new patient (the server assigns the definitive N° d'ordre and logs the creation)
   const handleCreateNewDossier = (newDossier: DossierPsychiatrique) => {
     setDossiers((prev) => [newDossier, ...prev]);
     setActiveDossierId(newDossier.id);
     setActiveView('DOSSIER');
-    setActiveRubriqueId('s1');
-
-    logAudit(
-      'CREATION',
-      newDossier.s1Identification.numeroOrdre,
-      newDossier.id,
-      `Création et ouverture du dossier patient pour ${newDossier.s1Identification.nom} ${newDossier.s1Identification.prenoms}.`
-    );
+    setActiveRubriqueId('s2');
+    notify({ title: 'Dossier créé', message: `${newDossier.s1Identification.nom} ${newDossier.s1Identification.prenoms}` });
   };
 
-  // Update a specific rubrique
+  // Update a specific rubrique (the server checks permissions and records old/new values, BR-012)
   const handleUpdateRubrique = (rubriqueKey: string, updatedData: any) => {
     if (!activeDossier) return;
-
-    const now = new Date().toISOString();
-    const targetRubrique = RUBRIQUES_CONFIG.find((r) => r.id === activeRubriqueId);
-    const rubNom = targetRubrique ? `${targetRubrique.code} : ${targetRubrique.titre}` : activeRubriqueId;
 
     let newStatus = activeDossier.statut;
     // B3: Transition BROUILLON -> EN_COURS si S2 & S3 sont renseignés
@@ -239,40 +366,12 @@ export default function App() {
       }
     }
 
-    const updatedDossier: DossierPsychiatrique = {
-      ...activeDossier,
-      [rubriqueKey]: updatedData,
-      statut: newStatus,
-      dateDerniereModification: now,
-    };
-
-    setDossiers((prev) => prev.map((d) => (d.id === activeDossier.id ? updatedDossier : d)));
-
-    // Audit log with old/new values (BR-012)
-    const oldData = (activeDossier as any)[rubriqueKey];
-    const oldSummary = oldData ? JSON.stringify(oldData).slice(0, 120) : '(vide)';
-    const newSummary = JSON.stringify(updatedData).slice(0, 120);
-    logAudit(
-      'MODIFICATION',
-      activeDossier.s1Identification.numeroOrdre,
-      activeDossier.id,
-      `Mise à jour de la rubrique ${rubNom} par ${currentUser.name}.`,
-      activeRubriqueId,
-      rubNom
-    );
-    // Store old/new values in the last audit entry
-    setAuditLogs((prev) => {
-      if (prev.length === 0) return prev;
-      const last = prev[0];
-      if (last.action === 'MODIFICATION' && last.rubriqueId === activeRubriqueId) {
-        return [{ ...last, oldValueSummary: oldSummary, newValueSummary: newSummary }, ...prev.slice(1)];
-      }
-      return prev;
-    });
+    updateActiveDossier({ [rubriqueKey]: updatedData, statut: newStatus } as Partial<DossierPsychiatrique>);
   };
 
   // Navigate to next rubrique
   const handleNextRubrique = () => {
+    if (!confirmDiscard()) return;
     const currentIndex = RUBRIQUES_CONFIG.findIndex((r) => r.id === activeRubriqueId);
     if (currentIndex >= 0 && currentIndex < RUBRIQUES_CONFIG.length - 1) {
       setActiveRubriqueId(RUBRIQUES_CONFIG[currentIndex + 1].id);
@@ -282,6 +381,7 @@ export default function App() {
 
   // Navigate to previous rubrique
   const handlePrevRubrique = () => {
+    if (!confirmDiscard()) return;
     const currentIndex = RUBRIQUES_CONFIG.findIndex((r) => r.id === activeRubriqueId);
     if (currentIndex > 0) {
       setActiveRubriqueId(RUBRIQUES_CONFIG[currentIndex - 1].id);
@@ -289,70 +389,35 @@ export default function App() {
     }
   };
 
-  // Validation of dossier (F-21 & B3)
+  // Validation of dossier (F-21 & B3) — signatory, date and author are set by the server
   const handleConfirmValidation = (signataire: string) => {
     if (!activeDossier) return;
-
-    // B3: Only EN_COURS can be validated (no skipping states)
     if (activeDossier.statut !== 'EN_COURS') {
-      alert('Seul un dossier EN_COURS peut être validé.');
+      notify({ tone: 'error', title: 'Validation impossible', message: 'Seul un dossier EN_COURS peut être validé.' });
       return;
     }
-
     const now = new Date().toISOString();
-    const updatedDossier: DossierPsychiatrique = {
-      ...activeDossier,
+    updateActiveDossier({
       statut: 'VALIDÉ',
-      dateDerniereModification: now,
-      validationInfo: {
-        dateHeure: now,
-        valideParNom: currentUser.name,
-        valideParRole: currentUser.role,
-        signataire,
-      },
-    };
-
-    setDossiers((prev) => prev.map((d) => (d.id === activeDossier.id ? updatedDossier : d)));
-
-    logAudit(
-      'VALIDATION',
-      activeDossier.s1Identification.numeroOrdre,
-      activeDossier.id,
-      `Validation et verrouillage officiel du dossier médical par ${signataire}.`
-    );
+      validationInfo: { dateHeure: now, valideParNom: currentUser.name, valideParRole: currentUser.role, signataire },
+    });
+    notify({ title: 'Dossier validé et verrouillé' });
   };
 
-  // Addendum on validated dossier (BR-013)
+  // Addendum on validated record (BR-013)
   const handleConfirmAddendum = (rubriqueId: string, rubriqueNom: string, contenu: string) => {
     if (!activeDossier) return;
-
-    const now = new Date().toISOString();
     const newAddendum = {
       id: 'add-' + Date.now(),
-      dateHeure: now,
+      dateHeure: new Date().toISOString(),
       auteurNom: currentUser.name,
       auteurRole: currentUser.role,
       rubriqueId,
       rubriqueNom,
       contenu,
     };
-
-    const updatedDossier: DossierPsychiatrique = {
-      ...activeDossier,
-      dateDerniereModification: now,
-      addenda: [newAddendum, ...(activeDossier.addenda || [])],
-    };
-
-    setDossiers((prev) => prev.map((d) => (d.id === activeDossier.id ? updatedDossier : d)));
-
-    logAudit(
-      'ADDENDUM',
-      activeDossier.s1Identification.numeroOrdre,
-      activeDossier.id,
-      `Addendum consigné sur ${rubriqueNom} : "${contenu.slice(0, 60)}..." par ${currentUser.name}.`,
-      rubriqueId,
-      rubriqueNom
-    );
+    updateActiveDossier({ addenda: [newAddendum, ...(activeDossier.addenda || [])] });
+    notify({ title: 'Addendum consigné', message: rubriqueNom });
   };
 
   // Archive & Reactivate triggers (ArchiveModal)
@@ -366,70 +431,49 @@ export default function App() {
 
   const handleConfirmArchive = (motif: string) => {
     if (!activeDossier) return;
-
     // B3: Only VALIDÉ dossiers can be archived (no skipping states)
     if (activeDossier.statut !== 'VALIDÉ') {
-      alert('Seul un dossier VALIDÉ peut être archivé.');
+      notify({ tone: 'error', title: 'Archivage impossible', message: 'Seul un dossier VALIDÉ peut être archivé.' });
       return;
     }
-
-    const now = new Date().toISOString();
-    const updatedDossier: DossierPsychiatrique = {
-      ...activeDossier,
+    updateActiveDossier({
       statut: 'ARCHIVÉ',
-      dateDerniereModification: now,
       archivageInfo: {
-        dateHeure: now,
+        dateHeure: new Date().toISOString(),
         archiveParNom: `${currentUser.name} (${currentUser.role})`,
         motif: motif.trim(),
       },
-    };
-
-    setDossiers((prev) => prev.map((d) => (d.id === activeDossier.id ? updatedDossier : d)));
-
-    logAudit(
-      'ARCHIVAGE',
-      activeDossier.s1Identification.numeroOrdre,
-      activeDossier.id,
-      `Archivage du dossier médical. Motif : ${motif.trim()}`
-    );
+    });
+    notify({ title: 'Dossier archivé' });
   };
 
   const handleConfirmReactivate = (motif: string) => {
     if (!activeDossier) return;
-
     // B3: Only ARCHIVÉ dossiers can be reactivated
     if (activeDossier.statut !== 'ARCHIVÉ') {
-      alert('Seul un dossier ARCHIVÉ peut être réactivé.');
+      notify({ tone: 'error', title: 'Réactivation impossible', message: 'Seul un dossier ARCHIVÉ peut être réactivé.' });
       return;
     }
-
-    const now = new Date().toISOString();
-    const updatedDossier: DossierPsychiatrique = {
-      ...activeDossier,
+    updateActiveDossier({
       statut: 'EN_COURS',
-      dateDerniereModification: now,
-    };
-
-    setDossiers((prev) => prev.map((d) => (d.id === activeDossier.id ? updatedDossier : d)));
-
-    logAudit(
-      'REACTIVATION',
-      activeDossier.s1Identification.numeroOrdre,
-      activeDossier.id,
-      `Réactivation du dossier archivé. Motif : ${motif.trim()}`
-    );
+      derniereReactivation: { dateHeure: new Date().toISOString(), parNom: currentUser.name, motif: motif.trim() },
+    });
+    notify({ title: 'Dossier réactivé' });
   };
 
-  // Export audit log
-  const handleLogExport = () => {
-    if (!activeDossier) return;
-    logAudit(
-      'EXPORT',
-      activeDossier.s1Identification.numeroOrdre,
-      activeDossier.id,
-      `Exportation / Impression clinique intégrale du dossier patient par ${currentUser.name}.`
-    );
+  // Export: journalised by the server before printing (F-22)
+  const handleLogExport = (rubriques: string[]) =>
+    activeDossier ? logEvent('EXPORT', activeDossier.id, rubriques) : Promise.resolve(false);
+
+  // BR-003 / F-04: data that depends on the patient's sex, for the S1 consistency warning
+  const sexDependentFields = (d: DossierPsychiatrique) => {
+    const fields: string[] = [];
+    const gyneco = d.s6Antecedents.personnels.gynecoObstetricaux;
+    if (gyneco && (gyneco.aucun || gyneco.details?.trim())) fields.push('S6 gynéco-obstétricaux');
+    const sexuel = d.s7Biographie.developpementSexuelEtSentimentale;
+    if (sexuel.menarcheAge?.trim()) fields.push('S7 ménarche');
+    if (sexuel.spermarcheAge?.trim()) fields.push('S7 spermarche');
+    return fields;
   };
 
   // Current permission for active rubrique
@@ -438,36 +482,24 @@ export default function App() {
   const activeRubriqueConfig = RUBRIQUES_CONFIG.find((r) => r.id === activeRubriqueId);
 
   if (loadStatus !== 'ready') {
-    return (
-      <div className="min-h-screen bg-canvas flex items-center justify-center p-6 font-sans">
-        <div className="clinical-card max-w-md w-full p-8 text-center">
-          <div className="mx-auto w-12 h-12 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white">
-            <HeartPulse className="w-6 h-6" strokeWidth={2.5} />
-          </div>
-          {loadStatus === 'loading' ? (
-            <p className="mt-5 text-sm font-semibold text-ink-500" role="status">
-              Chargement des dossiers…
-            </p>
-          ) : (
-            <>
-              <h1 className="mt-5 text-lg font-bold text-ink-900">Serveur local injoignable</h1>
-              <p className="mt-2 text-sm text-ink-500">
-                Vérifiez que la fenêtre « PsyDossier » est toujours ouverte, ou relancez
-                « Demarrer PsyDossier ».
-              </p>
-              <button type="button" onClick={loadFromServer} className="btn-primary mt-6">
-                Réessayer
-              </button>
-            </>
-          )}
-        </div>
-      </div>
+    return loadStatus === 'loading' ? (
+      <SplashCard>
+        <p className="mt-5 text-base font-semibold text-ink-600" role="status">Chargement des dossiers…</p>
+      </SplashCard>
+    ) : (
+      <SplashCard>
+        <h1 className="mt-5 text-lg font-bold text-ink-900">Serveur local injoignable</h1>
+        <p className="mt-2 text-base text-ink-600">
+          Vérifiez que la fenêtre « PsyDossier » est toujours ouverte, ou relancez « Demarrer PsyDossier ».
+        </p>
+        <button type="button" onClick={loadFromServer} className="btn-primary mt-6">Réessayer</button>
+      </SplashCard>
     );
   }
 
   return (
     <div className="min-h-screen bg-canvas text-ink-900 flex antialiased font-sans">
-      {pendingCount > 0 && (
+      {pendingCount > 0 && !sessionExpired && (
         <div
           role="alert"
           className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] chip bg-amber-100 text-amber-900 !py-2.5 !px-4 shadow-[var(--shadow-float)] no-print"
@@ -480,21 +512,25 @@ export default function App() {
       <Sidebar
         activeView={activeView}
         onChangeView={(view) => {
+          if (!confirmDiscard()) return;
           setActiveView(view);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         activeDossier={activeDossier}
         activeRubriqueId={activeRubriqueId}
         onSelectRubrique={(rubId) => {
+          if (!confirmDiscard()) return;
           setActiveRubriqueId(rubId);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         dossiersCount={dossiers.length}
         auditCount={auditLogs.length}
-        onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
+        onOpenNewPatient={openNewPatient}
         onOpenQuickSearch={() => setIsCommandPaletteOpen(true)}
         currentUser={currentUser}
-        onSelectUser={setCurrentUser}
+        canReadAudit={canReadAudit}
+        onLogout={handleLogout}
+        onChangePassword={() => setIsPasswordDialogOpen(true)}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
         isMobileOpen={isMobileSidebarOpen}
@@ -506,13 +542,13 @@ export default function App() {
         {/* Top Header (Breadcrumbs, Command Search & Quick Actions) */}
         <Header
           currentUser={currentUser}
-          onSelectUser={setCurrentUser}
           activeView={activeView}
           onChangeView={(view) => {
+            if (!confirmDiscard()) return;
             setActiveView(view);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
+          onOpenNewPatient={openNewPatient}
           onOpenQuickSearch={() => setIsCommandPaletteOpen(true)}
           onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
           activeDossier={activeDossier}
@@ -528,8 +564,9 @@ export default function App() {
               dossiers={dossiers}
               currentUser={currentUser}
               onSelectDossier={handleSelectDossier}
-              onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
+              onOpenNewPatient={openNewPatient}
               onNavigateToFilteredRegistre={(filters) => {
+                if (!confirmDiscard()) return;
                 setRegistreFilters(filters);
                 setActiveView('REGISTRE');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -542,7 +579,7 @@ export default function App() {
             <PatientList
               dossiers={dossiers}
               onSelectDossier={handleSelectDossier}
-              onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
+              onOpenNewPatient={openNewPatient}
               currentUserRole={currentUser.role}
               initialFilters={registreFilters}
               onClearInitialFilters={() => setRegistreFilters(null)}
@@ -550,7 +587,9 @@ export default function App() {
           )}
 
           {/* VIEW B: JOURNAL D'AUDIT */}
-          {activeView === 'AUDIT' && (
+          {activeView === 'UTILISATEURS' && currentUser.role === 'ADMIN' && <UsersView currentUserId={currentUser.id} />}
+
+          {activeView === 'AUDIT' && canReadAudit && (
             <AuditLogView
               logs={auditLogs}
               onSelectDossier={(dossierId) => {
@@ -565,6 +604,7 @@ export default function App() {
               referenceLists={referenceLists}
               onUpdateReferenceLists={setReferenceLists}
               currentUserRole={currentUser.role}
+              usage={referentielsUsage}
             />
           )}
 
@@ -580,7 +620,7 @@ export default function App() {
                 onOpenExportModal={() => setIsExportModalOpen(true)}
                 onArchiveDossier={handleOpenArchiveModal}
                 onReactivateDossier={handleOpenReactivateModal}
-                onCloseDossier={() => setActiveView('REGISTRE')}
+                onCloseDossier={() => confirmDiscard() && setActiveView('REGISTRE')}
               />
 
               {/* 2-Column Clinical Workspace */}
@@ -590,14 +630,15 @@ export default function App() {
                 dossier={activeDossier}
                 activeRubriqueId={activeRubriqueId}
                 onSelectRubrique={(id) => {
+                  if (!confirmDiscard()) return;
                   setActiveRubriqueId(id);
                   window.scrollTo({ top: 120, behavior: 'smooth' });
                 }}
                 currentUserRole={currentUser.role}
               />
 
-              {/* Right Column : Active Rubrique Form */}
-              <div className="flex-1 min-w-0">
+              {/* Right Column : Active Rubrique Form (remounted per dossier) */}
+              <div className="flex-1 min-w-0" key={activeDossier.id}>
                 {activeRubriqueId === 's1' && (
                   <S1Identification
                     data={activeDossier.s1Identification}
@@ -605,6 +646,7 @@ export default function App() {
                     onSave={(data: S1IdentificationData) => handleUpdateRubrique('s1Identification', data)}
                     onNext={handleNextRubrique}
                     referenceLists={referenceLists}
+                    sexDependentFields={sexDependentFields(activeDossier)}
                   />
                 )}
 
@@ -815,6 +857,7 @@ export default function App() {
         onSelectExistingDossier={handleSelectDossier}
         referenceLists={referenceLists}
         currentUserName={currentUser.name}
+        canWriteMotif={getRubriquePermission(currentUser.role, 's3') === 'write'}
       />
 
       {activeDossier && (
@@ -851,6 +894,26 @@ export default function App() {
         />
       )}
 
+      {isPasswordDialogOpen && <ChangePasswordDialog onClose={() => setIsPasswordDialogOpen(false)} />}
+
+      {sessionExpired && (
+        <SessionExpiredDialog
+          login={user.login}
+          onAuth={(u) => {
+            if (u.id !== user.id) {
+              // Another person signed in: start a fresh workspace for them.
+              window.location.reload();
+              return;
+            }
+            setSessionExpired(false);
+            resume();
+          }}
+          onSwitchUser={() => {
+            api.logout().finally(onSignedOut);
+          }}
+        />
+      )}
+
       {/* Global Quick Actions Command Palette (Cmd+K / Ctrl+K / /) */}
       <CommandPaletteModal
         isOpen={isCommandPaletteOpen}
@@ -859,12 +922,15 @@ export default function App() {
         onSelectDossier={(dossierId, targetRubriqueId) => {
           handleSelectDossier(dossierId, targetRubriqueId);
         }}
-        onOpenNewPatient={() => setIsNewPatientModalOpen(true)}
+        onOpenNewPatient={openNewPatient}
         onChangeView={(view) => {
+          if (!confirmDiscard()) return;
           setActiveView(view);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         activeDossierId={activeDossierId}
+        canCreateDossier={canCreateDossier}
+        canReadAudit={canReadAudit}
       />
     </div>
   );

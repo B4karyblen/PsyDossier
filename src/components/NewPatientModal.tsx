@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { DossierPsychiatrique, ReferenceLists } from '../types';
+import { createEmptyDossier } from '../utils/emptyDossier';
+import { activeValues } from '../utils/referentiels';
 import {
   X,
   Plus,
@@ -24,6 +26,8 @@ interface NewPatientModalProps {
   onSelectExistingDossier: (dossierId: string) => void;
   referenceLists: ReferenceLists;
   currentUserName: string;
+  /** S3 is only filled at admission by roles allowed to write it (PRD B2). */
+  canWriteMotif: boolean;
 }
 
 export const NewPatientModal: React.FC<NewPatientModalProps> = ({
@@ -34,13 +38,13 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
   onSelectExistingDossier,
   referenceLists,
   currentUserName,
+  canWriteMotif,
 }) => {
   if (!isOpen) return null;
 
-  // Generate unique order number
+  // Provisional number; the server assigns the definitive unique one on save (BR-001)
   const currentYear = new Date().getFullYear();
-  const nextNum = existingDossiers.length + 1;
-  const autoNumeroOrdre = `PSY-${currentYear}-${String(nextNum).padStart(4, '0')}`;
+  const autoNumeroOrdre = `PSY-${currentYear}-····`;
 
   const [nom, setNom] = useState('');
   const [prenoms, setPrenoms] = useState('');
@@ -82,21 +86,24 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
 
     const now = new Date().toISOString();
 
-    const newDossier: DossierPsychiatrique = {
-      id: 'dossier-' + Date.now(),
-      statut: plainteInitiale.trim() ? 'EN_COURS' : 'BROUILLON',
-      dateCreation: now,
-      dateDerniereModification: now,
+    const blank = createEmptyDossier({
+      id: 'dossier-' + crypto.randomUUID(),
+      numeroOrdre: autoNumeroOrdre,
+      now,
+      sexe,
       psychiatreReferent: currentUserName,
-      serviceHospitalier: 'Service de Psychiatrie Universitaire',
-      addenda: [],
+      intervenant: currentUserName,
+    });
+    const motif = canWriteMotif ? plainteInitiale.trim() : '';
+    const newDossier: DossierPsychiatrique = {
+      ...blank,
+      statut: motif ? 'EN_COURS' : 'BROUILLON',
       s1Identification: {
-        numeroOrdre: autoNumeroOrdre,
+        ...blank.s1Identification,
         nom: nom.trim().toUpperCase(),
         prenoms: prenoms.trim(),
         age: Number(age),
         dateNaissance: dateNaissance || undefined,
-        sexe,
         profession,
         situationMatrimoniale,
         religion,
@@ -108,110 +115,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
         modalite,
         soinsSansConsentementType: modalite === 'Soins sans consentement' ? "À la demande d'un tiers" : undefined,
       },
-      s3Motif: {
-        plaintePrincipale: plainteInitiale.trim(),
-        sourcePlainte: 'Patient et entourage',
-      },
-      s4HistoireMaladie: {
-        modeInstallation: '',
-        facteursDeclenchants: [],
-      },
-      s5Representation: {
-        categories: [],
-      },
-      s6Antecedents: {
-        personnels: {
-          medicaux: { aucun: false, details: '' },
-          chirurgicaux: { aucun: false, details: '' },
-          gynecoObstetricaux: sexe === 'Féminin' ? { aucun: false, details: '' } : undefined,
-          psychiatriques: { aucun: false, details: '' },
-          addictifs: { aucun: false, details: '' },
-          judiciaires: { aucun: false, details: '' },
-        },
-        familiaux: {
-          medicaux: { aucun: false, details: '' },
-          chirurgicaux: { aucun: false, details: '' },
-          psychiatriques: { aucun: false, details: '' },
-          addictifs: { aucun: false, details: '' },
-        },
-      },
-      s7Biographie: {
-        ascendants: {
-          pere: { nom: '', vivant: true },
-          mere: { nom: '', vivant: true },
-        },
-        collateraux: {
-          fratrie: [],
-        },
-        conceptionGrossesseAccouchement: '',
-        developpementPsychomoteur: {},
-        scolarite: {},
-        developpementProfessionnel: '',
-        developpementSexuelEtSentimentale: {
-          conjoints: [],
-          enfants: [],
-        },
-        evenementsMarquants: { positifs: [], negatifs: [] },
-      },
-      s8EnqueteSociale: {
-        autodescription: '',
-        heterodescription: '',
-        relationsSociales: '',
-        loisirs: '',
-        conduitesAddictives: '',
-      },
-      s9Demande: {
-        demandeConsciente: '',
-        demandeInconsciente: '',
-      },
-      s10ExamenClinique: {
-        somatique: {
-          nonRealise: false,
-          constantes: {},
-          appareils: {},
-        },
-        psychiatrique: {},
-      },
-      s11ResumeSyndromique: {
-        syndromesIdentifies: [],
-        resume: '',
-      },
-      s12HypothesesDiag: {
-        hypotheses: [],
-      },
-      s13Bilans: {
-        bilans: [],
-      },
-      s14PriseEnCharge: {
-        orientation: '',
-        traitementMedicamenteux: [],
-        psychotherapie: {},
-      },
-      s15Evolution: {
-        entrees: [
-          {
-            id: 'init-evo-' + Date.now(),
-            dateHeure: now,
-            auteurNom: currentUserName,
-            auteurRole: 'SECRETARIAT',
-            note: 'Création du dossier médical et initialisation de l’identité.',
-          },
-        ],
-      },
-      s16ProjetTherapeutique: {
-        versionCourante: 1,
-        objectifsCourtTerme: '',
-        objectifsMoyenTerme: '',
-        moyensEtStrategies: '',
-        echeancesEtRevisions: '',
-        intervenants: [currentUserName],
-        historiqueVersions: [],
-      },
-      s17Pronostic: {
-        courtTerme: { appreciation: '', details: '' },
-        moyenTerme: { appreciation: '', details: '' },
-        longTerme: { appreciation: '', details: '' },
-      },
+      s3Motif: { ...blank.s3Motif, plaintePrincipale: motif },
     };
 
     onCreateDossier(newDossier);
@@ -293,7 +197,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
                 1. Identification & N° d'Ordre Médical
               </span>
               <span className="text-xs font-mono font-bold text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-500/20">
-                BR-001 Attribué
+                Attribué à l’enregistrement
               </span>
             </div>
 
@@ -429,6 +333,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
           </div>
 
           {/* Subcard 3: Motif & plainte d'admission */}
+          {canWriteMotif && (
           <div className="clinical-subcard p-4 sm:p-5 space-y-3">
             <div className="flex items-center justify-between pb-1 border-b border-ink-100">
               <span className="text-sm font-bold text-ink-900">
@@ -444,6 +349,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               className="clinical-input leading-relaxed"
             />
           </div>
+          )}
 
           {/* Subcard 4: Coordonnées & Données Sociales */}
           <div className="clinical-subcard p-4 sm:p-5 space-y-3">
@@ -470,7 +376,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
                   className="clinical-input"
                 >
                   <option value="">Sélectionner...</option>
-                  {referenceLists.ethnies.map((e) => (
+                  {activeValues(referenceLists, 'ethnies').map((e) => (
                     <option key={e} value={e}>
                       {e}
                     </option>

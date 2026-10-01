@@ -12,7 +12,6 @@ interface ValidationModalProps {
   onConfirmValidation: (signataire: string) => void;
   onConfirmAddendum: (rubriqueId: string, rubriqueNom: string, contenu: string) => void;
   onNavigateToRubrique?: (rubriqueId: string) => void;
-  onSwitchToPsychiatre?: () => void;
 }
 
 export const ValidationModal: React.FC<ValidationModalProps> = ({
@@ -24,7 +23,6 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
   onConfirmValidation,
   onConfirmAddendum,
   onNavigateToRubrique,
-  onSwitchToPsychiatre,
 }) => {
   if (!isOpen) return null;
 
@@ -110,7 +108,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                     ? 'bg-emerald-100 text-emerald-700'
                     : 'bg-rose-100 text-rose-700'
                 }`}>
-                  {8 - validationChecks.missingRequirements.length}/8 conformes
+                  {7 - validationChecks.missingRequirements.length}/7 conformes
                 </span>
               </div>
 
@@ -123,7 +121,6 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                   { id: 's11', label: 'S11 : Résumé syndromique rédigé', ok: Boolean(dossier.s11ResumeSyndromique.resume) },
                   { id: 's12', label: 'S12 : Hypothèse diagnostique Principale établie', ok: dossier.s12HypothesesDiag.hypotheses?.some((h) => h.type === 'Principale') },
                   { id: 's14', label: 'S14 : Orientation thérapeutique choisie', ok: Boolean(dossier.s14PriseEnCharge.orientation) },
-                  { id: 's17', label: 'S17 : Pronostic à court, moyen et long terme (BR-017)', ok: Boolean(dossier.s17Pronostic.courtTerme.appreciation && dossier.s17Pronostic.moyenTerme.appreciation && dossier.s17Pronostic.longTerme.appreciation) },
                 ].map((item) => (
                   <div key={item.id} className="flex items-center justify-between p-2 rounded-lg bg-white border border-ink-100 hover:border-ink-200 transition-colors">
                     <div className="flex items-center gap-2.5">
@@ -167,15 +164,16 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                   <p className="leading-snug">
                     Session courante : <strong>{currentUser.name}</strong> ({currentUser.role}). Seul le psychiatre référent peut signer et verrouiller le dossier.
                   </p>
-                  {onSwitchToPsychiatre && (
-                    <button
-                      type="button"
-                      onClick={onSwitchToPsychiatre}
-                      className="btn-secondary btn-sm mt-1.5"
-                    >
-                      Basculer sur le Dr. Oumar Diallo (Psychiatre)
-                    </button>
-                  )}
+                </div>
+              </div>
+            )}
+
+            {validationChecks.warnings.length > 0 && (
+              <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2.5 text-sm text-amber-900">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+                <div>
+                  <span className="font-semibold block">Avertissement (non bloquant)</span>
+                  {validationChecks.warnings.join(' · ')}
                 </div>
               </div>
             )}

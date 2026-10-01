@@ -20,6 +20,7 @@ import {
   Stethoscope,
 } from 'lucide-react';
 import { StatusBadge } from './ui/StatusBadge';
+import { ROLES_CAN_EXPORT } from '../utils/emptyDossier';
 
 interface PatientBannerProps {
   dossier: DossierPsychiatrique;
@@ -243,7 +244,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
               )
             )}
 
-            {['PSYCHIATRE', 'PSYCHOLOGUE', 'INFIRMIER', 'ASSISTANT_SOCIAL', 'ADMIN'].includes(currentUser.role) && (
+            {ROLES_CAN_EXPORT.includes(currentUser.role) && (
               <button onClick={onOpenExportModal} className="btn-secondary" title="Exporter / imprimer le dossier">
                 <Printer className="w-4 h-4 text-ink-500" />
                 <span className="hidden sm:inline">Exporter</span>

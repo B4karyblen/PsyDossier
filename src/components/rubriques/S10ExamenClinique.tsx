@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
 import { S10ExamenCliniqueData, UserRole } from '../../types';
 import { AlertTriangle, AlertCircle, CheckCircle2, Lock, Activity, Brain } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -20,7 +21,7 @@ export const S10ExamenClinique: React.FC<Props> = ({
   onNext,
   onPrev,
 }) => {
-  const [formData, setFormData] = useState<S10ExamenCliniqueData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S10ExamenCliniqueData>(data);
   const [activeTab, setActiveTab] = useState<'somatique' | 'psychiatrique'>('somatique');
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
@@ -697,6 +698,8 @@ export const S10ExamenClinique: React.FC<Props> = ({
 
         {/* Action buttons */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s10"
           isReadOnly={isSomatiqueReadOnly && isPsychiatriqueReadOnly}
           isSaved={isSaved}

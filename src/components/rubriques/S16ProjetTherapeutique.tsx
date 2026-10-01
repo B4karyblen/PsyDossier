@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
 import { S16ProjetTherapeutiqueData, ProjetTherapeutiqueVersion, UserRole } from '../../types';
 import { GitBranch, History, Plus, Target, Users, Calendar } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -22,7 +23,7 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
   onNext,
   onPrev,
 }) => {
-  const [formData, setFormData] = useState<S16ProjetTherapeutiqueData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S16ProjetTherapeutiqueData>(data);
   const [isSaved, setIsSaved] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [revisionSummary, setRevisionSummary] = useState('');
@@ -234,6 +235,8 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
 
         {/* Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s16"
           isReadOnly={!canEdit}
           isSaved={isSaved}

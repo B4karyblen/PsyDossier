@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
 import { S9DemandeData, UserRole } from '../../types';
 import { Lock, MessageSquare, Compass, Sparkles } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -20,7 +21,7 @@ export const S9Demande: React.FC<Props> = ({
   onNext,
   onPrev,
 }) => {
-  const [formData, setFormData] = useState<S9DemandeData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S9DemandeData>(data);
   const [isSaved, setIsSaved] = useState(false);
 
   // BR-014 / B2: Seuls Psychiatre et Psychologue peuvent modifier la demande inconsciente
@@ -120,6 +121,8 @@ export const S9Demande: React.FC<Props> = ({
 
         {/* Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s9"
           isReadOnly={isReadOnly}
           isSaved={isSaved}

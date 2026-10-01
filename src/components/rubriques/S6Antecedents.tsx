@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
 import { S6AntecedentsData, AntecedentItem } from '../../types';
 import { History, Users, ShieldAlert, Sparkles } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -20,7 +21,7 @@ export const S6Antecedents: React.FC<Props> = ({
   onNext,
   onPrev,
 }) => {
-  const [formData, setFormData] = useState<S6AntecedentsData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S6AntecedentsData>(data);
   const [isSaved, setIsSaved] = useState(false);
 
   const updateItem = (
@@ -156,6 +157,8 @@ export const S6Antecedents: React.FC<Props> = ({
 
         {/* Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s6"
           isReadOnly={isReadOnly}
           isSaved={isSaved}

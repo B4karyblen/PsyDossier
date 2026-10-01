@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
+import { activeValues } from '../../utils/referentiels';
 import { S1IdentificationData, ReferenceLists } from '../../types';
-import { AlertCircle, User, MapPin, Phone, ShieldCheck } from 'lucide-react';
+import { AlertCircle, AlertTriangle, User, MapPin, Phone, ShieldCheck } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
 
 interface Props {
@@ -10,6 +12,8 @@ interface Props {
   onNext: () => void;
   onPrev?: () => void;
   referenceLists: ReferenceLists;
+  /** Sex-dependent data already entered: S6 gynéco-obstétricaux / S7 ménarche or spermarche (BR-003). */
+  sexDependentFields?: string[];
 }
 
 export const S1Identification: React.FC<Props> = ({
@@ -19,8 +23,9 @@ export const S1Identification: React.FC<Props> = ({
   onNext,
   onPrev,
   referenceLists,
+  sexDependentFields = [],
 }) => {
-  const [formData, setFormData] = useState<S1IdentificationData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S1IdentificationData>(data);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -110,9 +115,17 @@ export const S1Identification: React.FC<Props> = ({
                 <option value="Masculin">Masculin</option>
                 <option value="Féminin">Féminin</option>
               </select>
-              <span className="text-xs text-primary-700 mt-1 block font-medium">
-                Conditionne les rubriques S6 (Gynéco) et S7 (Puberté)
-              </span>
+              {formData.sexe !== data.sexe && sexDependentFields.length > 0 ? (
+                <span role="alert" className="mt-1.5 flex items-start gap-1.5 text-sm text-amber-800 font-medium">
+                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+                  <span>
+                    Attention : des données dépendantes du sexe sont déjà saisies ({sexDependentFields.join(', ')}).
+                    Elles seront masquées ; vérifiez leur cohérence.
+                  </span>
+                </span>
+              ) : (
+                <span className="field-hint">Conditionne les rubriques S6 (Gynéco) et S7 (Puberté)</span>
+              )}
             </div>
 
             <div>
@@ -211,7 +224,7 @@ export const S1Identification: React.FC<Props> = ({
                 className="clinical-input w-full"
               >
                 <option value="">Sélectionner la situation</option>
-                {referenceLists.situationsMatrimoniales.map((s) => (
+                {activeValues(referenceLists, 'situationsMatrimoniales', formData.situationMatrimoniale).map((s) => (
                   <option key={s} value={s}>
                     {s}
                   </option>
@@ -230,7 +243,7 @@ export const S1Identification: React.FC<Props> = ({
                 className="clinical-input w-full"
               >
                 <option value="">Sélectionner</option>
-                {referenceLists.religions.map((r) => (
+                {activeValues(referenceLists, 'religions', formData.religion).map((r) => (
                   <option key={r} value={r}>
                     {r}
                   </option>
@@ -249,7 +262,7 @@ export const S1Identification: React.FC<Props> = ({
                 className="clinical-input w-full"
               >
                 <option value="">Sélectionner</option>
-                {referenceLists.ethnies.map((eth) => (
+                {activeValues(referenceLists, 'ethnies', formData.ethnie).map((eth) => (
                   <option key={eth} value={eth}>
                     {eth}
                   </option>
@@ -315,6 +328,8 @@ export const S1Identification: React.FC<Props> = ({
 
         {/* Reusable Clinical Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s1"
           isReadOnly={isReadOnly}
           isSaved={isSaved}

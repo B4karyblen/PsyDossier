@@ -1,13 +1,12 @@
 import React from 'react';
-import { UserProfile, DossierPsychiatrique } from '../types';
+import { UserProfile, DossierPsychiatrique, AppView } from '../types';
 import { Menu, Search, ChevronRight } from 'lucide-react';
 
 interface HeaderProps {
   currentUser: UserProfile;
-  onSelectUser: (user: UserProfile) => void;
-  activeView: 'DASHBOARD' | 'REGISTRE' | 'DOSSIER' | 'AUDIT' | 'REFERENTIELS';
-  onChangeView: (view: 'DASHBOARD' | 'REGISTRE' | 'DOSSIER' | 'AUDIT' | 'REFERENTIELS') => void;
-  onOpenNewPatient: () => void;
+  activeView: AppView;
+  onChangeView: (view: AppView) => void;
+  onOpenNewPatient?: () => void;
   onOpenQuickSearch: () => void;
   onOpenMobileMenu: () => void;
   activeDossier: DossierPsychiatrique | null;
@@ -17,7 +16,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   currentUser,
-  onSelectUser,
   activeView,
   onChangeView,
   onOpenNewPatient,
@@ -33,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
     AUDIT: "Journal d'audit médico-légal",
     REFERENTIELS: 'Nomenclatures & CIM-10',
     DOSSIER: 'Dossier patient',
+    UTILISATEURS: 'Utilisateurs & rôles',
   };
 
   const initials = currentUser.name

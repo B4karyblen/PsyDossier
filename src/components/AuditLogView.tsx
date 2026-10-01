@@ -21,9 +21,19 @@ interface AuditLogViewProps {
   onSelectDossier?: (dossierId: string) => void;
 }
 
+/** "s1.developpementSexuel[c-1].menarcheAge" → "developpement sexuel › c-1 › menarche age" */
+const humanizeField = (path: string) =>
+  path
+    .replace(/\[([^\]]+)\]/g, '.$1')
+    .split('.')
+    .filter(Boolean)
+    .map((p) => p.replace(/([a-z])([A-Z0-9])/g, '$1 $2').toLowerCase())
+    .join(' › ');
+
 export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossier }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [actionFilter, setActionFilter] = useState<string>('TOUTES');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const filteredLogs = useMemo(() => {
     return logs
@@ -71,7 +81,15 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
       case 'EXPORT':
         return 'bg-ink-100 text-ink-700 border-ink-200';
       case 'LECTURE':
-        return 'bg-ink-25 text-ink-500 border-ink-150';
+        return 'bg-white text-ink-600 border-ink-200';
+      case 'ACCES_REFUSE':
+      case 'ECHEC_CONNEXION':
+        return 'bg-rose-50 text-rose-800 border-rose-300';
+      case 'CONNEXION':
+      case 'DECONNEXION':
+        return 'bg-white text-ink-600 border-ink-200';
+      case 'GESTION_COMPTE':
+        return 'bg-sky-50 text-sky-800 border-sky-200';
       default:
         return 'bg-ink-25 text-ink-500 border-ink-150';
     }
@@ -148,6 +166,11 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                 <option value="REACTIVATION">Réactivation</option>
                 <option value="EXPORT">Exportation / Impression</option>
                 <option value="LECTURE">Consultation / Lecture</option>
+                <option value="ACCES_REFUSE">Accès refusé</option>
+                <option value="CONNEXION">Connexion</option>
+                <option value="ECHEC_CONNEXION">Échec de connexion</option>
+                <option value="DECONNEXION">Déconnexion</option>
+                <option value="GESTION_COMPTE">Gestion des comptes</option>
               </select>
             </div>
 
@@ -199,12 +222,12 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
           <table className="w-full text-left border-collapse text-body-sm">
             <thead>
               <tr className="bg-ink-25 border-b border-ink-150 text-xs font-bold text-ink-500">
-                <th className="py-3.5 px-4 sm:px-6">Date & Horodatage</th>
-                <th className="py-3.5 px-4 sm:px-6">Praticien / Rôle</th>
-                <th className="py-3.5 px-4 sm:px-6">Patient Réf.</th>
-                <th className="py-3.5 px-4 sm:px-6">Action</th>
-                <th className="py-3.5 px-4 sm:px-6">Rubrique</th>
-                <th className="py-3.5 px-4 sm:px-6">Détails & Motif</th>
+                <th className="py-3.5 px-4">Date & Horodatage</th>
+                <th className="py-3.5 px-4">Praticien / Rôle</th>
+                <th className="py-3.5 px-4">Patient Réf.</th>
+                <th className="py-3.5 px-4">Action</th>
+                <th className="py-3.5 px-4">Rubrique</th>
+                <th className="py-3.5 px-4">Détails & Motif</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-ink-100">
@@ -236,9 +259,10 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                   const isRecent = Date.now() - dateObj.getTime() < 3600000; // less than 1 hour
 
                   return (
-                    <tr key={log.id} className="hover:bg-ink-25/80 transition-colors group">
+                    <React.Fragment key={log.id}>
+                    <tr className="hover:bg-ink-25/80 transition-colors group">
                       {/* Timestamp */}
-                      <td className="py-3.5 px-4 sm:px-6 text-mono text-caption text-ink-600 whitespace-nowrap tabular-nums">
+                      <td className="py-3.5 px-4 text-mono text-caption text-ink-600 whitespace-nowrap tabular-nums">
                         <div className="flex items-center gap-1.5 font-bold text-ink-900">
                           <Calendar className="w-3 h-3 text-ink-400" />
                           {dateObj.toLocaleDateString('fr-FR')}
@@ -252,7 +276,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                       </td>
 
                       {/* User */}
-                      <td className="py-3.5 px-4 sm:px-6 whitespace-nowrap">
+                      <td className="py-3.5 px-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-md bg-ink-100 text-ink-900 flex items-center justify-center text-caption font-bold border border-ink-150">
                             {log.userName.charAt(0)}
@@ -265,7 +289,10 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                       </td>
 
                       {/* Patient */}
-                      <td className="py-3.5 px-4 sm:px-6 whitespace-nowrap">
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        {!log.dossierId ? (
+                          <span className="text-ink-400">—</span>
+                        ) : (
                         <button
                           type="button"
                           onClick={() => onSelectDossier?.(log.dossierId)}
@@ -275,19 +302,20 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                           <span>{log.patientNumeroOrdre}</span>
                           <ArrowRight className="w-3 h-3 text-ink-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </button>
+                        )}
                       </td>
 
                       {/* Action */}
-                      <td className="py-3.5 px-4 sm:px-6 whitespace-nowrap">
+                      <td className="py-3.5 px-4 whitespace-nowrap">
                         <span className={`px-2.5 py-0.5 rounded-md text-caption font-bold tracking-wide border shadow-2xs ${getActionBadge(log.action)}`}>
-                          {log.action}
+                          {log.action.replace('_', ' ')}
                         </span>
                       </td>
 
                       {/* Rubrique */}
-                      <td className="py-3.5 px-4 sm:px-6 text-ink-600 font-medium whitespace-nowrap text-body-sm">
+                      <td className="py-3.5 px-4 text-ink-600 font-medium text-body-sm max-w-[13rem]">
                         {log.rubriqueNom ? (
-                          <span className="px-2 py-0.5 rounded bg-ink-100 border border-ink-150 text-body-sm font-semibold text-ink-900">
+                          <span className="inline-block px-2 py-0.5 rounded bg-ink-100 border border-ink-150 text-body-sm font-semibold text-ink-900">
                             {log.rubriqueNom}
                           </span>
                         ) : (
@@ -296,10 +324,47 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                       </td>
 
                       {/* Details */}
-                      <td className="py-3.5 px-4 sm:px-6 text-ink-900 font-medium max-w-lg text-body-sm leading-relaxed">
+                      <td className="py-3.5 px-4 text-ink-900 font-medium min-w-[18rem] max-w-lg text-body-sm leading-relaxed">
                         {log.details}
+                        {log.changes && log.changes.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
+                            aria-expanded={expandedId === log.id}
+                            className="mt-1.5 !min-h-0 !min-w-0 text-sm font-semibold text-primary-700 hover:underline cursor-pointer"
+                          >
+                            {expandedId === log.id ? 'Masquer' : 'Voir'} avant / après ({log.changes.length} champ{log.changes.length > 1 ? 's' : ''})
+                          </button>
+                        )}
                       </td>
                     </tr>
+                    {expandedId === log.id && log.changes && (
+                      <tr>
+                        <td colSpan={6} className="px-4 pb-4 pt-0">
+                          <div className="clinical-subcard !p-0 overflow-hidden">
+                            <table className="w-full text-sm table-fixed">
+                              <thead>
+                                <tr className="text-left text-xs font-bold text-ink-600 border-b border-ink-150">
+                                  <th className="px-4 py-2 w-1/4">Champ</th>
+                                  <th className="px-4 py-2">Avant</th>
+                                  <th className="px-4 py-2">Après</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {log.changes.map((c) => (
+                                  <tr key={c.champ} className="border-b border-ink-150 last:border-0 align-top">
+                                    <td className="px-4 py-2 font-semibold text-ink-800 [overflow-wrap:anywhere]">{humanizeField(c.champ)}</td>
+                                    <td className="px-4 py-2 bg-white text-ink-700 [overflow-wrap:anywhere]">{c.avant || <em className="text-ink-400">vide</em>}</td>
+                                    <td className="px-4 py-2 bg-white text-ink-900 [overflow-wrap:anywhere]">{c.apres || <em className="text-ink-400">vide</em>}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    </React.Fragment>
                   );
                 })
               )}

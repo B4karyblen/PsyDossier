@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
 import { S7BiographieData, FratrieItem, ConjointItem, EnfantItem } from '../../types';
 import { Plus, Trash2, AlertCircle } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -21,7 +22,7 @@ export const S7Biographie: React.FC<Props> = ({
   onPrev,
 }) => {
 
-  const [formData, setFormData] = useState<S7BiographieData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S7BiographieData>(data);
   const [isSaved, setIsSaved] = useState(false);
   const [newPositif, setNewPositif] = useState('');
   const [newNegatif, setNewNegatif] = useState('');
@@ -943,6 +944,8 @@ export const S7Biographie: React.FC<Props> = ({
 
         {/* Action buttons */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s7"
           isReadOnly={isReadOnly}
           isSaved={isSaved}

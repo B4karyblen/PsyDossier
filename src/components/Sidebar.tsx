@@ -1,6 +1,6 @@
 import React from 'react';
-import { DossierPsychiatrique, UserProfile, UserRole } from '../types';
-import { CLINICAL_USERS } from '../data/initialData';
+import { DossierPsychiatrique, UserProfile, UserRole, AppView } from '../types';
+import { ROLE_LABELS } from './UsersView';
 import { calculateDossierStats } from '../utils/rules';
 import {
   LayoutGrid,
@@ -14,20 +14,25 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   X,
+  UserCog,
+  LogOut,
+  KeyRound,
 } from 'lucide-react';
 
 interface SidebarProps {
-  activeView: 'DASHBOARD' | 'REGISTRE' | 'DOSSIER' | 'AUDIT' | 'REFERENTIELS';
-  onChangeView: (view: 'DASHBOARD' | 'REGISTRE' | 'DOSSIER' | 'AUDIT' | 'REFERENTIELS') => void;
+  activeView: AppView;
+  onChangeView: (view: AppView) => void;
   activeDossier: DossierPsychiatrique | null;
   activeRubriqueId: string;
   onSelectRubrique?: (rubriqueId: string) => void;
   dossiersCount: number;
   auditCount: number;
-  onOpenNewPatient: () => void;
+  onOpenNewPatient?: () => void;
   onOpenQuickSearch: () => void;
   currentUser: UserProfile;
-  onSelectUser: (user: UserProfile) => void;
+  canReadAudit: boolean;
+  onLogout: () => void;
+  onChangePassword: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
   isMobileOpen: boolean;
@@ -45,7 +50,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenNewPatient,
   onOpenQuickSearch,
   currentUser,
-  onSelectUser,
+  canReadAudit,
+  onLogout,
+  onChangePassword,
   isCollapsed,
   onToggleCollapse,
   isMobileOpen,
@@ -90,13 +97,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const adminItems = [
-    {
-      id: 'AUDIT' as const,
-      label: "Journal d'audit",
-      icon: ShieldCheck,
-      badge: auditCount.toString(),
-      shortcut: '4',
-    },
+    ...(canReadAudit
+      ? [
+          {
+            id: 'AUDIT' as const,
+            label: "Journal d'audit",
+            icon: ShieldCheck,
+            badge: auditCount.toString(),
+            shortcut: '4',
+          },
+        ]
+      : []),
     {
       id: 'REFERENTIELS' as const,
       label: 'Référentiels & CIM-10',
@@ -104,6 +115,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: null,
       shortcut: '5',
     },
+    ...(currentUser.role === 'ADMIN'
+      ? [
+          {
+            id: 'UTILISATEURS' as const,
+            label: 'Utilisateurs & rôles',
+            icon: UserCog,
+            badge: null,
+            shortcut: '6',
+          },
+        ]
+      : []),
   ];
 
   const initials = currentUser.name
@@ -334,35 +356,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-semibold text-ink-900 truncate leading-tight">{currentUser.name}</div>
-                <div className="text-xs font-medium text-ink-500 truncate mt-0.5 capitalize">
-                  {currentUser.role.toLowerCase()}
+                <div className="text-xs font-medium text-ink-500 truncate mt-0.5">
+                  {ROLE_LABELS[currentUser.role]}
                 </div>
               </div>
             )}
           </div>
 
-          {!isCollapsed && (
-            <div className="relative mt-2.5">
-              <label htmlFor="sidebar-role-switch" className="sr-only">
-                Changer d'utilisateur clinique
-              </label>
-              <select
-                id="sidebar-role-switch"
-                value={currentUser.id}
-                onChange={(e) => {
-                  const found = CLINICAL_USERS.find((u) => u.id === e.target.value);
-                  if (found) onSelectUser(found);
-                }}
-                className="w-full appearance-none bg-white hover:bg-ink-50 border border-ink-200 text-ink-700 text-xs font-medium rounded-lg pl-2.5 pr-7 py-1.5 focus:outline-none focus:border-primary-500 focus:shadow-[var(--shadow-focus)] cursor-pointer truncate transition-colors"
-              >
-                {CLINICAL_USERS.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name} · {user.role}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" />
+          {!isCollapsed ? (
+            <div className="mt-2.5 grid grid-cols-2 gap-1.5">
+              <button type="button" onClick={onChangePassword} className="btn-secondary btn-sm !px-2">
+                <KeyRound className="w-4 h-4 text-ink-500" />
+                Mot de passe
+              </button>
+              <button type="button" onClick={onLogout} className="btn-secondary btn-sm !px-2">
+                <LogOut className="w-4 h-4 text-ink-500" />
+                Déconnexion
+              </button>
             </div>
+          ) : (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="btn-icon mt-2 mx-auto flex"
+              title="Se déconnecter"
+              aria-label="Se déconnecter"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           )}
         </div>
       </div>

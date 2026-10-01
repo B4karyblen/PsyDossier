@@ -87,6 +87,20 @@ INSTALLATION
   Astuce : clic droit sur « Demarrer PsyDossier.bat » > Envoyer vers >
   Bureau (créer un raccourci).
 
+PREMIER DÉMARRAGE — COMPTES
+  1. Au premier lancement, créer le compte ADMINISTRATEUR (nom, identifiant,
+     mot de passe de 8 caractères minimum).
+  2. Menu « Utilisateurs & rôles » > « Nouveau compte » pour chaque membre
+     du personnel (psychiatre, psychologue, infirmier, assistant social,
+     secrétariat, lecteur). Un code d'activation est affiché : le remettre
+     à la personne (valable 7 jours).
+  3. La personne clique « Activer avec mon code » sur l'écran de connexion
+     et choisit son mot de passe.
+  - Un compte n'est jamais supprimé : il est désactivé (traçabilité).
+  - Mot de passe oublié : l'administrateur clique sur la clé (« Nouveau code
+    d'activation ») à côté du compte.
+  - Les sessions se ferment après 30 minutes d'inactivité.
+
 UTILISATION
   - Laisser la fenêtre noire « PsyDossier » ouverte pendant l'utilisation.
   - La fermer arrête l'application. Les données sont déjà enregistrées.
@@ -112,6 +126,8 @@ MISE À JOUR
 
 SÉCURITÉ
   - L'application n'est accessible que depuis ce PC (127.0.0.1).
+  - Chaque accès, modification (avec valeurs avant/après), export et
+    connexion est inscrit dans un journal d'audit non modifiable.
   - Activer le chiffrement du disque (BitLocker) : les dossiers
     psychiatriques sont des données de santé sensibles.
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { DossierPsychiatrique } from '../types';
+import { DossierPsychiatrique, AppView } from '../types';
 import { RUBRIQUES_CONFIG } from '../utils/rules';
 import {
   Search,
@@ -21,9 +21,11 @@ interface CommandPaletteModalProps {
   onClose: () => void;
   dossiers: DossierPsychiatrique[];
   onSelectDossier: (dossierId: string, targetRubriqueId?: string) => void;
-  onOpenNewPatient: () => void;
-  onChangeView: (view: 'DASHBOARD' | 'REGISTRE' | 'AUDIT' | 'REFERENTIELS') => void;
+  onOpenNewPatient?: () => void;
+  onChangeView: (view: AppView) => void;
   activeDossierId: string | null;
+  canCreateDossier: boolean;
+  canReadAudit: boolean;
 }
 
 export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
@@ -34,6 +36,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   onOpenNewPatient,
   onChangeView,
   activeDossierId,
+  canCreateDossier,
+  canReadAudit,
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -76,7 +80,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     }> = [];
 
     // Global actions
-    items.push({
+    if (canCreateDossier) items.push({
       id: 'action-new-patient',
       category: 'ACTION',
       title: 'Nouveau Dossier Patient',
@@ -85,7 +89,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       icon: <Plus className="w-4 h-4 text-primary-600" />,
       action: () => {
         onClose();
-        onOpenNewPatient();
+        onOpenNewPatient?.();
       },
     });
 
@@ -115,7 +119,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       },
     });
 
-    items.push({
+    if (canReadAudit) items.push({
       id: 'nav-audit',
       category: 'NAVIGATION',
       title: 'Journal d’Audit & Traçabilité',

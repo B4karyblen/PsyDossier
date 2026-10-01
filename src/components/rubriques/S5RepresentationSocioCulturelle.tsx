@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
 import { S5RepresentationData } from '../../types';
 import { Globe2, Sparkles, MessageCircle } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -28,7 +29,7 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
   onNext,
   onPrev,
 }) => {
-  const [formData, setFormData] = useState<S5RepresentationData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S5RepresentationData>(data);
   const [isSaved, setIsSaved] = useState(false);
 
   const toggleCategory = (cat: string) => {
@@ -155,6 +156,8 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
 
         {/* Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s5"
           isReadOnly={isReadOnly}
           isSaved={isSaved}

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
+import { activeValues } from '../../utils/referentiels';
 import { S13BilansData, BilanItem, ReferenceLists, UserRole } from '../../types';
 import { Plus, Trash2, CheckCircle2, FileSpreadsheet, Lock } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -24,7 +26,7 @@ export const S13BilansParacliniques: React.FC<Props> = ({
   onPrev,
   referenceLists,
 }) => {
-  const [formData, setFormData] = useState<S13BilansData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S13BilansData>(data);
   const [isSaved, setIsSaved] = useState(false);
 
   const canPrescribe = ['PSYCHIATRE', 'ADMIN'].includes(currentUserRole) && !isReadOnly;
@@ -35,7 +37,7 @@ export const S13BilansParacliniques: React.FC<Props> = ({
     if (!canPrescribe && currentUserRole !== 'INFIRMIER') return;
     const newItem: BilanItem = {
       id: 'bil-' + Date.now(),
-      type: typePreset || referenceLists.typesBilans[0] || 'NFS, Ionogramme sanguin',
+      type: typePreset || activeValues(referenceLists, 'typesBilans')[0] || 'NFS, Ionogramme sanguin',
       datePrescription: new Date().toISOString().split('T')[0],
       prescripteur: currentUserName,
       statut: 'Prescrit',
@@ -107,7 +109,7 @@ export const S13BilansParacliniques: React.FC<Props> = ({
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {(referenceLists.typesBilans || []).map((preset) => (
+              {activeValues(referenceLists, 'typesBilans').map((preset) => (
                 <button
                   key={preset}
                   type="button"
@@ -218,6 +220,8 @@ export const S13BilansParacliniques: React.FC<Props> = ({
 
         {/* Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s13"
           isReadOnly={isReadOnly}
           isSaved={isSaved}

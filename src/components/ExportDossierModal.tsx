@@ -8,7 +8,8 @@ interface ExportDossierModalProps {
   onClose: () => void;
   dossier: DossierPsychiatrique;
   currentUser: UserProfile;
-  onLogExport: () => void;
+  /** Logs the export on the server; resolves false if it was refused. */
+  onLogExport: (rubriques: string[]) => Promise<boolean>;
 }
 
 export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
@@ -18,11 +19,12 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
   currentUser,
   onLogExport,
 }) => {
-  if (!isOpen) return null;
-
   const [selectedRubriques, setSelectedRubriques] = useState<string[]>(
     RUBRIQUES_CONFIG.map(r => r.id)
   );
+  const [isLogging, setIsLogging] = useState(false);
+
+  if (!isOpen) return null;
 
   const toggleAll = () => {
     if (selectedRubriques.length === RUBRIQUES_CONFIG.length) {
@@ -40,9 +42,12 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
     }
   };
 
-  const handlePrint = () => {
-    onLogExport();
-    window.print();
+  // F-22: the export is journalised first; printing only happens once the server accepted it.
+  const handlePrint = async () => {
+    setIsLogging(true);
+    const allowed = await onLogExport(selectedRubriques);
+    setIsLogging(false);
+    if (allowed) window.print();
   };
 
   const diagPrincipal = dossier.s12HypothesesDiag.hypotheses?.find(h => h.type === 'Principale');
@@ -63,6 +68,7 @@ export const ExportDossierModal: React.FC<ExportDossierModalProps> = ({
           <div className="flex items-center gap-2.5">
             <button
               onClick={handlePrint}
+              disabled={isLogging}
               className="btn-primary"
             >
               <Printer className="w-4 h-4" />

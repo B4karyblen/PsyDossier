@@ -12,20 +12,22 @@ import {
   Tag,
   Stethoscope,
   Sparkles,
+  EyeOff,
 } from 'lucide-react';
 
 interface ReferentielsViewProps {
   referenceLists: ReferenceLists;
   onUpdateReferenceLists: (updated: ReferenceLists) => void;
   currentUserRole: UserRole;
-  onSwitchToAdmin?: () => void;
+  /** Values used by dossiers (from the server): deactivate instead of delete (F-24). */
+  usage?: Record<string, string[]>;
 }
 
 export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
   referenceLists,
   onUpdateReferenceLists,
   currentUserRole,
-  onSwitchToAdmin,
+  usage = {},
 }) => {
   const [activeTab, setActiveTab] = useState<'syndromes' | 'cim' | 'bilans' | 'ethnies' | 'religions' | 'matrimoniales'>('syndromes');
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,6 +37,61 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
   const [isSaved, setIsSaved] = useState(false);
 
   const isAdmin = currentUserRole === 'ADMIN';
+
+  type Category = 'religions' | 'ethnies' | 'situationsMatrimoniales' | 'typesBilans' | 'syndromesFrequents' | 'diagnosticClassifications';
+  const isInactive = (cat: Category, v: string) => (referenceLists.inactive?.[cat] ?? []).includes(v);
+  const isUsed = (cat: Category, v: string) => (usage[cat] ?? []).includes(v);
+
+  const setInactive = (cat: Category, v: string, inactive: boolean) => {
+    const current = referenceLists.inactive?.[cat] ?? [];
+    onUpdateReferenceLists({
+      ...referenceLists,
+      inactive: {
+        ...referenceLists.inactive,
+        [cat]: inactive ? [...current, v] : current.filter((x) => x !== v),
+      },
+    });
+  };
+
+  /** Delete if unused; a value used by dossiers can only be deactivated (F-24). */
+  const renderActions = (cat: Category, v: string) => {
+    if (isInactive(cat, v)) {
+      return (
+        <span className="flex items-center gap-1.5 shrink-0">
+          <span className="chip chip-neutral">Désactivé</span>
+          <button type="button" onClick={() => setInactive(cat, v, false)} className="btn-ghost btn-sm !px-2">
+            Réactiver
+          </button>
+        </span>
+      );
+    }
+    if (isUsed(cat, v)) {
+      return (
+        <button
+          type="button"
+          onClick={() => setInactive(cat, v, true)}
+          className="btn-ghost btn-sm !px-2 shrink-0"
+          title="Valeur utilisée dans des dossiers : elle ne peut pas être supprimée, seulement désactivée."
+        >
+          <EyeOff className="w-4 h-4" />
+          Désactiver
+        </button>
+      );
+    }
+    return (
+      <button
+        type="button"
+        onClick={() =>
+          cat === 'diagnosticClassifications' ? removeCimItem(v) : removeItem(cat, v)
+        }
+        className="btn-icon !w-9 !h-9 !min-h-9 !min-w-9 shrink-0 hover:!text-rose-700 hover:!bg-rose-50"
+        title="Supprimer (valeur non utilisée)"
+        aria-label={`Supprimer ${v}`}
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+    );
+  };
 
   const handleAddItem = (category: 'religions' | 'ethnies' | 'situationsMatrimoniales' | 'typesBilans' | 'syndromesFrequents') => {
     if (!isAdmin || !newItemText.trim()) return;
@@ -70,7 +127,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
   const removeItem = (category: 'religions' | 'ethnies' | 'situationsMatrimoniales' | 'typesBilans' | 'syndromesFrequents', val: string) => {
     if (!isAdmin) return;
     const confirmed = window.confirm(
-      `Supprimer "${val}" de la liste ?\n\nAttention : si cette valeur est utilisée dans des dossiers existants, elle y restera mais ne sera plus disponible pour les nouvelles sélections.`
+      `Supprimer « ${val} » de la liste ? Cette valeur n’est utilisée dans aucun dossier.`
     );
     if (!confirmed) return;
     const updated = {
@@ -84,7 +141,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
     if (!isAdmin) return;
     const item = referenceLists.diagnosticClassifications.find((c) => c.code === code);
     const confirmed = window.confirm(
-      `Supprimer [${code}] ${item?.label || ''} de la classification ?\n\nAttention : si ce code est utilisé dans des dossiers existants, il y restera mais ne sera plus disponible pour les nouvelles sélections.`
+      `Supprimer [${code}] ${item?.label || ''} de la classification ? Ce code n’est utilisé dans aucun dossier.`
     );
     if (!confirmed) return;
     const updated = {
@@ -150,15 +207,6 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                 <Lock className="w-3.5 h-3.5" />
                 <span>Lecture seule · modifications réservées à l'administrateur</span>
               </div>
-              {onSwitchToAdmin && (
-                <button
-                  type="button"
-                  onClick={onSwitchToAdmin}
-                  className="btn-secondary !py-2"
-                >
-                  Basculer en Admin (M. Touré)
-                </button>
-              )}
             </div>
           ) : (
             <div className="chip bg-emerald-100 text-emerald-800 !py-2 !px-3.5">
@@ -251,16 +299,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{s}</span>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem('syndromesFrequents', s)}
-                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                      title="Supprimer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {isAdmin && renderActions('syndromesFrequents', s)}
                 </div>
               ))}
             </div>
@@ -303,16 +342,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                     </span>
                     <span className="font-bold text-ink-900 leading-snug">{item.label}</span>
                   </div>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => removeCimItem(item.code)}
-                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer shrink-0 ml-2"
-                      title="Supprimer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {isAdmin && renderActions('diagnosticClassifications', item.code)}
                 </div>
               ))}
             </div>
@@ -357,15 +387,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{b}</span>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem('typesBilans', b)}
-                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {isAdmin && renderActions('typesBilans', b)}
                 </div>
               ))}
             </div>
@@ -403,15 +425,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{e}</span>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem('ethnies', e)}
-                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {isAdmin && renderActions('ethnies', e)}
                 </div>
               ))}
             </div>
@@ -449,15 +463,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{r}</span>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem('religions', r)}
-                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {isAdmin && renderActions('religions', r)}
                 </div>
               ))}
             </div>
@@ -495,15 +501,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   className="clinical-subcard p-3 flex items-center justify-between text-body-sm font-semibold hover:border-primary-500/40 transition-colors group"
                 >
                   <span className="text-ink-900">{m}</span>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem('situationsMatrimoniales', m)}
-                      className="text-ink-400 hover:text-rose-700 hover:bg-rose-100 p-1 rounded-md transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  {isAdmin && renderActions('situationsMatrimoniales', m)}
                 </div>
               ))}
             </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
 import { S3MotifData } from '../../types';
 import { AlertCircle, MessageSquareQuote, Users, HelpCircle } from 'lucide-react';
 import { RubriqueFooterNav } from './RubriqueFooterNav';
@@ -18,7 +19,7 @@ export const S3Motif: React.FC<Props> = ({
   onNext,
   onPrev,
 }) => {
-  const [formData, setFormData] = useState<S3MotifData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S3MotifData>(data);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -132,6 +133,8 @@ export const S3Motif: React.FC<Props> = ({
 
         {/* Footer Navigation */}
         <RubriqueFooterNav
+          isDirty={form.isDirty}
+          onCancel={form.reset}
           currentRubriqueId="s3"
           isReadOnly={isReadOnly}
           isSaved={isSaved}

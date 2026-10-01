@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRubriqueForm } from '../../lib/useRubriqueForm';
 import { S17PronosticData, PronosticHorizon, UserRole } from '../../types';
 import { Save, Lock, AlertCircle, CheckCircle2, ChevronLeft, Printer, TrendingUp, Sparkles } from 'lucide-react';
 
@@ -21,7 +22,7 @@ export const S17Pronostic: React.FC<Props> = ({
   onOpenValidation,
   onOpenExport,
 }) => {
-  const [formData, setFormData] = useState<S17PronosticData>(data);
+  const [formData, setFormData, form] = useRubriqueForm<S17PronosticData>(data);
   const [isSaved, setIsSaved] = useState(false);
 
   const isPsychiatre = currentUserRole === 'PSYCHIATRE';
@@ -184,6 +185,23 @@ export const S17Pronostic: React.FC<Props> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
+            {form.isDirty && !effectiveReadOnly && (
+              <>
+                <span className="chip bg-amber-50 text-amber-800 ring-1 ring-inset ring-amber-200">
+                  <span className="dot" />
+                  Modifications non enregistrées
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('Annuler les modifications non enregistrées de cette rubrique ?')) form.reset();
+                  }}
+                  className="btn-ghost btn-sm"
+                >
+                  Annuler
+                </button>
+              </>
+            )}
             {!effectiveReadOnly && (
               <button
                 type="submit"

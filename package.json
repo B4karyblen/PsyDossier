@@ -10,7 +10,8 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "server": "tsx watch server/index.ts",
-    "package:win": "node scripts/package-win.mjs"
+    "package:win": "node scripts/package-win.mjs",
+    "server:demo": "PSYDOSSIER_DEMO=1 PSYDOSSIER_DATA=data-demo tsx watch server/index.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
