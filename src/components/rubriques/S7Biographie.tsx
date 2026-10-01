@@ -143,7 +143,7 @@ export const S7Biographie: React.FC<Props> = ({
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S7 · DÉVELOPPEMENT
             </span>
             <span className="text-xs text-ink-500">8 sections de vie</span>
@@ -151,7 +151,7 @@ export const S7Biographie: React.FC<Props> = ({
           <h2 className="text-h2 text-ink-900 mt-2">
             Éléments de Biographie Clinique
           </h2>
-          <p className="text-sm text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Histoire de vie, ascendants, collatéraux, scolarité, parcours affectif et événements marquants
           </p>
         </div>
@@ -167,7 +167,7 @@ export const S7Biographie: React.FC<Props> = ({
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* 1. Ascendants */}
         <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
-          <h3 className="text-sm font-semibold text-ink-900">
+          <h3 className="text-base font-bold text-ink-900">
             1. Ascendants
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -186,7 +186,7 @@ export const S7Biographie: React.FC<Props> = ({
                       pere: { ...formData.ascendants.pere, nom: e.target.value }
                     }
                   })}
-                  className="bg-ink-25 border border-ink-150 text-xs rounded px-2.5 py-1.5"
+                  className="clinical-input"
                   placeholder="Nom & prénom du père"
                 />
                 <input
@@ -200,7 +200,7 @@ export const S7Biographie: React.FC<Props> = ({
                       pere: { ...formData.ascendants.pere, age: parseInt(e.target.value) || undefined }
                     }
                   })}
-                  className="bg-ink-25 border border-ink-150 text-xs rounded px-2.5 py-1.5"
+                  className="clinical-input"
                   placeholder="Âge"
                 />
               </div>
@@ -216,7 +216,7 @@ export const S7Biographie: React.FC<Props> = ({
                       pere: { ...formData.ascendants.pere, profession: e.target.value }
                     }
                   })}
-                  className="bg-ink-25 border border-ink-150 text-xs rounded px-2.5 py-1.5"
+                  className="clinical-input"
                   placeholder="Profession"
                 />
                 <label className="flex items-center gap-2 text-xs text-ink-900">
@@ -253,7 +253,7 @@ export const S7Biographie: React.FC<Props> = ({
                       mere: { ...formData.ascendants.mere, nom: e.target.value }
                     }
                   })}
-                  className="bg-ink-25 border border-ink-150 text-xs rounded px-2.5 py-1.5"
+                  className="clinical-input"
                   placeholder="Nom & prénom de la mère"
                 />
                 <input
@@ -267,7 +267,7 @@ export const S7Biographie: React.FC<Props> = ({
                       mere: { ...formData.ascendants.mere, age: parseInt(e.target.value) || undefined }
                     }
                   })}
-                  className="bg-ink-25 border border-ink-150 text-xs rounded px-2.5 py-1.5"
+                  className="clinical-input"
                   placeholder="Âge"
                 />
               </div>
@@ -283,7 +283,7 @@ export const S7Biographie: React.FC<Props> = ({
                       mere: { ...formData.ascendants.mere, profession: e.target.value }
                     }
                   })}
-                  className="bg-ink-25 border border-ink-150 text-xs rounded px-2.5 py-1.5"
+                  className="clinical-input"
                   placeholder="Profession"
                 />
                 <label className="flex items-center gap-2 text-xs text-ink-900">
@@ -310,14 +310,14 @@ export const S7Biographie: React.FC<Props> = ({
         {/* 2. Collatéraux & Fratrie utérine */}
         <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-ink-900">
+            <h3 className="text-base font-bold text-ink-900">
               2. Collatéraux & Fratrie utérine
             </h3>
             {!isReadOnly && (
               <button
                 type="button"
                 onClick={addFrereSoeur}
-                className="text-[11px] font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 px-2.5 py-1 rounded flex items-center gap-1"
+                className="text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 px-2.5 py-1 rounded flex items-center gap-1"
               >
                 <Plus className="w-3 h-3" />
                 Ajouter un frère/sœur
@@ -327,7 +327,7 @@ export const S7Biographie: React.FC<Props> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Place du patient dans la fratrie utérine (rang)
               </label>
               <input
@@ -342,13 +342,13 @@ export const S7Biographie: React.FC<Props> = ({
                     placeFratrieUterine: parseInt(e.target.value) || undefined
                   }
                 })}
-                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                className="clinical-input w-full"
                 placeholder="Ex: 2 (cadet, aîné...)"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Nombre total de frères et sœurs déclarés
               </label>
               <input
@@ -363,14 +363,14 @@ export const S7Biographie: React.FC<Props> = ({
                     nombreFreresSoeursDeclares: parseInt(e.target.value) || undefined
                   }
                 })}
-                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                className="clinical-input w-full"
                 placeholder="Ex: 4"
               />
             </div>
           </div>
 
           {hasFratrieMismatch && (
-            <div className="p-2 bg-amber-100 border border-amber-500/30 rounded text-[11px] text-amber-700 flex items-center gap-1.5">
+            <div className="p-2 bg-amber-100 border border-amber-500/30 rounded text-xs text-amber-700 flex items-center gap-1.5">
               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
               <span>
                 Attention : {declaredBroCount} frères et sœurs déclarés, mais {listBroCount} répertoriés ci-dessous (avertissement non bloquant).
@@ -382,13 +382,13 @@ export const S7Biographie: React.FC<Props> = ({
           {formData.collateraux.fratrie && formData.collateraux.fratrie.length > 0 && (
             <div className="space-y-2 mt-2">
               {formData.collateraux.fratrie.map((frere) => (
-                <div key={frere.id} className="flex flex-wrap items-center gap-2 p-2 bg-white border border-ink-150 rounded-lg">
+                <div key={frere.id} className="flex flex-wrap items-center gap-2">
                   <input
                     type="text"
                     disabled={isReadOnly}
                     value={frere.nom}
                     onChange={(e) => updateFrereSoeur(frere.id, { nom: e.target.value })}
-                    className="text-xs bg-ink-25 border border-ink-150 rounded px-2 py-1 flex-1 min-w-[120px]"
+                    className="clinical-input flex-1 min-w-[160px]"
                     placeholder="Nom du frère / sœur"
                   />
                   <input
@@ -396,14 +396,14 @@ export const S7Biographie: React.FC<Props> = ({
                     disabled={isReadOnly}
                     value={frere.age || ''}
                     onChange={(e) => updateFrereSoeur(frere.id, { age: parseInt(e.target.value) || undefined })}
-                    className="text-xs bg-ink-25 border border-ink-150 rounded px-2 py-1 w-16"
+                    className="clinical-input !w-20 shrink-0"
                     placeholder="Âge"
                   />
                   <select
                     disabled={isReadOnly}
                     value={frere.sexe}
                     onChange={(e) => updateFrereSoeur(frere.id, { sexe: e.target.value as 'M' | 'F' })}
-                    className="text-xs bg-ink-25 border border-ink-150 rounded px-2 py-1"
+                    className="clinical-input !w-20 shrink-0"
                   >
                     <option value="M">M</option>
                     <option value="F">F</option>
@@ -413,10 +413,10 @@ export const S7Biographie: React.FC<Props> = ({
                     disabled={isReadOnly}
                     value={frere.profession || ''}
                     onChange={(e) => updateFrereSoeur(frere.id, { profession: e.target.value })}
-                    className="text-xs bg-ink-25 border border-ink-150 rounded px-2 py-1 flex-1 min-w-[100px]"
+                    className="clinical-input flex-1 min-w-[100px]"
                     placeholder="Profession"
                   />
-                  <label className="flex items-center gap-1 text-[11px] text-ink-500">
+                  <label className="flex items-center gap-1 text-xs text-ink-500">
                     <input
                       type="checkbox"
                       disabled={isReadOnly}
@@ -443,7 +443,7 @@ export const S7Biographie: React.FC<Props> = ({
 
         {/* 3. Conception, grossesse & accouchement */}
         <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-2">
-          <h3 className="text-sm font-semibold text-ink-900">
+          <h3 className="text-base font-bold text-ink-900">
             3. Conception, grossesse et accouchement du patient
           </h3>
           <textarea
@@ -451,19 +451,19 @@ export const S7Biographie: React.FC<Props> = ({
             disabled={isReadOnly}
             value={formData.conceptionGrossesseAccouchement || ''}
             onChange={(e) => setFormData({ ...formData, conceptionGrossesseAccouchement: e.target.value })}
-            className="w-full bg-white border border-ink-150 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-2.5 focus:outline-none"
+            className="clinical-input w-full"
             placeholder="Désir d'enfant, déroulement de la grossesse, terme, voie basse/césarienne, réanimation néonatale..."
           />
         </div>
 
         {/* 4. Développement psychomoteur */}
         <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
-          <h3 className="text-sm font-semibold text-ink-900">
+          <h3 className="text-base font-bold text-ink-900">
             4. Développement psychomoteur
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Âge de la marche
               </label>
               <input
@@ -474,12 +474,12 @@ export const S7Biographie: React.FC<Props> = ({
                   ...formData,
                   developpementPsychomoteur: { ...formData.developpementPsychomoteur, marche: e.target.value }
                 })}
-                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                className="clinical-input w-full"
                 placeholder="Ex: 12-14 mois"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Âge d'acquisition du langage
               </label>
               <input
@@ -490,12 +490,12 @@ export const S7Biographie: React.FC<Props> = ({
                   ...formData,
                   developpementPsychomoteur: { ...formData.developpementPsychomoteur, langage: e.target.value }
                 })}
-                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                className="clinical-input w-full"
                 placeholder="Ex: Phrases vers 2 ans"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Propreté sphinctérienne
               </label>
               <input
@@ -506,7 +506,7 @@ export const S7Biographie: React.FC<Props> = ({
                   ...formData,
                   developpementPsychomoteur: { ...formData.developpementPsychomoteur, proprete: e.target.value }
                 })}
-                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                className="clinical-input w-full"
                 placeholder="Ex: Vers 2 ans et demi"
               />
             </div>
@@ -515,12 +515,12 @@ export const S7Biographie: React.FC<Props> = ({
 
         {/* 5. Scolarité */}
         <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
-          <h3 className="text-sm font-semibold text-ink-900">
+          <h3 className="text-base font-bold text-ink-900">
             5. Scolarité
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Âge de début de scolarisation
               </label>
               <input
@@ -531,12 +531,12 @@ export const S7Biographie: React.FC<Props> = ({
                   ...formData,
                   scolarite: { ...formData.scolarite, debutAge: parseInt(e.target.value) || undefined }
                 })}
-                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                className="clinical-input w-full"
                 placeholder="Ex: 6 ans"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Niveau scolaire atteint
               </label>
               <input
@@ -547,12 +547,12 @@ export const S7Biographie: React.FC<Props> = ({
                   ...formData,
                   scolarite: { ...formData.scolarite, niveauAtteint: e.target.value }
                 })}
-                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                className="clinical-input w-full"
                 placeholder="Ex: Terminale, Université..."
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Diplômes obtenus
               </label>
               <input
@@ -563,14 +563,14 @@ export const S7Biographie: React.FC<Props> = ({
                   ...formData,
                   scolarite: { ...formData.scolarite, diplomes: e.target.value }
                 })}
-                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                className="clinical-input w-full"
                 placeholder="Ex: DEF, Bac, Licence..."
               />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Échecs ou redoublements
               </label>
               <input
@@ -581,12 +581,12 @@ export const S7Biographie: React.FC<Props> = ({
                   ...formData,
                   scolarite: { ...formData.scolarite, echecsScolaires: e.target.value }
                 })}
-                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                className="clinical-input w-full"
                 placeholder="Classes redoublées, abandons..."
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Vécu psychologique des échecs
               </label>
               <input
@@ -597,7 +597,7 @@ export const S7Biographie: React.FC<Props> = ({
                   ...formData,
                   scolarite: { ...formData.scolarite, vecuDesEchecs: e.target.value }
                 })}
-                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                className="clinical-input w-full"
                 placeholder="Réaction familiale, dévalorisation..."
               />
             </div>
@@ -606,7 +606,7 @@ export const S7Biographie: React.FC<Props> = ({
 
         {/* 6. Développement ultérieur et parcours professionnel */}
         <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-2">
-          <h3 className="text-sm font-semibold text-ink-900">
+          <h3 className="text-base font-bold text-ink-900">
             6. Développement ultérieur et parcours professionnel
           </h3>
           <textarea
@@ -614,7 +614,7 @@ export const S7Biographie: React.FC<Props> = ({
             disabled={isReadOnly}
             value={formData.developpementProfessionnel || ''}
             onChange={(e) => setFormData({ ...formData, developpementProfessionnel: e.target.value })}
-            className="w-full bg-white border border-ink-150 text-xs rounded-lg p-2.5"
+            className="clinical-input w-full"
             placeholder="Historique des emplois, stabilité, relations avec collègues et hiérarchie..."
           />
         </div>
@@ -622,7 +622,7 @@ export const S7Biographie: React.FC<Props> = ({
         {/* 7. Développement sexuel et sentimental (BR-003: Ménarche vs Spermarche) */}
         <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-ink-900">
+            <h3 className="text-base font-bold text-ink-900">
               7. Développement sexuel et adaptation sentimentale
             </h3>
             <div className="flex items-center gap-2">
@@ -631,14 +631,14 @@ export const S7Biographie: React.FC<Props> = ({
                   <button
                     type="button"
                     onClick={addConjoint}
-                    className="text-[11px] font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 px-2 py-0.5 rounded"
+                    className="text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 px-2 py-0.5 rounded"
                   >
                     + Conjoint(e)
                   </button>
                   <button
                     type="button"
                     onClick={addEnfant}
-                    className="text-[11px] font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 px-2 py-0.5 rounded"
+                    className="text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 px-2 py-0.5 rounded"
                   >
                     + Enfant
                   </button>
@@ -651,8 +651,8 @@ export const S7Biographie: React.FC<Props> = ({
             {/* Conditionnel au sexe (BR-003) */}
             {patientSexe === 'Féminin' ? (
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
-                  Âge de la ménarche (premières règles) <span className="text-primary-700 font-mono text-[10px]">(Féminin)</span>
+                <label className="field-label">
+                  Âge de la ménarche (premières règles) <span className="text-primary-700 font-mono text-xs">(Féminin)</span>
                 </label>
                 <input
                   type="text"
@@ -665,14 +665,14 @@ export const S7Biographie: React.FC<Props> = ({
                       menarcheAge: e.target.value
                     }
                   })}
-                  className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                  className="clinical-input w-full"
                   placeholder="Ex: 13 ans"
                 />
               </div>
             ) : (
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
-                  Âge de la spermarche (premières éjaculations) <span className="text-primary-700 font-mono text-[10px]">(Masculin)</span>
+                <label className="field-label">
+                  Âge de la spermarche (premières éjaculations) <span className="text-primary-700 font-mono text-xs">(Masculin)</span>
                 </label>
                 <input
                   type="text"
@@ -685,14 +685,14 @@ export const S7Biographie: React.FC<Props> = ({
                       spermarcheAge: e.target.value
                     }
                   })}
-                  className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                  className="clinical-input w-full"
                   placeholder="Ex: 14 ans"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Premier rapport sexuel (conditions & vécu)
               </label>
               <input
@@ -706,14 +706,14 @@ export const S7Biographie: React.FC<Props> = ({
                     premierRapportConditionsVecu: e.target.value
                   }
                 })}
-                className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+                className="clinical-input w-full"
                 placeholder="Consentement, âge, traumatisme éventuel..."
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink-700 mb-1">
+            <label className="field-label">
               Principales relations amoureuses et histoire du couple
             </label>
             <input
@@ -727,7 +727,7 @@ export const S7Biographie: React.FC<Props> = ({
                   principalesRelationsAmoureuses: e.target.value
                 }
               })}
-              className="w-full bg-white border border-ink-150 text-xs rounded-lg px-3 py-1.5"
+              className="clinical-input w-full"
               placeholder="Ex: Marié depuis 8 ans, vie conjugale harmonieuse..."
             />
           </div>
@@ -735,9 +735,9 @@ export const S7Biographie: React.FC<Props> = ({
           {/* Conjoints */}
           {formData.developpementSexuelEtSentimentale.conjoints?.length > 0 && (
             <div className="space-y-1.5 pt-1">
-              <span className="text-[11px] font-bold text-ink-500">Conjoint(e)s identifié(e)s :</span>
+              <span className="text-xs font-bold text-ink-500">Conjoint(e)s identifié(e)s :</span>
               {formData.developpementSexuelEtSentimentale.conjoints.map((c) => (
-                <div key={c.id} className="flex items-center gap-2 p-1.5 bg-white border border-ink-150 rounded">
+                <div key={c.id} className="flex items-center gap-2">
                   <input
                     type="text"
                     disabled={isReadOnly}
@@ -746,7 +746,7 @@ export const S7Biographie: React.FC<Props> = ({
                       const updated = formData.developpementSexuelEtSentimentale.conjoints.map(x => x.id === c.id ? { ...x, nom: e.target.value } : x);
                       setFormData({ ...formData, developpementSexuelEtSentimentale: { ...formData.developpementSexuelEtSentimentale, conjoints: updated } });
                     }}
-                    className="text-xs bg-ink-25 border border-ink-150 rounded px-2 py-1 flex-1"
+                    className="clinical-input flex-1"
                     placeholder="Nom du conjoint"
                   />
                   <input
@@ -757,7 +757,7 @@ export const S7Biographie: React.FC<Props> = ({
                       const updated = formData.developpementSexuelEtSentimentale.conjoints.map(x => x.id === c.id ? { ...x, statut: e.target.value } : x);
                       setFormData({ ...formData, developpementSexuelEtSentimentale: { ...formData.developpementSexuelEtSentimentale, conjoints: updated } });
                     }}
-                    className="text-xs bg-ink-25 border border-ink-150 rounded px-2 py-1 w-28"
+                    className="clinical-input w-28"
                     placeholder="Statut (Actuel, Ex...)"
                   />
                   {!isReadOnly && (
@@ -773,9 +773,9 @@ export const S7Biographie: React.FC<Props> = ({
           {/* Enfants */}
           {formData.developpementSexuelEtSentimentale.enfants?.length > 0 && (
             <div className="space-y-1.5 pt-1">
-              <span className="text-[11px] font-bold text-ink-500">Enfants identifiés :</span>
+              <span className="text-xs font-bold text-ink-500">Enfants identifiés :</span>
               {formData.developpementSexuelEtSentimentale.enfants.map((enf) => (
-                <div key={enf.id} className="flex items-center gap-2 p-1.5 bg-white border border-ink-150 rounded">
+                <div key={enf.id} className="flex items-center gap-2">
                   <input
                     type="text"
                     disabled={isReadOnly}
@@ -784,7 +784,7 @@ export const S7Biographie: React.FC<Props> = ({
                       const updated = formData.developpementSexuelEtSentimentale.enfants.map(x => x.id === enf.id ? { ...x, nom: e.target.value } : x);
                       setFormData({ ...formData, developpementSexuelEtSentimentale: { ...formData.developpementSexuelEtSentimentale, enfants: updated } });
                     }}
-                    className="text-xs bg-ink-25 border border-ink-150 rounded px-2 py-1 flex-1"
+                    className="clinical-input flex-1"
                     placeholder="Nom / Prénom de l’enfant"
                   />
                   <input
@@ -795,7 +795,7 @@ export const S7Biographie: React.FC<Props> = ({
                       const updated = formData.developpementSexuelEtSentimentale.enfants.map(x => x.id === enf.id ? { ...x, age: parseInt(e.target.value) || undefined } : x);
                       setFormData({ ...formData, developpementSexuelEtSentimentale: { ...formData.developpementSexuelEtSentimentale, enfants: updated } });
                     }}
-                    className="text-xs bg-ink-25 border border-ink-150 rounded px-2 py-1 w-16"
+                    className="clinical-input !w-20 shrink-0"
                     placeholder="Âge"
                   />
                   <select
@@ -805,7 +805,7 @@ export const S7Biographie: React.FC<Props> = ({
                       const updated = formData.developpementSexuelEtSentimentale.enfants.map(x => x.id === enf.id ? { ...x, sexe: e.target.value as 'M' | 'F' } : x);
                       setFormData({ ...formData, developpementSexuelEtSentimentale: { ...formData.developpementSexuelEtSentimentale, enfants: updated } });
                     }}
-                    className="text-xs bg-ink-25 border border-ink-150 rounded px-2 py-1"
+                    className="clinical-input !w-20 shrink-0"
                   >
                     <option value="M">M</option>
                     <option value="F">F</option>
@@ -823,7 +823,7 @@ export const S7Biographie: React.FC<Props> = ({
 
         {/* 8. Événements marquants positifs et négatifs */}
         <div className="p-4 bg-ink-25 border border-ink-150 rounded-lg space-y-3">
-          <h3 className="text-sm font-semibold text-ink-900">
+          <h3 className="text-base font-bold text-ink-900">
             8. Événements marquants de la vie
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -858,7 +858,7 @@ export const S7Biographie: React.FC<Props> = ({
                     type="text"
                     value={newPositif}
                     onChange={(e) => setNewPositif(e.target.value)}
-                    className="text-xs bg-white border border-ink-150 rounded px-2.5 py-1 flex-1"
+                    className="clinical-input flex-1"
                     placeholder="Ajouter un événement positif..."
                   />
                   <button
@@ -914,7 +914,7 @@ export const S7Biographie: React.FC<Props> = ({
                     type="text"
                     value={newNegatif}
                     onChange={(e) => setNewNegatif(e.target.value)}
-                    className="text-xs bg-white border border-ink-150 rounded px-2.5 py-1 flex-1"
+                    className="clinical-input flex-1"
                     placeholder="Ajouter un événement négatif..."
                   />
                   <button

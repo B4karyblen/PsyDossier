@@ -233,12 +233,12 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
             onKeyDown={handleKeyDown}
             placeholder="Rechercher un patient, un N° d'ordre, une rubrique (S1..S17), ou une action..."
             aria-label="Recherche rapide"
-            className="w-full text-[15px] font-medium text-ink-900 placeholder:text-ink-400 bg-transparent outline-none"
+            className="w-full text-sm font-medium text-ink-900 placeholder:text-ink-400 bg-transparent outline-none"
           />
           {query ? (
             <button
               onClick={() => setQuery('')}
-              aria-label="Effacer" className="btn-icon !w-8 !h-8 !min-h-8 !min-w-8"
+              aria-label="Effacer" className="btn-icon"
             >
               <X className="w-4 h-4" />
             </button>

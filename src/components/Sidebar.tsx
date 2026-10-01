@@ -114,22 +114,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
     .slice(0, 2);
 
   const itemClass = (isActive: boolean) =>
-    `relative w-full !min-h-9 flex items-center rounded-lg transition-colors duration-150 cursor-pointer group text-left ${
-      isCollapsed ? 'justify-center p-2' : 'px-2.5 py-1.5 gap-2.5'
+    `relative w-full !min-h-10 flex items-center rounded-lg transition-colors duration-150 cursor-pointer group text-left ${
+      isCollapsed ? 'justify-center p-2' : 'px-3 py-2 gap-3'
     } ${
       isActive
         ? 'bg-ink-100 text-ink-900'
-        : 'text-ink-600 hover:text-ink-900 hover:bg-ink-50'
+        : 'text-ink-700 hover:text-ink-900 hover:bg-ink-50'
     }`;
 
   const iconWrapClass = (isActive: boolean) =>
     `w-5 h-5 flex items-center justify-center shrink-0 transition-colors ${
-      isActive ? 'text-ink-900' : 'text-ink-400 group-hover:text-ink-700'
+      isActive ? 'text-ink-900' : 'text-ink-500 group-hover:text-ink-800'
     }`;
 
   const badgeClass = (isActive: boolean) =>
-    `min-w-5 px-1.5 rounded-md text-[11px] leading-[18px] font-semibold tabular-nums text-center ${
-      isActive ? 'bg-white text-ink-700 ring-1 ring-inset ring-ink-200' : 'text-ink-500'
+    `min-w-6 px-1.5 rounded-md text-xs leading-5 font-bold tabular-nums text-center ${
+      isActive ? 'bg-white text-ink-800 ring-1 ring-inset ring-ink-200' : 'bg-ink-100 text-ink-700'
     }`;
 
   const activeIndicator = (isActive: boolean) =>
@@ -154,10 +154,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           {!isCollapsed && (
             <div className="min-w-0">
-              <div className="text-[15px] font-bold tracking-tight text-ink-900 leading-none">
+              <div className="text-base font-bold tracking-tight text-ink-900 leading-none">
                 PsyDossier
               </div>
-              <p className="text-[11px] text-ink-500 font-semibold truncate mt-1">
+              <p className="text-xs text-ink-600 font-medium truncate mt-1">
                 CHU Point G · Psychiatrie
               </p>
             </div>
@@ -191,7 +191,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onOpenQuickSearch();
             onCloseMobile();
           }}
-          className={`w-full !min-h-9 flex items-center rounded-lg bg-white hover:bg-ink-50 border border-ink-200 shadow-[var(--shadow-soft)] text-ink-500 transition-colors cursor-pointer ${
+          className={`w-full !min-h-10 flex items-center rounded-lg bg-ink-50 hover:bg-ink-100 border border-ink-200 text-ink-500 transition-colors cursor-pointer ${
             isCollapsed ? 'justify-center p-2' : 'px-2.5 py-1.5 gap-2 text-sm'
           }`}
           title="Recherche rapide (⌘K)"
@@ -212,7 +212,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <nav aria-label="Navigation principale" className={`flex-1 overflow-y-auto py-3 space-y-5 ${isCollapsed ? 'px-2' : 'px-3'}`}>
         <div className="space-y-0.5">
           {!isCollapsed && (
-            <div className="px-2.5 pb-1.5 text-xs font-medium text-ink-400">
+            <div className="px-3 pb-1.5 text-xs font-bold text-ink-500">
               Espace clinique
             </div>
           )}
@@ -245,11 +245,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {!isCollapsed && (
                     <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
                       <div className="min-w-0">
-                        <div className={`text-sm truncate leading-tight ${isActive ? 'font-semibold' : 'font-medium'}`}>
+                        <div className={`text-sm truncate leading-tight ${isActive ? 'font-bold' : 'font-semibold'}`}>
                           {item.label}
                         </div>
                         {item.sublabel && (
-                          <div className={`text-xs font-medium tabular-nums truncate mt-0.5 text-ink-500`}>
+                          <div className={`text-xs font-medium tabular-nums truncate mt-0.5 text-ink-600`}>
                             {item.sublabel}
                           </div>
                         )}
@@ -270,7 +270,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <div className="space-y-0.5">
           {!isCollapsed && (
-            <div className="px-2.5 pb-1.5 text-xs font-medium text-ink-400">
+            <div className="px-3 pb-1.5 text-xs font-bold text-ink-500">
               Conformité & nomenclatures
             </div>
           )}
@@ -295,7 +295,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
                 {!isCollapsed && (
                   <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
-                    <span className={`text-sm truncate leading-tight ${isActive ? 'font-semibold' : 'font-medium'}`}>
+                    <span className={`text-sm truncate leading-tight ${isActive ? 'font-bold' : 'font-semibold'}`}>
                       {item.label}
                     </span>
                     {item.badge && <span className={badgeClass(isActive)}>{item.badge}</span>}
@@ -323,7 +323,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className={`${isCollapsed ? 'flex justify-center' : ''}`}>
           <div className="flex items-center gap-2.5">
             <div className="relative shrink-0">
-              <div className="w-8 h-8 rounded-full bg-primary-900 text-white flex items-center justify-center font-semibold text-[11px]">
+              <div className="w-8 h-8 rounded-full bg-primary-900 text-white flex items-center justify-center font-bold text-xs">
                 {initials}
               </div>
               <span
@@ -353,7 +353,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   const found = CLINICAL_USERS.find((u) => u.id === e.target.value);
                   if (found) onSelectUser(found);
                 }}
-                className="w-full !min-h-8 appearance-none bg-white hover:bg-ink-50 border border-ink-200 text-ink-700 text-xs font-medium rounded-lg pl-2.5 pr-7 py-1.5 focus:outline-none focus:border-primary-500 focus:shadow-[var(--shadow-focus)] cursor-pointer truncate transition-colors"
+                className="w-full appearance-none bg-white hover:bg-ink-50 border border-ink-200 text-ink-700 text-xs font-medium rounded-lg pl-2.5 pr-7 py-1.5 focus:outline-none focus:border-primary-500 focus:shadow-[var(--shadow-focus)] cursor-pointer truncate transition-colors"
               >
                 {CLINICAL_USERS.map((user) => (
                   <option key={user.id} value={user.id}>
@@ -374,7 +374,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Desktop Persistent Sidebar */}
       <aside
         className={`hidden lg:flex flex-col shrink-0 sticky top-0 h-screen transition-all duration-300 z-30 ${
-          isCollapsed ? 'w-[68px]' : 'w-64'
+          isCollapsed ? 'w-[72px]' : 'w-[280px]'
         }`}
       >
         {sidebarContent}
@@ -387,7 +387,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="fixed inset-0 bg-ink-950/40 backdrop-blur-sm transition-opacity"
             onClick={onCloseMobile}
           />
-          <div className="relative w-64 max-w-[85vw] h-full shadow-[var(--shadow-float)] z-10 animate-in slide-in-from-left duration-200">
+          <div className="relative w-[280px] max-w-[85vw] h-full shadow-[var(--shadow-float)] z-10 animate-in slide-in-from-left duration-200">
             {sidebarContent}
           </div>
         </div>

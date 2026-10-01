@@ -81,7 +81,7 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-ink-100 gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S16 · PROJET
             </span>
             <span className="text-xs text-ink-500">Objectifs & Planification</span>
@@ -89,7 +89,7 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
           <h2 className="text-h2 text-ink-900 mt-2">
             Projet Thérapeutique Personnalisé
           </h2>
-          <p className="text-sm text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Objectifs à court, moyen et long terme, moyens d'action et planification des réévaluations
           </p>
         </div>
@@ -103,7 +103,7 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
             <button
               type="button"
               onClick={() => setShowHistory(!showHistory)}
-              className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-ink-900 bg-ink-25 hover:bg-ink-100 border border-ink-200 rounded-lg transition-all cursor-pointer"
+              className="btn-secondary btn-sm"
             >
               <History className="w-3.5 h-3.5 text-primary-700" />
               <span>Historique ({formData.historiqueVersions.length})</span>
@@ -130,7 +130,7 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
                     Archivée le {new Date(v.dateHeure).toLocaleDateString('fr-FR')} par {v.auteurNom}
                   </span>
                 </div>
-                <div className="text-[11px] text-ink-600">
+                <div className="text-xs text-ink-600">
                   Court terme : {v.objectifsCourtTerme || 'Non précisé'}
                 </div>
               </div>
@@ -144,14 +144,14 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <Target className="w-4 h-4 text-primary-600" />
-            <h3 className="text-sm font-semibold text-ink-900">
+            <h3 className="text-base font-bold text-ink-900">
               Objectifs Thérapeutiques Définis
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Objectifs à court terme (Hospitalisation / Phase aiguë)
               </label>
               <textarea
@@ -159,13 +159,13 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
                 disabled={!canEdit}
                 value={formData.objectifsCourtTerme}
                 onChange={(e) => setFormData({ ...formData, objectifsCourtTerme: e.target.value })}
-                className="w-full bg-white border border-ink-200 focus:border-primary-500 text-xs font-medium rounded-lg p-3 focus:outline-none"
+                className="clinical-input w-full"
                 placeholder="Ex: Sédation de l'angoisse, rupture du délire, reprise du sommeil, apaisement de l'agitation..."
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Objectifs à moyen et long terme (Réhabilitation / Autonomie)
               </label>
               <textarea
@@ -173,7 +173,7 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
                 disabled={!canEdit}
                 value={formData.objectifsMoyenTerme}
                 onChange={(e) => setFormData({ ...formData, objectifsMoyenTerme: e.target.value })}
-                className="w-full bg-white border border-ink-200 focus:border-primary-500 text-xs font-medium rounded-lg p-3 focus:outline-none"
+                className="clinical-input w-full"
                 placeholder="Ex: Insight, prévention de la rechute, autonomie quotidienne, reprise d'une formation..."
               />
             </div>
@@ -183,7 +183,7 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
         {/* Subcard 2: Moyens & Stratégies */}
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-4">
           <div>
-            <label className="block text-sm font-bold text-ink-900 mb-1">
+            <label className="field-label">
               Moyens et Stratégies Thérapeutiques Mobilisés
             </label>
             <textarea
@@ -191,14 +191,14 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
               disabled={!canEdit}
               value={formData.moyensEtStrategies}
               onChange={(e) => setFormData({ ...formData, moyensEtStrategies: e.target.value })}
-              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-xs font-medium rounded-lg p-3 focus:outline-none"
+              className="clinical-input w-full"
               placeholder="Psychopharmacologie, entretiens réguliers, ateliers thérapeutiques, guidance parentale..."
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Échéances & Révisions programmées
               </label>
               <input
@@ -206,13 +206,13 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
                 disabled={!canEdit}
                 value={formData.echeancesEtRevisions}
                 onChange={(e) => setFormData({ ...formData, echeancesEtRevisions: e.target.value })}
-                className="w-full bg-white border border-ink-200 focus:border-primary-500 text-sm font-medium rounded-lg px-3 py-2.5 focus:outline-none focus:shadow-[var(--shadow-focus)]"
+                className="clinical-input w-full"
                 placeholder="Ex: Évaluation clinique hebdomadaire, bilan à 3 mois"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Intervenants clés impliqués
               </label>
               <input
@@ -225,7 +225,7 @@ export const S16ProjetTherapeutique: React.FC<Props> = ({
                     intervenants: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
                   })
                 }
-                className="w-full bg-white border border-ink-200 focus:border-primary-500 text-sm font-medium rounded-lg px-3 py-2.5 focus:outline-none focus:shadow-[var(--shadow-focus)]"
+                className="clinical-input w-full"
                 placeholder="Ex: Dr. Diallo, Psychologue Traoré, Infirmier Coulibaly..."
               />
             </div>

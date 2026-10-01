@@ -36,13 +36,13 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
   return (
     <aside
       aria-label="Rubriques du dossier"
-      className="w-full lg:w-64 shrink-0 clinical-card p-3 h-fit self-start lg:sticky lg:top-[72px] no-print"
+      className="w-full lg:w-72 shrink-0 clinical-card p-3 h-fit self-start lg:sticky lg:top-[72px] no-print"
     >
       {/* Progress header */}
       <div className="px-2 pt-1 pb-3 border-b border-ink-150">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-ink-900">Plan type</h2>
-          <span className="text-xs font-medium tabular-nums text-ink-500">
+          <h2 className="text-base font-bold text-ink-900">Plan type</h2>
+          <span className="text-sm font-semibold tabular-nums text-ink-600">
             {completedCount}/17 · {percentage}%
           </span>
         </div>
@@ -68,7 +68,7 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
       <div className={`mt-3 space-y-3 lg:max-h-[calc(100vh-200px)] overflow-y-auto -mr-2 pr-2 ${isMobileOpen ? 'block' : 'hidden'} lg:block`}>
         {blocks.map((block) => (
           <div key={block.title}>
-            <div className="px-2 pb-1 text-xs font-medium text-ink-400">{block.title}</div>
+            <div className="px-2 pb-1 text-xs font-bold text-ink-500">{block.title}</div>
 
             <div className="space-y-0.5">
               {block.items.map((rubrique) => {
@@ -84,20 +84,20 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
                   </span>
                 ) : completeness === 'COMPLETE' ? (
                   <span
-                    className="w-4 h-4 rounded-full bg-brand-500 flex items-center justify-center text-white"
+                    className="w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center text-white"
                     title="Rubrique complète"
                   >
-                    <Check className="w-2.5 h-2.5" strokeWidth={4} />
+                    <Check className="w-3 h-3" strokeWidth={3.5} />
                   </span>
                 ) : completeness === 'PARTIELLE' ? (
                   <span
-                    className="w-4 h-4 rounded-full border-[1.5px] border-amber-400 bg-amber-50 flex items-center justify-center"
+                    className="w-5 h-5 rounded-full border-2 border-amber-400 bg-amber-50 flex items-center justify-center"
                     title="Rubrique en cours de saisie"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                   </span>
                 ) : (
-                  <span className="block w-4 h-4 rounded-full border-[1.5px] border-ink-300" title="Non commencée" />
+                  <span className="block w-5 h-5 rounded-full border-2 border-ink-300" title="Non commencée" />
                 );
 
                 return (
@@ -108,17 +108,17 @@ export const RubriquesNav: React.FC<RubriquesNavProps> = ({
                       setIsMobileOpen(false);
                     }}
                     aria-current={isActive ? 'step' : undefined}
-                    className={`w-full !min-h-8 flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] text-left transition-colors cursor-pointer ${
+                    className={`w-full !min-h-10 flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-left transition-colors cursor-pointer ${
                       isActive
-                        ? 'bg-ink-100 text-ink-900 font-semibold'
+                        ? 'bg-ink-100 text-ink-900 font-bold'
                         : isHidden
                         ? 'text-ink-400 hover:bg-ink-50 font-medium'
-                        : 'text-ink-600 hover:text-ink-900 hover:bg-ink-50 font-medium'
+                        : 'text-ink-700 hover:text-ink-900 hover:bg-ink-50 font-semibold'
                     }`}
                   >
                     <span
-                      className={`w-7 shrink-0 text-[11px] font-semibold tabular-nums ${
-                        isActive ? 'text-ink-700' : 'text-ink-400'
+                      className={`w-8 shrink-0 text-xs font-bold tabular-nums ${
+                        isActive ? 'text-ink-800' : 'text-ink-500'
                       }`}
                     >
                       {rubrique.code}

@@ -200,7 +200,7 @@ export const PatientList: React.FC<PatientListProps> = ({
   const archivedCount = dossiers.filter((d) => d.statut === 'ARCHIVÉ').length;
 
   const selectCls =
-    'bg-white border border-ink-200 rounded-lg pl-2.5 pr-7 !min-h-8 py-1 text-sm font-medium text-ink-700 shadow-[var(--shadow-soft)] hover:border-ink-300 focus:outline-none focus:border-primary-500 focus:shadow-[var(--shadow-focus)] cursor-pointer transition-colors';
+    'bg-white border border-ink-200 rounded-lg pl-3 pr-8 !min-h-10 py-2 text-sm font-semibold text-ink-800 shadow-[var(--shadow-soft)] hover:border-ink-300 focus:outline-none focus:border-primary-500 focus:shadow-[var(--shadow-focus)] cursor-pointer transition-colors';
 
   const statusCounts: Record<string, number> = {
     TOUS_ACTIFS: activeCount,
@@ -216,8 +216,8 @@ export const PatientList: React.FC<PatientListProps> = ({
       {/* Page header */}
       <header className="page-header">
         <div>
-          <h2 className="text-h1 text-ink-900">Registre des patients</h2>
-          <p className="text-sm text-ink-500 mt-1">
+          <h2 className="page-title">Registre des patients</h2>
+          <p className="page-subtitle">
             Dossiers standardisés en 17 rubriques · {activeCount} actifs · {archivedCount} archivés
           </p>
         </div>
@@ -273,34 +273,53 @@ export const PatientList: React.FC<PatientListProps> = ({
             className="tab !min-h-0 -mb-px whitespace-nowrap"
           >
             {st.label}
-            <span className="text-xs font-medium text-ink-400 tabular-nums">{statusCounts[st.id]}</span>
+            <span className="chip chip-neutral !px-1.5 !py-0 tabular-nums">{statusCounts[st.id]}</span>
           </button>
         ))}
       </div>
 
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="relative w-full sm:w-64 shrink-0">
-          <Search className="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Nom, N° d'ordre, diagnostic…"
-            aria-label="Rechercher un patient"
-            className="clinical-input w-full !pl-9 !pr-9 !py-1 !min-h-8"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              aria-label="Effacer la recherche"
-              className="absolute right-0 top-1/2 -translate-y-1/2 !min-h-8 flex items-center justify-center text-ink-400 hover:text-ink-900 cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+      {/* Toolbar: row 1 search + sort, row 2 filters */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 min-w-0 max-w-xl">
+            <Search className="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Nom, N° d'ordre, diagnostic…"
+              aria-label="Rechercher un patient"
+              className="clinical-input w-full !pl-10 !pr-10"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                aria-label="Effacer la recherche"
+                className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-center text-ink-400 hover:text-ink-900 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
 
+          <div className="ml-auto shrink-0 flex items-center gap-1.5">
+            <label htmlFor="registre-sort" className="sr-only">Trier par</label>
+            <select id="registre-sort" value={sortBy} onChange={(e) => setSortBy(e.target.value as any)} className={selectCls}>
+              <option value="dateModif">Tri : mise à jour</option>
+              <option value="dateCreation">Tri : admission</option>
+              <option value="nom">Tri : nom</option>
+              <option value="completude">Tri : complétude</option>
+            </select>
+            <button
+              onClick={() => setSortAsc(!sortAsc)}
+              className="btn-icon"
+              title={sortAsc ? 'Ordre croissant' : 'Ordre décroissant'}
+              aria-label={sortAsc ? 'Ordre croissant' : 'Ordre décroissant'}
+            >
+              <ArrowUpDown className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <select aria-label="Tranche d'âge" value={trancheAgeFilter} onChange={(e) => setTrancheAgeFilter(e.target.value)} className={selectCls}>
             <option value="TOUTES">Âge : tous</option>
@@ -326,30 +345,13 @@ export const PatientList: React.FC<PatientListProps> = ({
             <option value="Hospitalisation">Hospitalisation</option>
           </select>
           {hasActiveFilters && (
-            <button onClick={resetAllFilters} className="btn-ghost btn-sm !min-h-8">
+            <button onClick={resetAllFilters} className="btn-ghost btn-sm">
               <RotateCcw className="w-3.5 h-3.5" />
               Réinitialiser
             </button>
           )}
         </div>
 
-        <div className="ml-auto flex items-center gap-1.5">
-          <label htmlFor="registre-sort" className="sr-only">Trier par</label>
-          <select id="registre-sort" value={sortBy} onChange={(e) => setSortBy(e.target.value as any)} className={selectCls}>
-            <option value="dateModif">Tri : mise à jour</option>
-            <option value="dateCreation">Tri : admission</option>
-            <option value="nom">Tri : nom</option>
-            <option value="completude">Tri : complétude</option>
-          </select>
-          <button
-            onClick={() => setSortAsc(!sortAsc)}
-            className="btn-icon !w-8 !h-8 !min-h-8 !min-w-8"
-            title={sortAsc ? 'Ordre croissant' : 'Ordre décroissant'}
-            aria-label={sortAsc ? 'Ordre croissant' : 'Ordre décroissant'}
-          >
-            <ArrowUpDown className="w-4 h-4" />
-          </button>
-        </div>
       </div>
 
       {/* Main Content: Table or Cards Deck */}
@@ -381,19 +383,19 @@ export const PatientList: React.FC<PatientListProps> = ({
                       <tr key={dossier.id} onClick={() => onSelectDossier(dossier.id)} className="cursor-pointer group">
                         <td>
                           <div className="flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-ink-100 text-ink-700 flex items-center justify-center text-[11px] font-semibold shrink-0">
+                            <span className="w-10 h-10 rounded-full bg-ink-100 text-ink-800 flex items-center justify-center text-sm font-bold shrink-0">
                               {`${dossier.s1Identification.nom?.[0] || ''}${dossier.s1Identification.prenoms?.[0] || ''}`.toUpperCase()}
                             </span>
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className="font-semibold text-ink-900 whitespace-nowrap">
+                                <span className="text-base font-semibold text-ink-900 whitespace-nowrap">
                                   {dossier.s1Identification.nom} {dossier.s1Identification.prenoms}
                                 </span>
-                                <span className="text-xs font-medium tabular-nums text-ink-400 whitespace-nowrap">
+                                <span className="text-xs font-semibold tabular-nums text-ink-500 whitespace-nowrap">
                                   {dossier.s1Identification.numeroOrdre}
                                 </span>
                               </div>
-                              <div className="text-xs text-ink-500 truncate max-w-xs mt-0.5">
+                              <div className="text-sm text-ink-600 truncate max-w-[16rem] mt-0.5">
                                 {diagPrincipal
                                   ? `${diagPrincipal.codeCimDsm ? `${diagPrincipal.codeCimDsm} · ` : ''}${diagPrincipal.libelle}`
                                   : dossier.s1Identification.profession || 'Diagnostic en cours d’évaluation'}
@@ -406,7 +408,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                           <div className="text-xs text-ink-500">{dossier.s1Identification.sexe}</div>
                         </td>
                         <td>
-                          <div className="text-ink-900 font-medium whitespace-nowrap">{dossier.s2Modalites.modalite}</div>
+                          <div className="text-ink-900 font-medium">{dossier.s2Modalites.modalite}</div>
                           <div className="text-xs text-ink-500 whitespace-nowrap">
                             {dossier.s14PriseEnCharge.orientation || 'Orientation non définie'}
                           </div>
@@ -441,7 +443,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                               onSelectDossier(dossier.id);
                             }}
                             aria-label={`Ouvrir le dossier de ${dossier.s1Identification.nom} ${dossier.s1Identification.prenoms}`}
-                            className="btn-icon !w-8 !h-8 !min-h-8 !min-w-8 text-ink-400 group-hover:text-ink-900"
+                            className="btn-icon text-ink-500 group-hover:text-ink-900"
                           >
                             <ChevronRight className="w-4 h-4" />
                           </button>
@@ -454,9 +456,9 @@ export const PatientList: React.FC<PatientListProps> = ({
             </div>
 
             {/* Pagination Footer */}
-            <div className="px-4 py-2.5 border-t border-ink-150 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-ink-500">
+            <div className="px-5 py-3 border-t border-ink-150 bg-[var(--color-sunken)] flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-ink-500">
               <div className="flex items-center gap-2">
-                <label htmlFor="registre-page-size">Lignes par page</label>
+                <label htmlFor="registre-page-size" className="font-medium text-ink-600">Lignes par page</label>
                 <select
                   id="registre-page-size"
                   value={pageSize}
@@ -481,7 +483,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="btn-secondary btn-sm !px-2 !min-w-8 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="btn-secondary btn-sm !px-2 disabled:opacity-40 disabled:cursor-not-allowed"
                   aria-label="Page précédente"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -489,7 +491,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                 <button
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="btn-secondary btn-sm !px-2 !min-w-8 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="btn-secondary btn-sm !px-2 disabled:opacity-40 disabled:cursor-not-allowed"
                   aria-label="Page suivante"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -520,7 +522,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                       {/* Top row: Avatar + Order + Status */}
                       <div className="flex items-center justify-between gap-2 mb-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-ink-100 text-ink-700 flex items-center justify-center font-semibold text-[11px]">
+                          <div className="w-10 h-10 rounded-full bg-ink-100 text-ink-800 flex items-center justify-center font-bold text-sm">
                             {initials}
                           </div>
                           <span className="text-xs font-bold tabular-nums text-ink-500">
@@ -532,7 +534,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                       </div>
 
                       {/* Name */}
-                      <h3 className="text-[15px] font-semibold text-ink-900 leading-tight">
+                      <h3 className="text-lg font-bold text-ink-900 leading-tight">
                         {dossier.s1Identification.nom} {dossier.s1Identification.prenoms}
                       </h3>
 
@@ -545,7 +547,7 @@ export const PatientList: React.FC<PatientListProps> = ({
                       </div>
 
                       {/* Meta */}
-                      <div className="flex items-center gap-2 text-[11px] text-ink-500 mt-2.5">
+                      <div className="flex items-center gap-2 text-xs text-ink-500 mt-2.5">
                         <span className="font-semibold text-ink-900">{dossier.s1Identification.age} ans</span>
                         <span>·</span>
                         <span>{dossier.s1Identification.sexe}</span>

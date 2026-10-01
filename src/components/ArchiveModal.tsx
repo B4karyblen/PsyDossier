@@ -101,7 +101,7 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
           )}
 
           <div>
-            <label className="block font-bold text-ink-900 mb-1">
+            <label className="field-label">
               Catégorie de motif <span className="text-rose-500">*</span>
             </label>
             <select
@@ -129,7 +129,7 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({
           </div>
 
           <div>
-            <label className="block font-bold text-ink-900 mb-1">
+            <label className="field-label">
               Précisions & justification clinique
             </label>
             <textarea

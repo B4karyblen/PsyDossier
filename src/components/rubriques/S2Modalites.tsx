@@ -48,7 +48,7 @@ export const S2Modalites: React.FC<Props> = ({
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S2 · ADMINISTRATIF
             </span>
             <span className="text-xs text-ink-500">Obligatoire pour validation</span>
@@ -56,7 +56,7 @@ export const S2Modalites: React.FC<Props> = ({
           <h2 className="text-h2 text-ink-900 mt-2">
             Modalités de Consultation
           </h2>
-          <p className="text-sm text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Cadre médico-légal d'admission et de consentement aux soins (BR-004, BR-005, BR-006)
           </p>
         </div>
@@ -72,7 +72,7 @@ export const S2Modalites: React.FC<Props> = ({
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Main Option selector cards */}
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-3.5">
-          <label className="block text-sm font-bold text-ink-900">
+          <label className="field-label">
             Régime d’admission légal <span className="text-rose-500">*</span>
           </label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
@@ -125,7 +125,7 @@ export const S2Modalites: React.FC<Props> = ({
                   />
                   <span className="text-xs font-bold text-ink-900">{option.title}</span>
                 </div>
-                <span className="text-[11px] text-ink-500 mt-1.5 pl-6 font-medium">
+                <span className="text-xs text-ink-500 mt-1.5 pl-6 font-medium">
                   {option.desc}
                 </span>
               </label>
@@ -135,16 +135,16 @@ export const S2Modalites: React.FC<Props> = ({
 
         {/* Conditionnel : Adressé par un tiers */}
         {formData.modalite === 'Adressé par un tiers' && (
-          <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-4">
+          <div className="bg-white border border-ink-150 rounded-xl p-5 space-y-4">
             <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
               <UserCheck className="w-4 h-4 text-primary-600" />
-              <h3 className="text-sm font-semibold text-ink-900">
+              <h3 className="text-base font-bold text-ink-900">
                 Précisions sur le tiers orienteur
               </h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
+                <label className="field-label">
                   Type de prescripteur / tiers
                 </label>
                 <select
@@ -156,7 +156,7 @@ export const S2Modalites: React.FC<Props> = ({
                       adresseParTiersType: e.target.value as any,
                     })
                   }
-                  className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)]"
+                  className="clinical-input w-full"
                 >
                   <option value="Médecin traitant">Médecin traitant</option>
                   <option value="Centre de santé">Centre de santé / CSREF</option>
@@ -166,7 +166,7 @@ export const S2Modalites: React.FC<Props> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
+                <label className="field-label">
                   Identité / Précisions sur le tiers <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -176,7 +176,7 @@ export const S2Modalites: React.FC<Props> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, adresseParTiersPrecision: e.target.value })
                   }
-                  className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)]"
+                  className="clinical-input w-full"
                   placeholder="Ex: Dr. Traoré (CSREF Commune IV) ou Frère aîné"
                 />
               </div>
@@ -196,7 +196,7 @@ export const S2Modalites: React.FC<Props> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
+                <label className="field-label">
                   Sous-type légal <span className="text-rose-500">*</span>
                 </label>
                 <select
@@ -208,7 +208,7 @@ export const S2Modalites: React.FC<Props> = ({
                       soinsSansConsentementType: e.target.value as SoinsSansConsentementType,
                     })
                   }
-                  className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)]"
+                  className="clinical-input w-full"
                 >
                   <option value="À la demande d'un tiers">À la demande d'un tiers (famille, tuteur)</option>
                   <option value="À la demande d'un représentant de l'État">
@@ -218,7 +218,7 @@ export const S2Modalites: React.FC<Props> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
+                <label className="field-label">
                   Identité du demandeur officiel
                 </label>
                 <input
@@ -228,13 +228,13 @@ export const S2Modalites: React.FC<Props> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, soinsSansConsentementDemandeur: e.target.value })
                   }
-                  className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)]"
+                  className="clinical-input w-full"
                   placeholder="Ex: Procureur, Préfet, Commissaire ou Tuteur légal"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
+                <label className="field-label">
                   Date de la décision ou du certificat médical initial
                 </label>
                 <input
@@ -244,7 +244,7 @@ export const S2Modalites: React.FC<Props> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, dateDecisionOuCertificat: e.target.value })
                   }
-                  className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)] tabular-nums"
+                  className="clinical-input w-full tabular-nums"
                 />
               </div>
             </div>
@@ -253,7 +253,7 @@ export const S2Modalites: React.FC<Props> = ({
 
         {/* Observations générales */}
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-2">
-          <label className="block text-sm font-medium text-ink-700">
+          <label className="field-label">
             Observations sur les circonstances d'arrivée / accompagnement
           </label>
           <textarea
@@ -261,7 +261,7 @@ export const S2Modalites: React.FC<Props> = ({
             disabled={isReadOnly}
             value={formData.observationsModalite || ''}
             onChange={(e) => setFormData({ ...formData, observationsModalite: e.target.value })}
-            className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)]"
+            className="clinical-input w-full"
             placeholder="Ex: Arrivé calme / agité, accompagné par ses parents et son oncle..."
           />
         </div>

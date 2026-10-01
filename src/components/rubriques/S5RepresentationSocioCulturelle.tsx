@@ -54,7 +54,7 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S5 · ANAMNÈSE
             </span>
             <span className="text-xs text-ink-500">Psychiatrie transculturelle</span>
@@ -62,7 +62,7 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
           <h2 className="text-h2 text-ink-900 mt-2">
             Représentation Socio-Culturelle de la Maladie
           </h2>
-          <p className="text-sm text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Compréhension profane, étiologies traditionnelles formulées par le patient et son entourage
           </p>
         </div>
@@ -73,7 +73,7 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-3.5">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <Globe2 className="w-4 h-4 text-primary-600" />
-            <label className="block text-sm font-bold text-ink-900">
+            <label className="field-label">
               Étiologies & Croyances Évoquées par le Milieu Culturel
             </label>
           </div>
@@ -104,13 +104,13 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <MessageCircle className="w-4 h-4 text-primary-600" />
-            <h3 className="text-sm font-semibold text-ink-900">
+            <h3 className="text-base font-bold text-ink-900">
               Explications Profanes Détaillées
             </h3>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink-700 mb-1">
+            <label className="field-label">
               Explication de la maladie selon le patient
             </label>
             <textarea
@@ -118,13 +118,13 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
               disabled={isReadOnly}
               value={formData.explicationPatient || ''}
               onChange={(e) => setFormData({ ...formData, explicationPatient: e.target.value })}
-              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3 focus:outline-none"
+              className="clinical-input w-full"
               placeholder="Comment le patient interprète-t-il sa souffrance ? (Ex: Attaque mystique, punition, malchance, fatigue intellectuelle...)"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink-700 mb-1">
+            <label className="field-label">
               Explication de la maladie selon la famille / entourage
             </label>
             <textarea
@@ -132,7 +132,7 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
               disabled={isReadOnly}
               value={formData.explicationFamille || ''}
               onChange={(e) => setFormData({ ...formData, explicationFamille: e.target.value })}
-              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3 focus:outline-none"
+              className="clinical-input w-full"
               placeholder="Interprétation avancée par les parents, conjoints, tuteurs..."
             />
           </div>
@@ -140,7 +140,7 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
 
         {/* Subcard 3: Recours antérieurs & Précisions */}
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-2">
-          <label className="block text-sm font-bold text-ink-900">
+          <label className="field-label">
             Recours Thérapeutiques Antérieurs & Précisions
           </label>
           <textarea
@@ -148,7 +148,7 @@ export const S5RepresentationSocioCulturelle: React.FC<Props> = ({
             disabled={isReadOnly}
             value={formData.precisions || ''}
             onChange={(e) => setFormData({ ...formData, precisions: e.target.value })}
-            className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3 focus:outline-none"
+            className="clinical-input w-full"
             placeholder="Noter les soins traditionnels déjà reçus, lavages, décoctions, rituels religieux, scarifications, ou précisions socioculturelles..."
           />
         </div>

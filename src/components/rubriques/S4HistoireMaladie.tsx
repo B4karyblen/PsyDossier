@@ -77,7 +77,7 @@ export const S4HistoireMaladie: React.FC<Props> = ({
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S4 · ANAMNÈSE
             </span>
             <span className="text-xs text-ink-500">Chrono-clinique</span>
@@ -85,7 +85,7 @@ export const S4HistoireMaladie: React.FC<Props> = ({
           <h2 className="text-h2 text-ink-900 mt-2">
             Histoire de la Maladie
           </h2>
-          <p className="text-sm text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Début des troubles, mode d'installation, facteurs déclenchants et évolution de l'épisode actuel
           </p>
         </div>
@@ -103,14 +103,14 @@ export const S4HistoireMaladie: React.FC<Props> = ({
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <Clock className="w-4 h-4 text-primary-600" />
-            <h3 className="text-sm font-semibold text-ink-900">
+            <h3 className="text-base font-bold text-ink-900">
               Début & Mode d'Installation
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Date de début des troubles actuels
               </label>
               <input
@@ -118,12 +118,12 @@ export const S4HistoireMaladie: React.FC<Props> = ({
                 disabled={isReadOnly}
                 value={formData.dateDebut || ''}
                 onChange={(e) => setFormData({ ...formData, dateDebut: e.target.value })}
-                className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)] tabular-nums"
+                className="clinical-input w-full tabular-nums"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Mode d'installation <span className="text-rose-500">*</span>
               </label>
               <div className="flex gap-4 pt-1.5">
@@ -149,7 +149,7 @@ export const S4HistoireMaladie: React.FC<Props> = ({
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-3.5">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <Zap className="w-4 h-4 text-primary-600" />
-            <label className="block text-sm font-bold text-ink-900">
+            <label className="field-label">
               Facteurs Déclenchants Potentiels (Cocher les options applicables)
             </label>
           </div>
@@ -177,7 +177,7 @@ export const S4HistoireMaladie: React.FC<Props> = ({
 
           {formData.facteursDeclenchants.includes('Autre') && (
             <div className="pt-2">
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Précision pour le facteur « Autre » <span className="text-rose-500">*</span> (BR-008)
               </label>
               <input
@@ -190,7 +190,7 @@ export const S4HistoireMaladie: React.FC<Props> = ({
                     facteursDeclenchantsAutrePrecision: e.target.value,
                   })
                 }
-                className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)]"
+                className="clinical-input w-full"
                 placeholder="Ex: Conflit foncier, sorcellerie perçue, maladie physique..."
               />
             </div>
@@ -201,13 +201,13 @@ export const S4HistoireMaladie: React.FC<Props> = ({
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <History className="w-4 h-4 text-primary-600" />
-            <h3 className="text-sm font-semibold text-ink-900">
+            <h3 className="text-base font-bold text-ink-900">
               Chronologie & Récit de l'Épisode
             </h3>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink-700 mb-1">
+            <label className="field-label">
               Récit chronologique et itinéraire thérapeutique
             </label>
             <textarea
@@ -215,13 +215,13 @@ export const S4HistoireMaladie: React.FC<Props> = ({
               disabled={isReadOnly}
               value={formData.itineraireTherapeutique || ''}
               onChange={(e) => setFormData({ ...formData, itineraireTherapeutique: e.target.value })}
-              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3.5 focus:outline-none leading-relaxed"
+              className="clinical-input w-full leading-relaxed"
               placeholder="Décrire l'apparition des premiers signes, leur succession dans le temps, les modifications comportementales, les consultations ou thérapeutiques déjà essayées..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink-700 mb-1">
+            <label className="field-label">
               Retentissement socio-professionnel & familial
             </label>
             <input
@@ -231,7 +231,7 @@ export const S4HistoireMaladie: React.FC<Props> = ({
               onChange={(e) =>
                 setFormData({ ...formData, retentissementSocioProfessionnel: e.target.value })
               }
-              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)]"
+              className="clinical-input w-full"
               placeholder="Ex: Arrêt de travail, déscolarisation, rupture des liens familiaux..."
             />
           </div>

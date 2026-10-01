@@ -124,7 +124,7 @@ export const S15EvolutionClinique: React.FC<Props> = ({
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S15 · SUIVI
             </span>
             <span className="text-xs text-ink-500">Journal clinique</span>
@@ -132,7 +132,7 @@ export const S15EvolutionClinique: React.FC<Props> = ({
           <h2 className="text-h2 text-ink-900 mt-2">
             Évolution Clinique & Transmissions
           </h2>
-          <p className="text-sm text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Historique inaltérable et horodaté des transmissions interdisciplinaires (BR-012 & BR-013)
           </p>
         </div>
@@ -149,7 +149,7 @@ export const S15EvolutionClinique: React.FC<Props> = ({
               <Plus className="w-3.5 h-3.5 text-primary-600" />
               Nouvelle Transmission Clinique
             </label>
-            <span className="text-[11px] text-ink-500">
+            <span className="text-xs text-ink-500">
               Signé : <strong className="text-ink-900">{currentUserName}</strong> ({currentUserRole})
             </span>
           </div>
@@ -159,14 +159,14 @@ export const S15EvolutionClinique: React.FC<Props> = ({
             value={newNote}
             onChange={(e) => setNewNote(e.target.value)}
             placeholder="Consigner l'état clinique du jour, comportement, tolérance thérapeutique, événements intercurrents..."
-            className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3 focus:outline-none leading-relaxed"
+            className="clinical-input w-full leading-relaxed"
           />
 
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={!newNote.trim()}
-              className="btn-primary btn-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              className="btn-primary btn-sm disabled:cursor-not-allowed"
             >
               <Plus className="w-4 h-4" />
               Consigner au dossier
@@ -184,13 +184,13 @@ export const S15EvolutionClinique: React.FC<Props> = ({
             placeholder="Filtrer par auteur..."
             value={filterAuthor}
             onChange={(e) => { setFilterAuthor(e.target.value); setCurrentPage(1); }}
-            className="text-sm bg-white border border-ink-200 rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)] focus:border-primary-500 w-40"
+            className="clinical-input w-40"
           />
           <input
             type="date"
             value={filterDateFrom}
             onChange={(e) => { setFilterDateFrom(e.target.value); setCurrentPage(1); }}
-            className="text-sm bg-white border border-ink-200 rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)] focus:border-primary-500"
+            className="clinical-input !w-auto"
             title="Date de début"
           />
           <span className="text-xs text-ink-500">→</span>
@@ -198,7 +198,7 @@ export const S15EvolutionClinique: React.FC<Props> = ({
             type="date"
             value={filterDateTo}
             onChange={(e) => { setFilterDateTo(e.target.value); setCurrentPage(1); }}
-            className="text-sm bg-white border border-ink-200 rounded-lg px-3 py-2 focus:outline-none focus:shadow-[var(--shadow-focus)] focus:border-primary-500"
+            className="clinical-input !w-auto"
             title="Date de fin"
           />
           {(filterAuthor || filterDateFrom || filterDateTo) && (
@@ -241,12 +241,12 @@ export const S15EvolutionClinique: React.FC<Props> = ({
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-ink-100 gap-2">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-ink-900">{entree.auteurNom}</span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white border border-ink-200 text-primary-700">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-white border border-ink-200 text-primary-700">
                         {entree.auteurRole}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-[11px] text-ink-500">
+                    <div className="flex items-center gap-2 text-xs text-ink-500">
                       <Clock className="w-3 h-3 text-ink-400" />
                       <span className="tabular-nums">
                         {dt.toLocaleDateString('fr-FR', {
@@ -273,7 +273,7 @@ export const S15EvolutionClinique: React.FC<Props> = ({
                             rectifyingEntryId === entree.id ? null : entree.id
                           )
                         }
-                        className="text-[11px] text-primary-700 hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+                        className="text-xs text-primary-700 hover:underline font-semibold flex items-center gap-1 cursor-pointer"
                       >
                         <CornerDownRight className="w-3 h-3" />
                         Ajouter un rectificatif / addendum
@@ -288,7 +288,7 @@ export const S15EvolutionClinique: React.FC<Props> = ({
                         value={rectificationText}
                         onChange={(e) => setRectificationText(e.target.value)}
                         placeholder="Texte rectificatif qui sera consigné sous forme d’addendum..."
-                        className="w-full text-xs bg-ink-25 border border-ink-200 rounded-lg p-2.5 outline-none"
+                        className="clinical-input w-full"
                       />
                       <div className="flex justify-end gap-2">
                         <button
@@ -325,7 +325,7 @@ export const S15EvolutionClinique: React.FC<Props> = ({
               type="button"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1.5 text-xs font-semibold text-ink-900 bg-white border border-ink-200 hover:bg-ink-25 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="btn-secondary btn-sm"
             >
               ← Précédent
             </button>
@@ -336,7 +336,7 @@ export const S15EvolutionClinique: React.FC<Props> = ({
               type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1.5 text-xs font-semibold text-ink-900 bg-white border border-ink-200 hover:bg-ink-25 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="btn-secondary btn-sm"
             >
               Suivant →
             </button>

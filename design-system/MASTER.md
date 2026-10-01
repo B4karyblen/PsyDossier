@@ -39,18 +39,53 @@ Teal is allowed in exactly these places:
 
 **Never** use teal for buttons, links, focus rings, selected tabs, form accents or chip backgrounds.
 
-### Ink · Neutral slate
-`ink-25 #FBFCFD` · `50 #F7F8FA` (canvas, table header) · `100 #F0F2F5` (active nav, avatar bg) · `150 #E7EAEE` (card borders, dividers) · `200 #DCE0E6` (input borders) · `300 #C3C9D2` (hover borders) · `400 #949DAB` (icons, placeholders only) · `500 #636D7E` (secondary text, min for text) · `600 #4A5466` · `700 #343D4D` (labels) · `800 #222A38` · `900 #151B27` (primary text)
+### Ink · Neutral gray (contrast on white)
+| Token | Hex | Contrast | Use |
+|---|---|---|---|
+| ink-50 / sunken | #F6F7F9 | — | level-2 sub-container, table header |
+| ink-100 | #EDEFF3 | — | hover / selected on white, readonly input |
+| ink-150 | #E3E6EB | — | card borders, dividers |
+| ink-200 | #D3D8DF | — | input borders |
+| ink-300 | #B4BCC7 | — | hover borders, separators (never text) |
+| ink-400 | #6B7280 | 4.8:1 | icons, placeholders, tertiary text (floor) |
+| ink-500 | #4B5563 | 7.5:1 | secondary text |
+| ink-700 | #2A3241 | 12:1 | labels |
+| ink-900 | #111827 | 17:1 | primary text |
+
+## Surface ladder (gray ↔ white)
+
+| Level | Surface | Color | Examples |
+|---|---|---|---|
+| 0 | Canvas | gray `#EEF0F4` | page background |
+| 1 | Main container | **white** | `.clinical-card`, sidebar, top bar, modal |
+| 2 | Sub-container | **gray** `--color-sunken` | `.clinical-subcard`, table header, segmented track, sidebar search, pagination footer |
+| 3 | Control | **white** | `.clinical-input`, chips (`.chip-neutral`), segmented thumb, list items inside a sub-container |
+
+Rule: a surface is never the same color as its parent. Gray sits on white, white sits on gray.
+Hover/selected on white = `ink-100`; on gray = white.
 
 ### Semantic
 Tailwind `emerald` (validated), `amber` (in progress / pending), `rose` (danger, coercive care, archived), `sky`/`violet` for neutral categories.
 Badge recipe: `bg-{c}-50 text-{c}-700 ring-1 ring-inset ring-{c}-200` + `.dot`.
 
 ## Typography
-- Family: **Manrope** (self-hosted brand font). `font-mono` maps to Manrope with tabular figures.
-- Scale: 12 caption · 13 small · **14 body** · 16 · 18 h3 · 20 h2 · 24 h1 · 30 display.
-- Weights: 500 body · 600 labels, buttons, table emphasis · 700 page titles only. No 800.
-- Labels: sentence case, `text-sm font-medium text-ink-700`. No uppercase-tracking labels in the app (print export only).
+From the UI UX Pro Max UX guidelines: 16px body minimum, modular scale, line height 1.5+, contrast ≥ 4.5:1.
+Tailwind's built-in sizes are remapped in `@theme`, so `text-xs` can never render below 13px.
+
+| Class | Size / line | Use |
+|---|---|---|
+| `text-xs` | 13 / 20 | captions, badges, meta (floor; never body copy) |
+| `text-sm` | 15 / 22 | secondary text, table cells, nav, buttons |
+| `text-base` | 16 / 24 | body, inputs, descriptions |
+| `text-lg` | 18 / 26 | card titles (`.card-title`) |
+| `text-xl` / `.text-h2` | 20 / 28 | section titles |
+| `.page-title` | 26 / 34 | page titles |
+| KPI | 32 | dashboard numbers |
+
+- Family: **Manrope** (self-hosted brand font), tabular figures for IDs and numbers.
+- Weights: 500 body · 600 labels, secondary buttons, table names · 700 titles, active nav, selected tabs.
+- **White text on navy is always bold (700).** Enforced in CSS for `.btn-primary` and any `.text-white` on a `bg-primary-*` element.
+- Arbitrary pixel sizes (`text-[11px]`, etc.) are banned.
 
 ## Shape & elevation
 | Token | Value | Use |
@@ -66,15 +101,18 @@ Badge recipe: `bg-{c}-50 text-{c}-700 ring-1 ring-inset ring-{c}-200` + `.dot`.
 ## Components (`src/index.css`)
 | Class | Purpose |
 |---|---|
-| `.btn-primary` / `.clinical-btn-primary` | navy fill, white text, 36px |
+| `.btn-primary` / `.clinical-btn-primary` | navy fill, **bold** white text, 40px; disabled = gray fill + gray text (no opacity) |
 | `.btn-secondary` | white, `ink-200` border, soft shadow |
 | `.btn-ghost` | text-only, hover `ink-100` |
 | `.btn-danger` | destructive confirm (archive) |
-| `.btn-icon` | 36px square icon button (needs `aria-label`) |
-| `.btn-sm` / `.btn-lg` | 32px / 40px size modifiers |
+| `.btn-icon` | 40px square icon button (needs `aria-label`) |
+| `.btn-sm` / `.btn-lg` | 36px / 44px size modifiers |
 | `.clinical-card` | white, 12px radius, hairline border |
-| `.clinical-subcard` | nested white section, 10px radius |
-| `.clinical-input` | full-width, 14px, navy focus ring |
+| `.clinical-subcard` | level-2 gray section inside a card |
+| `.clinical-input` | white, full-width, 16px, 44px tall, navy focus ring |
+| `.field-label` / `.field-hint` | 15px semibold label / 13px hint |
+| `.chip-neutral` | white chip with ring — readable on white and gray |
+| `.card-header` / `.card-title` | card title strip, 18px bold |
 | `.data-table` | sticky `ink-50` header, 1px row dividers, hover row |
 | `.tab` + `[aria-selected]` | underline tabs, navy 2px indicator |
 | `.segmented` | compact toggle group (view mode) |
@@ -86,8 +124,8 @@ Badge recipe: `bg-{c}-50 text-{c}-700 ring-1 ring-inset ring-{c}-200` + `.dot`.
 | `StatusBadge` (`src/components/ui`) | dossier status → badge |
 
 ## Layout
-- **Sidebar** 256px (68px collapsed), white, `ink-150` right border. Sections: logo · search · nav groups · user. Active item = `ink-100` bg + teal 3px edge bar. Badges are plain counts.
-- **Top bar** 56px, white/90 + blur, breadcrumb › page title on one line, ⌘K search, user avatar. No CTA in the top bar: page CTAs live in the page header.
+- **Sidebar** 280px (72px collapsed), white, `ink-150` right border. Sections: logo · search · nav groups · user. Active item = `ink-100` bg + teal 3px edge bar. Badges are plain counts.
+- **Top bar** 64px, white/90 + blur, breadcrumb › page title on one line, ⌘K search, user avatar. No CTA in the top bar: page CTAs live in the page header.
 - **Content** `max-w-[1400px]` (dossier 1600px), `px-4 sm:px-6 lg:px-8`, `py-6 lg:py-8`, 24px between sections.
 - **Dashboard**: page header (date, greeting, CTA) → KPI strip (one card, 4 cells) → list cards with divided rows → diagnostics table-list.
 - **Registry**: page header → underline status tabs with counts → toolbar (search, filters, sort) → table card with pagination footer.
@@ -107,7 +145,7 @@ Rubrique completeness: complete = teal dot + check · partial = amber ring + dot
 ## Rules
 - Contrast: text ≥ 4.5:1. `ink-400` is for icons and placeholders only.
 - Focus: visible 2px navy outline (`:focus-visible`), inputs use `--shadow-focus`.
-- Targets: 40px minimum for standalone controls; dense controls (32–36px) only inside toolbars and tables.
+- Targets: 40px minimum for every control; inputs 44px.
 - Motion: 150ms color/border transitions; no scale-on-hover; `prefers-reduced-motion` respected.
-- Icons: Lucide only, 16px in controls, 18px in nav. No emoji.
+- Icons: Lucide only, 16px in controls, 18px in nav and card headers. No emoji.
 - No raw hex in JSX; use tokens.

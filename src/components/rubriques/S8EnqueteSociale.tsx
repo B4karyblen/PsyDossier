@@ -34,7 +34,7 @@ export const S8EnqueteSociale: React.FC<Props> = ({
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S8 · SOCIAL & ENVIRONNEMENT
             </span>
             <span className="text-xs text-ink-500">Personnalité & Insertion</span>
@@ -42,7 +42,7 @@ export const S8EnqueteSociale: React.FC<Props> = ({
           <h2 className="text-h2 text-ink-900 mt-2">
             Enquête Sociale & Personnalité Prémorbide
           </h2>
-          <p className="text-sm text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Autodescription, hétérodescription par l’entourage, insertion relationnelle et centres d'intérêt
           </p>
         </div>
@@ -53,13 +53,13 @@ export const S8EnqueteSociale: React.FC<Props> = ({
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <UserCheck className="w-4 h-4 text-primary-600" />
-            <h3 className="text-sm font-semibold text-ink-900">
+            <h3 className="text-base font-bold text-ink-900">
               Traits de Caractère & Personnalité Antérieure
             </h3>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink-700 mb-1">
+            <label className="field-label">
               Autodescription (Comment le patient se décrit-il lui-même avant l'apparition des troubles ?)
             </label>
             <textarea
@@ -67,13 +67,13 @@ export const S8EnqueteSociale: React.FC<Props> = ({
               disabled={isReadOnly}
               value={formData.autodescription || ''}
               onChange={(e) => setFormData({ ...formData, autodescription: e.target.value })}
-              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3 focus:outline-none"
+              className="clinical-input w-full"
               placeholder="Ex: Calme, sociable, réservé, perfectionniste, anxieux, colérique..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink-700 mb-1">
+            <label className="field-label">
               Hétérodescription (Description du patient par l'entourage / famille)
             </label>
             <textarea
@@ -81,13 +81,13 @@ export const S8EnqueteSociale: React.FC<Props> = ({
               disabled={isReadOnly}
               value={formData.heterodescription || ''}
               onChange={(e) => setFormData({ ...formData, heterodescription: e.target.value })}
-              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3 focus:outline-none"
+              className="clinical-input w-full"
               placeholder="Ex: Toujours dévoué, généreux, sans histoire, ou au contraire susceptible, isolé..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink-700 mb-1">
+            <label className="field-label">
               Source de l'hétérodescription (Qui a fourni cette description ?)
             </label>
             <input
@@ -95,7 +95,7 @@ export const S8EnqueteSociale: React.FC<Props> = ({
               disabled={isReadOnly}
               value={formData.heterodescriptionSource || ''}
               onChange={(e) => setFormData({ ...formData, heterodescriptionSource: e.target.value })}
-              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2.5 focus:outline-none focus:shadow-[var(--shadow-focus)]"
+              className="clinical-input w-full"
               placeholder="Ex: Épouse, mère, frère aîné, ami d'enfance..."
             />
           </div>
@@ -105,13 +105,13 @@ export const S8EnqueteSociale: React.FC<Props> = ({
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <Heart className="w-4 h-4 text-primary-600" />
-            <h3 className="text-sm font-semibold text-ink-900">
+            <h3 className="text-base font-bold text-ink-900">
               Vie Relationnelle & Centres d'Intérêt
             </h3>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink-700 mb-1">
+            <label className="field-label">
               Relations avec les pairs & insertion sociale
             </label>
             <textarea
@@ -119,13 +119,13 @@ export const S8EnqueteSociale: React.FC<Props> = ({
               disabled={isReadOnly}
               value={formData.relationsSociales || ''}
               onChange={(e) => setFormData({ ...formData, relationsSociales: e.target.value })}
-              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3 focus:outline-none"
+              className="clinical-input w-full"
               placeholder="Amis intimes, intégration dans le quartier, associations, relations de travail..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink-700 mb-1">
+            <label className="field-label">
               Loisirs, activités culturelles et sportives
             </label>
             <input
@@ -133,7 +133,7 @@ export const S8EnqueteSociale: React.FC<Props> = ({
               disabled={isReadOnly}
               value={formData.loisirs || ''}
               onChange={(e) => setFormData({ ...formData, loisirs: e.target.value })}
-              className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2.5 focus:outline-none focus:shadow-[var(--shadow-focus)]"
+              className="clinical-input w-full"
               placeholder="Ex: Football, lecture, musique, thé au grin, religion..."
             />
           </div>

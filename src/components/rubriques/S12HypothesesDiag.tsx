@@ -95,7 +95,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S12 · SYNTHÈSE
             </span>
             <span className="text-xs text-ink-500">Obligatoire pour validation</span>
@@ -103,7 +103,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
           <h2 className="text-h2 text-ink-900 mt-2">
             Hypothèses Diagnostiques (CIM-10 / DSM-5)
           </h2>
-          <p className="text-sm text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Diagnostic principal et diagnostics différentiels argumentés (BR-014 : exclusivité Psychiatre)
           </p>
         </div>
@@ -141,9 +141,9 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                   key={preset.code}
                   type="button"
                   onClick={() => addHypothese(preset)}
-                  className="px-2.5 py-1 text-[11px] font-semibold bg-white hover:bg-primary-50 text-ink-900 hover:text-primary-700 border border-ink-200 hover:border-primary-500 rounded-lg transition-all cursor-pointer shadow-2xs"
+                  className="btn-secondary btn-sm"
                 >
-                  <span className="font-mono text-[10px] text-primary-700 mr-1">[{preset.code}]</span>
+                  <span className="font-mono text-xs text-primary-700 mr-1">[{preset.code}]</span>
                   {preset.label}
                 </button>
               ))}
@@ -161,7 +161,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={() => addHypothese()}
-                className="px-3 py-1.5 text-xs font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-500/30 rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+                className="btn-secondary btn-sm"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Ajouter une hypothèse
@@ -217,7 +217,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                   <div className="md:col-span-1">
-                    <label className="block text-sm font-medium text-ink-700 mb-1">
+                    <label className="field-label">
                       Code CIM-10 / DSM-5
                     </label>
                     <input
@@ -225,13 +225,13 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                       disabled={effectiveReadOnly}
                       value={hyp.codeCimDsm || ''}
                       onChange={(e) => updateHypothese(hyp.id, { codeCimDsm: e.target.value.toUpperCase() })}
-                      className="w-full bg-white border border-ink-200 focus:border-primary-500 text-sm font-mono font-medium rounded-lg px-3 py-2 uppercase"
+                      className="clinical-input w-full font-mono uppercase"
                       placeholder="Ex: F20.0"
                     />
                   </div>
 
                   <div className="md:col-span-3">
-                    <label className="block text-sm font-medium text-ink-700 mb-1">
+                    <label className="field-label">
                       Libellé nosologique / Diagnostic <span className="text-rose-500">*</span>
                     </label>
                     <input
@@ -239,14 +239,14 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                       disabled={effectiveReadOnly}
                       value={hyp.libelle}
                       onChange={(e) => updateHypothese(hyp.id, { libelle: e.target.value })}
-                      className="w-full bg-white border border-ink-200 focus:border-primary-500 text-sm font-medium text-ink-900 rounded-lg px-3 py-2"
+                      className="clinical-input w-full"
                       placeholder="Ex: Schizophrénie paranoïde"
                     />
                   </div>
                 </div>
 
                 <div className="mt-3">
-                  <label className="block text-sm font-medium text-ink-700 mb-1">
+                  <label className="field-label">
                     Arguments cliniques & critères remplis
                   </label>
                   <textarea
@@ -254,7 +254,7 @@ export const S12HypothesesDiag: React.FC<Props> = ({
                     disabled={effectiveReadOnly}
                     value={hyp.argumentsCliniques}
                     onChange={(e) => updateHypothese(hyp.id, { argumentsCliniques: e.target.value })}
-                    className="w-full bg-white border border-ink-200 focus:border-primary-500 text-xs font-medium rounded-lg p-3 focus:outline-none"
+                    className="clinical-input w-full"
                     placeholder="Critères remplis, durée des symptômes, évolution, arguments en faveur..."
                   />
                 </div>

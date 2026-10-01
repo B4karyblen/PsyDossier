@@ -105,7 +105,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                 <span className="text-sm font-bold text-ink-900">
                   Contrôle Qualité & Préconditions (F-21 & B3)
                 </span>
-                <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded ${
+                <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
                   validationChecks.missingRequirements.length === 0
                     ? 'bg-emerald-100 text-emerald-700'
                     : 'bg-rose-100 text-rose-700'
@@ -148,7 +148,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                           onNavigateToRubrique(item.id);
                           onClose();
                         }}
-                        className="text-[11px] text-primary-700 hover:underline font-bold flex items-center gap-1 cursor-pointer shrink-0 ml-2"
+                        className="text-xs text-primary-700 hover:underline font-bold flex items-center gap-1 cursor-pointer shrink-0 ml-2"
                       >
                         Compléter <ArrowRight className="w-3 h-3" />
                       </button>
@@ -171,7 +171,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                     <button
                       type="button"
                       onClick={onSwitchToPsychiatre}
-                      className="mt-1.5 px-3 py-1 bg-white text-amber-700 border border-amber-500 font-bold rounded-lg hover:bg-amber-100 text-xs cursor-pointer shadow-2xs"
+                      className="btn-secondary btn-sm mt-1.5"
                     >
                       Basculer sur le Dr. Oumar Diallo (Psychiatre)
                     </button>
@@ -198,7 +198,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-ink-700 mb-1">
+                  <label className="field-label">
                     Signature du médecin psychiatre signataire <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -210,7 +210,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                   />
                 </div>
 
-                <label className="flex items-start gap-2.5 p-3.5 bg-ink-100 rounded-lg text-xs text-ink-900 cursor-pointer border border-ink-150">
+                <label className="flex items-start gap-2.5 p-3.5 bg-white rounded-lg text-xs text-ink-900 cursor-pointer border border-ink-150">
                   <input
                     type="checkbox"
                     checked={confirmedCheckbox}
@@ -236,7 +236,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
               <button
                 type="submit"
                 disabled={!validationChecks.canValidate || !confirmedCheckbox || !signataire.trim()}
-                className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
+                className="btn-primary disabled:cursor-not-allowed"
               >
                 <Lock className="w-4 h-4" />
                 <span>Valider & Verrouiller le Dossier</span>
@@ -254,7 +254,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Rubrique concernée par l'addendum <span className="text-rose-500">*</span>
               </label>
               <select
@@ -271,7 +271,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-700 mb-1">
+              <label className="field-label">
                 Contenu de l'addendum clinique <span className="text-rose-500">*</span>
               </label>
               <textarea
@@ -296,7 +296,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
               <button
                 type="submit"
                 disabled={!addendumContent.trim()}
-                className="clinical-btn-primary px-5 py-2.5 text-xs flex items-center gap-2 disabled:opacity-50 cursor-pointer shadow-sm "
+                className="btn-primary"
               >
                 <FilePlus2 className="w-4 h-4" />
                 <span>Consigner l'Addendum Horodaté</span>

@@ -797,7 +797,7 @@ export default function App() {
           <div>
             PsyDossier EHR © {new Date().getFullYear()} · Plan type de dossier patient en psychiatrie (17 rubriques)
           </div>
-          <div className="flex items-center gap-3 text-[11px]">
+          <div className="flex items-center gap-3 text-xs">
             <span>Session active : <strong className="text-ink-900">{currentUser.name}</strong></span>
             <span aria-hidden="true">·</span>
             <span>Rôle : <span className="font-mono text-primary-700">{currentUser.role}</span></span>

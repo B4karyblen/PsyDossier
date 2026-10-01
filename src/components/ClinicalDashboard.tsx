@@ -138,29 +138,29 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
     count?: number;
     meta: string;
   }) => (
-    <div className="flex items-center justify-between gap-3 px-5 py-3.5 border-b border-ink-150">
+    <div className="card-header">
       <div className="flex items-center gap-2.5 min-w-0">
-        <span className={`icon-tile ${tile} !w-7 !h-7`}>
-          <Icon className="w-4 h-4" />
+        <span className={`icon-tile ${tile}`}>
+          <Icon className="w-[18px] h-[18px]" />
         </span>
-        <h2 className="text-sm font-semibold text-ink-900 truncate">{title}</h2>
+        <h2 className="card-title truncate">{title}</h2>
         {count !== undefined && (
-          <span className="chip bg-ink-100 text-ink-600 tabular-nums">{count}</span>
+          <span className="chip chip-neutral tabular-nums">{count}</span>
         )}
       </div>
-      <span className="text-xs font-medium text-ink-500 shrink-0 hidden sm:inline">{meta}</span>
+      <span className="text-sm font-medium text-ink-500 shrink-0 hidden sm:inline">{meta}</span>
     </div>
   );
 
   const EmptyState = ({ children }: { children: React.ReactNode }) => (
-    <div className="px-5 py-10 text-center text-sm text-ink-500">{children}</div>
+    <div className="px-5 py-10 text-center text-base text-ink-500">{children}</div>
   );
 
   const rowClass =
-    'w-full text-left px-5 py-3 flex items-center gap-3 cursor-pointer transition-colors hover:bg-ink-50 group';
+    'w-full text-left px-5 py-3.5 flex items-center gap-3.5 cursor-pointer transition-colors hover:bg-ink-50 group';
 
   const Avatar = ({ name }: { name: string }) => (
-    <span className="w-8 h-8 rounded-full bg-ink-100 text-ink-700 flex items-center justify-center text-[11px] font-semibold shrink-0">
+    <span className="w-10 h-10 rounded-full bg-ink-100 text-ink-800 flex items-center justify-center text-sm font-bold shrink-0">
       {name
         .split(' ')
         .map((n) => n[0])
@@ -174,11 +174,11 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
       {/* Page header */}
       <header className="page-header">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-ink-500 first-letter:uppercase">{today}</p>
-          <h1 className="mt-1 text-h1 text-ink-900">
+          <p className="text-sm font-semibold text-ink-500 first-letter:uppercase">{today}</p>
+          <h1 className="mt-1 page-title">
             {greeting}, Dr {firstName}
           </h1>
-          <p className="mt-1 text-sm text-ink-500">
+          <p className="page-subtitle">
             Service de psychiatrie universitaire · {currentUser.title}
           </p>
         </div>
@@ -207,18 +207,18 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
               key={k.label}
               type="button"
               onClick={k.onClick}
-              className={`text-left p-5 hover:bg-ink-50 transition-colors cursor-pointer group border-ink-150 ${
+              className={`text-left p-5 lg:p-6 hover:bg-ink-50 transition-colors cursor-pointer group border-ink-150 ${
                 i % 2 === 1 ? 'border-l' : ''
               } ${i >= 2 ? 'border-t xl:border-t-0' : ''} ${i === 2 ? 'xl:border-l' : ''}`}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-2 text-sm font-medium text-ink-500">
-                  <Icon className="w-4 h-4 text-ink-400" />
+                <span className="flex items-center gap-2 text-sm font-semibold text-ink-600">
+                  <Icon className="w-[18px] h-[18px] text-ink-500" />
                   {k.label}
                 </span>
                 <ArrowUpRight className="w-4 h-4 text-ink-300 group-hover:text-ink-700 transition-colors" />
               </div>
-              <div className="mt-3 text-[28px] font-bold text-ink-900 tabular-nums tracking-tight leading-none">
+              <div className="mt-3 text-[32px] font-bold text-ink-900 tabular-nums tracking-tight leading-none">
                 {k.value}
               </div>
               <div className="mt-3 h-[18px] flex items-center">
@@ -227,7 +227,7 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
                     <span style={{ width: `${k.progress}%` }} />
                   </div>
                 ) : (
-                  <span className="text-xs font-medium text-ink-500 truncate">{k.hint}</span>
+                  <span className="text-sm font-medium text-ink-500 truncate">{k.hint}</span>
                 )}
               </div>
             </button>
@@ -253,10 +253,10 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
                   <Avatar name={item.nom} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 min-w-0">
-                      <strong className="text-sm font-semibold text-ink-900 truncate">{item.nom}</strong>
-                      <span className="hidden sm:inline text-xs font-medium text-ink-400 tabular-nums shrink-0">{item.numeroOrdre}</span>
+                      <strong className="text-base font-semibold text-ink-900 truncate">{item.nom}</strong>
+                      <span className="hidden sm:inline text-xs font-semibold text-ink-500 tabular-nums shrink-0">{item.numeroOrdre}</span>
                     </div>
-                    <div className="text-xs text-ink-500 mt-0.5 line-clamp-1">
+                    <div className="text-sm text-ink-600 mt-0.5 line-clamp-1">
                       <span className="text-rose-700 font-medium">{item.type}</span> · {item.demandeur}
                     </div>
                   </div>
@@ -286,10 +286,10 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
                   <Avatar name={bilan.patientNom} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 min-w-0">
-                      <strong className="text-sm font-semibold text-ink-900 truncate">{bilan.patientNom}</strong>
-                      <span className="hidden sm:inline text-xs font-medium text-ink-400 tabular-nums shrink-0">{bilan.numeroOrdre}</span>
+                      <strong className="text-base font-semibold text-ink-900 truncate">{bilan.patientNom}</strong>
+                      <span className="hidden sm:inline text-xs font-semibold text-ink-500 tabular-nums shrink-0">{bilan.numeroOrdre}</span>
                     </div>
-                    <div className="text-xs text-ink-500 mt-0.5 truncate">
+                    <div className="text-sm text-ink-600 mt-0.5 truncate">
                       <span className="text-ink-700 font-medium">{bilan.type}</span> · Prescrit le {bilan.datePrescription}
                     </div>
                   </div>
@@ -326,16 +326,16 @@ export const ClinicalDashboard: React.FC<ClinicalDashboardProps> = ({
                   key={diag}
                   type="button"
                   onClick={() => onNavigateToFilteredRegistre?.({ search: label })}
-                  className="w-full text-left px-5 py-3 grid grid-cols-[4.5rem_1fr_auto] sm:grid-cols-[4.5rem_1fr_10rem_3rem] items-center gap-4 hover:bg-ink-50 cursor-pointer transition-colors"
+                  className="w-full text-left px-5 py-3.5 grid grid-cols-[4.5rem_1fr_auto] sm:grid-cols-[4.5rem_1fr_10rem_3rem] items-center gap-4 hover:bg-ink-50 cursor-pointer transition-colors"
                   title={`Filtrer les dossiers avec le diagnostic : ${diag}`}
                 >
-                  <span className="chip bg-ink-100 text-ink-700 tabular-nums justify-self-start">{code || '—'}</span>
-                  <span className="text-sm font-medium text-ink-900 truncate">{label}</span>
+                  <span className="chip chip-neutral tabular-nums justify-self-start">{code || '—'}</span>
+                  <span className="text-base font-medium text-ink-900 truncate">{label}</span>
                   <span className="progress hidden sm:block">
                     <span style={{ width: `${percentage}%` }} />
                   </span>
-                  <span className="text-sm font-semibold text-ink-900 tabular-nums text-right">
-                    {count} <span className="text-xs font-medium text-ink-500">cas</span>
+                  <span className="text-base font-bold text-ink-900 tabular-nums text-right">
+                    {count} <span className="text-sm font-medium text-ink-500">cas</span>
                   </span>
                 </button>
               );

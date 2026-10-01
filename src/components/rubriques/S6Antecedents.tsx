@@ -72,11 +72,11 @@ export const S6Antecedents: React.FC<Props> = ({
             disabled={isReadOnly}
             value={val.details}
             onChange={(e) => updateItem(section, key, false, e.target.value)}
-            className="w-full bg-white border border-ink-200 focus:border-primary-500 text-xs font-medium rounded-lg p-2.5 focus:outline-none"
+            className="clinical-input w-full"
             placeholder={placeholder}
           />
         ) : (
-          <div className="text-[11px] text-primary-700 bg-primary-50 p-2 rounded-lg font-semibold">
+          <div className="text-sm text-ink-600 bg-white border border-ink-150 px-3 py-2 rounded-lg font-medium">
             ✓ Aucun antécédent notable rapporté
           </div>
         )}
@@ -97,7 +97,7 @@ export const S6Antecedents: React.FC<Props> = ({
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S6 · ANTÉCÉDENTS
             </span>
             <span className="text-xs text-ink-500">Médico-sociaux</span>
@@ -105,7 +105,7 @@ export const S6Antecedents: React.FC<Props> = ({
           <h2 className="text-h2 text-ink-900 mt-2">
             Antécédents Personnels et Familiaux
           </h2>
-          <p className="text-sm text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Historique somatique, psychiatrique, addictif, judiciaire et familial
           </p>
         </div>
@@ -116,7 +116,7 @@ export const S6Antecedents: React.FC<Props> = ({
         <div className="space-y-3.5">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <History className="w-4 h-4 text-primary-600" />
-            <h3 className="text-sm font-semibold text-ink-900">
+            <h3 className="text-base font-bold text-ink-900">
               1. Antécédents Personnels du Patient
             </h3>
           </div>
@@ -141,7 +141,7 @@ export const S6Antecedents: React.FC<Props> = ({
         <div className="space-y-3.5">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <Users className="w-4 h-4 text-primary-600" />
-            <h3 className="text-sm font-semibold text-ink-900">
+            <h3 className="text-base font-bold text-ink-900">
               2. Antécédents Familiaux (Hérédité & Parentèle)
             </h3>
           </div>

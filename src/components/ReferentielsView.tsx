@@ -132,7 +132,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                 <h2 className="text-2xl font-bold text-ink-900 tracking-tight">
                   Référentiels & nomenclatures
                 </h2>
-                <span className="hidden sm:inline-flex chip bg-ink-100 text-ink-600">
+                <span className="hidden sm:inline-flex chip chip-neutral">
                   <Tag className="w-3 h-3" /> F-24
                 </span>
               </div>
@@ -278,7 +278,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   type="button"
                   onClick={() => handleAddItem('syndromesFrequents')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="btn-primary shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter au référentiel
@@ -337,7 +337,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   type="button"
                   onClick={handleAddCim}
                   disabled={!newCimCode.trim() || !newCimLabel.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  className="btn-primary shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter le code
@@ -383,7 +383,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   type="button"
                   onClick={() => handleAddItem('typesBilans')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="btn-primary shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter le bilan
@@ -429,7 +429,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   type="button"
                   onClick={() => handleAddItem('ethnies')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="btn-primary shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter
@@ -475,7 +475,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   type="button"
                   onClick={() => handleAddItem('religions')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="btn-primary shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter
@@ -521,7 +521,7 @@ export const ReferentielsView: React.FC<ReferentielsViewProps> = ({
                   type="button"
                   onClick={() => handleAddItem('situationsMatrimoniales')}
                   disabled={!newItemText.trim()}
-                  className="clinical-btn-primary px-4 py-2 text-body-sm flex items-center justify-center gap-1.5 shrink-0 disabled:opacity-50"
+                  className="btn-primary shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   Ajouter

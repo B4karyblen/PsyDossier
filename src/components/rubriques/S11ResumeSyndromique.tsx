@@ -70,7 +70,7 @@ export const S11ResumeSyndromique: React.FC<Props> = ({
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S11 · SYNTHÈSE
             </span>
             <span className="text-xs text-ink-500">Obligatoire pour validation</span>
@@ -78,7 +78,7 @@ export const S11ResumeSyndromique: React.FC<Props> = ({
           <h2 className="text-h2 text-ink-900 mt-2">
             Résumé Syndromique Structuré
           </h2>
-          <p className="text-sm text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Articulation clinique globale : terrain, stresseurs, sémiologie et constellations syndromiques
           </p>
         </div>
@@ -95,10 +95,10 @@ export const S11ResumeSyndromique: React.FC<Props> = ({
         {/* Subcard 1: Syndromes Identifiés */}
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-3.5">
           <div className="flex items-center justify-between pb-2 border-b border-ink-100">
-            <label className="block text-sm font-bold text-ink-900">
+            <label className="field-label">
               Constellations Syndromiques Identifiées (Cliquer pour sélectionner)
             </label>
-            <span className="text-[11px] font-semibold text-primary-700">
+            <span className="text-xs font-semibold text-primary-700">
               {formData.syndromesIdentifies.length} sélectionné(s)
             </span>
           </div>
@@ -138,12 +138,12 @@ export const S11ResumeSyndromique: React.FC<Props> = ({
                   }
                 }}
                 placeholder="Ajouter un autre syndrome personnalisé..."
-                className="bg-white border border-ink-200 focus:border-primary-500 text-sm font-medium rounded-lg px-3 py-2 flex-1 outline-none text-ink-900"
+                className="clinical-input flex-1"
               />
               <button
                 type="button"
                 onClick={addCustom}
-                className="px-3.5 py-2 text-xs font-semibold text-ink-900 bg-white border border-ink-200 hover:bg-ink-100 rounded-lg transition-colors cursor-pointer"
+                className="btn-secondary btn-sm"
               >
                 + Ajouter
               </button>
@@ -155,7 +155,7 @@ export const S11ResumeSyndromique: React.FC<Props> = ({
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-3">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <FileSpreadsheet className="w-4 h-4 text-primary-600" />
-            <label className="block text-sm font-bold text-ink-900">
+            <label className="field-label">
               Synthèse & Observation Clinique Finale <span className="text-rose-500">*</span>
             </label>
           </div>
@@ -164,10 +164,10 @@ export const S11ResumeSyndromique: React.FC<Props> = ({
             disabled={isReadOnly}
             value={formData.resume}
             onChange={(e) => setFormData({ ...formData, resume: e.target.value })}
-            className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3.5 focus:outline-none leading-relaxed"
+            className="clinical-input w-full leading-relaxed"
             placeholder="Rédiger une observation clinique synthétique articulant terrain, mode d'entrée, stresseurs déclenchants, sémiologie positive et négative, et orientation syndromique globale..."
           />
-          <span className="text-[11px] text-ink-500 block font-medium">
+          <span className="text-xs text-ink-500 block font-medium">
             Condition bloquante pour la validation officielle du dossier (Règle F-14)
           </span>
         </div>

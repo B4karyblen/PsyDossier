@@ -40,7 +40,7 @@ export const S3Motif: React.FC<Props> = ({
       <div className="flex items-center justify-between pb-4 border-b border-ink-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="chip bg-ink-100 text-ink-700 tabular-nums">
+            <span className="chip chip-neutral tabular-nums">
               S3 · ANAMNÈSE
             </span>
             <span className="text-xs text-ink-500">Obligatoire pour validation</span>
@@ -48,7 +48,7 @@ export const S3Motif: React.FC<Props> = ({
           <h2 className="text-h2 text-ink-900 mt-2">
             Motif de Consultation Actuel
           </h2>
-          <p className="text-sm text-ink-500 mt-0.5">
+          <p className="text-base text-ink-500 mt-1">
             Plainte principale formulée par le patient et/ou son entourage
           </p>
         </div>
@@ -64,7 +64,7 @@ export const S3Motif: React.FC<Props> = ({
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Subcard 1: Source de formulation */}
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-3.5">
-          <label className="block text-sm font-bold text-ink-900">
+          <label className="field-label">
             Origine de la formulation de la plainte <span className="text-rose-500">*</span>
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -95,7 +95,7 @@ export const S3Motif: React.FC<Props> = ({
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-3">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <MessageSquareQuote className="w-4 h-4 text-primary-600" />
-            <h3 className="text-sm font-semibold text-ink-900">
+            <h3 className="text-base font-bold text-ink-900">
               Plainte Principale (In Extenso) <span className="text-rose-500">*</span>
             </h3>
           </div>
@@ -104,10 +104,10 @@ export const S3Motif: React.FC<Props> = ({
             disabled={isReadOnly}
             value={formData.plaintePrincipale}
             onChange={(e) => setFormData({ ...formData, plaintePrincipale: e.target.value })}
-            className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-xs font-medium rounded-lg p-3.5 focus:outline-none leading-relaxed"
+            className="clinical-input w-full leading-relaxed"
             placeholder="Noter fidèlement les propos du patient et/ou de la famille expliquant la venue en consultation psychiatrique..."
           />
-          <span className="text-[11px] text-ink-500 block font-medium">
+          <span className="text-xs text-ink-500 block font-medium">
             Exemple : « Propos incohérents depuis 3 jours, agitation nocturne, refus de s'alimenter, insomnie totale... »
           </span>
         </div>
@@ -116,7 +116,7 @@ export const S3Motif: React.FC<Props> = ({
         <div className="bg-ink-25 border border-ink-150 rounded-xl p-5 space-y-2">
           <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
             <Users className="w-4 h-4 text-primary-600" />
-            <label className="block text-sm font-bold text-ink-900">
+            <label className="field-label">
               Accompagnateurs Présents lors de la Consultation
             </label>
           </div>
@@ -125,7 +125,7 @@ export const S3Motif: React.FC<Props> = ({
             disabled={isReadOnly}
             value={formData.accompagnateurs || ''}
             onChange={(e) => setFormData({ ...formData, accompagnateurs: e.target.value })}
-            className="w-full bg-white border border-ink-200 focus:border-primary-500 text-ink-900 text-sm font-medium rounded-lg px-3 py-2.5 focus:outline-none focus:shadow-[var(--shadow-focus)]"
+            className="clinical-input w-full"
             placeholder="Ex: Venu accompagné de son frère aîné et de sa mère"
           />
         </div>

@@ -109,7 +109,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                 <Icon className="w-5 h-5" />
               </span>
               <div>
-                <div className="text-[13px] font-semibold text-ink-500">{m.label}</div>
+                <div className="text-xs font-semibold text-ink-500">{m.label}</div>
                 <div className="text-2xl font-bold text-ink-900 tabular-nums leading-tight">{m.value}</div>
               </div>
             </div>
@@ -177,7 +177,7 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ logs, onSelectDossie
                 key={act}
                 type="button"
                 onClick={() => setActionFilter(act)}
-                className={`px-3.5 !min-h-9 rounded-full text-[13px] font-bold transition-colors cursor-pointer ${
+                className={`px-3.5 !min-h-9 rounded-full text-xs font-bold transition-colors cursor-pointer ${
                   isSelected
                     ? 'bg-primary-900 text-white'
                     : 'bg-ink-25 text-ink-500 hover:bg-ink-100 hover:text-ink-900 border border-ink-150'

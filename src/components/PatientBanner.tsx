@@ -95,7 +95,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
             </button>
 
             <div className="relative shrink-0">
-              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-ink-100 text-ink-700 flex items-center justify-center font-semibold text-sm">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-ink-100 text-ink-800 flex items-center justify-center font-bold text-base">
                 {initials}
               </div>
               <div
@@ -114,13 +114,13 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-lg sm:text-xl font-bold text-ink-900 tracking-tight truncate">
+                <h1 className="text-xl sm:text-2xl font-bold text-ink-900 tracking-tight truncate">
                   {dossier.s1Identification.nom} {dossier.s1Identification.prenoms}
                 </h1>
                 {statusChip && <StatusBadge status={dossier.statut} label={statusChip.label} />}
               </div>
 
-              <div className="flex items-center gap-x-2 gap-y-1 text-sm text-ink-500 mt-0.5 flex-wrap">
+              <div className="flex items-center gap-x-2 gap-y-1 text-base text-ink-600 mt-1 flex-wrap">
                 <button
                   onClick={handleCopyOrderNumber}
                   className="!min-h-0 !min-w-0 inline-flex items-center gap-1 font-semibold tabular-nums text-ink-700 hover:text-ink-900 transition-colors cursor-pointer"
@@ -138,12 +138,12 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
               </div>
 
               <div className="flex items-center gap-2 mt-2 flex-wrap">
-                <span className="chip bg-white text-ink-700 ring-1 ring-inset ring-ink-200">
+                <span className="chip chip-neutral">
                   <Stethoscope className="w-3.5 h-3.5 text-ink-500" />
                   {dossier.psychiatreReferent}
                 </span>
                 {diagPrincipal && (
-                  <span className="chip bg-white text-ink-700 ring-1 ring-inset ring-ink-200 max-w-full sm:max-w-[360px] min-w-0" title={diagPrincipal.libelle}>
+                  <span className="chip chip-neutral max-w-full sm:max-w-[360px] min-w-0" title={diagPrincipal.libelle}>
                     {diagPrincipal.codeCimDsm && <span className="tabular-nums font-semibold text-ink-900">{diagPrincipal.codeCimDsm}</span>}
                     <span className="truncate font-medium">{diagPrincipal.libelle}</span>
                   </span>
@@ -157,7 +157,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
             <div className="relative">
               <button
                 onClick={() => setShowChecklist(!showChecklist)}
-                className="flex items-center gap-2.5 bg-white hover:bg-ink-50 border border-ink-200 shadow-[var(--shadow-soft)] !min-h-9 pl-1.5 pr-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 bg-white hover:bg-ink-50 border border-ink-200 shadow-[var(--shadow-soft)] !min-h-10 pl-2 pr-3 py-1 rounded-lg transition-colors cursor-pointer"
                 title="Afficher la checklist des 17 rubriques"
                 aria-expanded={showChecklist}
               >
@@ -168,7 +168,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
                   <span className="absolute inset-[3px] rounded-full bg-white" />
                   <span className="sr-only">{stats.percentage}%</span>
                 </span>
-                <span className="text-sm font-semibold text-ink-900 tabular-nums">
+                <span className="text-sm font-bold text-ink-900 tabular-nums">
                   {stats.completeCount}/{stats.total}
                   <span className="font-medium text-ink-500"> rubriques</span>
                 </span>
@@ -183,7 +183,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
                       {stats.total - stats.completeCount} restantes
                     </span>
                   </div>
-                  <div className="max-h-72 overflow-y-auto space-y-0.5 pr-1 text-[13px]">
+                  <div className="max-h-72 overflow-y-auto space-y-0.5 pr-1 text-xs">
                     {RUBRIQUES_CONFIG.map((rub) => {
                       const isComplete = getRubriqueCompleteness(dossier, rub.id) === 'COMPLETE';
                       return (
@@ -196,7 +196,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
                           className="w-full !min-h-9 flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg hover:bg-ink-50 transition-colors text-left cursor-pointer"
                         >
                           <span className="flex items-center gap-2 truncate">
-                            <span className="w-7 text-[11px] font-bold tabular-nums text-ink-400">{rub.code}</span>
+                            <span className="w-7 text-xs font-bold tabular-nums text-ink-400">{rub.code}</span>
                             <span className="truncate font-semibold text-ink-800">{rub.titre}</span>
                           </span>
                           {isComplete ? (
@@ -204,7 +204,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
                               <Check className="w-2.5 h-2.5" strokeWidth={4} />
                             </span>
                           ) : (
-                            <span className="chip bg-amber-50 text-amber-800 !text-[10px] shrink-0">À compléter</span>
+                            <span className="chip bg-amber-50 text-amber-800 !text-xs shrink-0">À compléter</span>
                           )}
                         </button>
                       );
@@ -271,7 +271,7 @@ export const PatientBanner: React.FC<PatientBannerProps> = ({
         </div>
 
         {dossier.statut === 'VALIDÉ' && dossier.validationInfo && (
-          <div className="mt-4 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between text-[13px] flex-wrap gap-2">
+          <div className="mt-4 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs flex-wrap gap-2">
             <div className="flex items-center gap-2 text-emerald-800 font-semibold">
               <Lock className="w-4 h-4 shrink-0" />
               <span>

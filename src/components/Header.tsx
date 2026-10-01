@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
     .join('')
     .slice(0, 2);
 
-  const crumbBtn = 'hover:text-ink-900 font-medium transition-colors cursor-pointer !min-h-0 !min-w-0';
+  const crumbBtn = 'text-ink-600 hover:text-ink-900 font-semibold transition-colors cursor-pointer !min-h-0 !min-w-0';
 
   const renderBreadcrumbs = () => (
     <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-sm text-ink-500 min-w-0 shrink-0">
@@ -68,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
   );
 
   return (
-    <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-ink-150 px-4 sm:px-6 lg:px-8 h-14 flex items-center no-print">
+    <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-ink-150 px-4 sm:px-6 lg:px-8 h-16 flex items-center no-print">
       <div className="w-full flex items-center justify-between gap-3 sm:gap-6">
         <div className="flex items-center gap-2 min-w-0">
           <button
@@ -83,7 +83,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="min-w-0 flex items-center gap-1.5 text-sm">
             {renderBreadcrumbs()}
             <ChevronRight className="w-3.5 h-3.5 text-ink-300 shrink-0" aria-hidden="true" />
-            <h1 className="font-semibold text-ink-900 truncate">
+            <h1 className="font-bold text-ink-900 truncate">
               {activeView === 'DOSSIER' && activeRubriqueTitle ? activeRubriqueTitle : viewTitles[activeView]}
             </h1>
           </div>
@@ -93,7 +93,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={onOpenQuickSearch}
-            className="hidden md:flex !min-h-9 items-center gap-2 w-64 xl:w-72 pl-3 pr-1.5 py-1.5 bg-white hover:bg-ink-50 border border-ink-200 rounded-lg text-sm text-ink-400 transition-colors cursor-pointer shadow-[var(--shadow-soft)]"
+            className="hidden md:flex !min-h-10 items-center gap-2 w-64 xl:w-80 pl-3 pr-2 py-2 bg-ink-50 hover:bg-ink-100 border border-ink-200 rounded-lg text-sm text-ink-500 transition-colors cursor-pointer"
           >
             <Search className="w-4 h-4 shrink-0" />
             <span className="truncate font-medium">Rechercher un patient…</span>
@@ -110,7 +110,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <div
-            className="hidden sm:flex w-8 h-8 rounded-full bg-primary-900 text-white items-center justify-center text-[11px] font-semibold shrink-0"
+            className="hidden sm:flex w-9 h-9 rounded-full bg-primary-900 text-white items-center justify-center text-xs font-bold shrink-0"
             title={`${currentUser.name} · ${currentUser.role}`}
           >
             {initials}

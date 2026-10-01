@@ -264,12 +264,12 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
                     onClose();
                     onSelectExistingDossier(potentialDuplicate.id);
                   }}
-                  className="px-3 py-1.5 bg-white text-amber-700 border border-amber-500 font-bold rounded-lg text-xs hover:bg-amber-100 shadow-2xs cursor-pointer flex items-center gap-1.5"
+                  className="btn-secondary btn-sm"
                 >
                   <span>Ouvrir le dossier existant</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
-                <span className="text-[11px] text-amber-800 font-medium">
+                <span className="text-xs text-amber-800 font-medium">
                   ou poursuivre la création d'un nouveau dossier distinct ci-dessous.
                 </span>
               </div>
@@ -292,14 +292,14 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               <span className="text-sm font-bold text-ink-900">
                 1. Identification & N° d'Ordre Médical
               </span>
-              <span className="text-[10px] font-mono font-bold text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-500/20">
+              <span className="text-xs font-mono font-bold text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-500/20">
                 BR-001 Attribué
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
+                <label className="field-label">
                   N° Ordre Patient
                 </label>
                 <input
@@ -311,7 +311,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
+                <label className="field-label">
                   Nom de famille <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -325,7 +325,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
+                <label className="field-label">
                   Prénoms <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -341,7 +341,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
+                <label className="field-label">
                   Âge (années) <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -357,7 +357,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
+                <label className="field-label">
                   Sexe biologique <span className="text-rose-500">*</span>
                 </label>
                 <select
@@ -371,7 +371,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">
+                <label className="field-label">
                   Date de naissance (si connue)
                 </label>
                 <input
@@ -390,7 +390,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               <span className="text-sm font-bold text-ink-900">
                 2. Modalité de Consultation Initiale <span className="text-rose-500">*</span>
               </span>
-              <span className="text-[10px] font-bold text-ink-500">Règle BR-004</span>
+              <span className="text-xs font-bold text-ink-500">Règle BR-004</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -420,7 +420,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
                         </span>
                         {isSelected && <CheckCircle2 className="w-4 h-4 text-primary-600" />}
                       </div>
-                      <p className="text-[11px] text-ink-500 mt-1 leading-snug">{m.desc}</p>
+                      <p className="text-xs text-ink-500 mt-1 leading-snug">{m.desc}</p>
                     </div>
                   </button>
                 );
@@ -434,7 +434,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               <span className="text-sm font-bold text-ink-900">
                 3. Motif d’Admission & Plainte Principale (S3)
               </span>
-              <span className="text-[10px] text-primary-700 font-bold">Initialise statut EN COURS si saisi</span>
+              <span className="text-xs text-primary-700 font-bold">Initialise statut EN COURS si saisi</span>
             </div>
             <textarea
               rows={2}
@@ -452,7 +452,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">Profession</label>
+                <label className="field-label">Profession</label>
                 <input
                   type="text"
                   value={profession}
@@ -463,7 +463,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">Ethnie</label>
+                <label className="field-label">Ethnie</label>
                 <select
                   value={ethnie}
                   onChange={(e) => setEthnie(e.target.value)}
@@ -479,7 +479,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ink-700 mb-1">Téléphone</label>
+                <label className="field-label">Téléphone</label>
                 <input
                   type="tel"
                   value={telephone}
@@ -502,7 +502,7 @@ export const NewPatientModal: React.FC<NewPatientModalProps> = ({
             </button>
             <button
               type="submit"
-              className="clinical-btn-primary px-5 py-2.5 text-xs flex items-center gap-2 cursor-pointer shadow-sm "
+              className="btn-primary"
             >
               <Plus className="w-4 h-4" />
               <span>Créer & Ouvrir le Dossier Médical</span>
