@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle, Eye, EyeOff, HeartPulse, KeyRound, Lock, LogIn, ShieldCheck } from 'lucide-react';
 import { api, ApiError, SessionUser } from '../../lib/api';
+import { LicenceNotice } from '../../lib/licence';
 
 type OnAuth = (user: SessionUser) => void;
 
@@ -28,6 +29,7 @@ const AuthCard: React.FC<{ title: string; subtitle: string; children: React.Reac
       <Lock className="w-3.5 h-3.5" />
       Données de santé confidentielles — accès nominatif et journalisé
     </p>
+    <LicenceNotice className="mt-2 text-center max-w-md" />
   </div>
 );
 

@@ -1,5 +1,10 @@
 /**
- * Builds a portable Windows release:
+ * Builds a portable Windows release, licensed to one client:
+ *
+ *   npm run package:win -- --titulaire "Dr Prénom Nom" --lieu "Cabinet de psychiatrie" [--comptes 1] [--ref PSD-…]
+ *
+ * The licence (holder, place, reference, number of accounts) is compiled into the server,
+ * shown in the app and recorded in the client's database and backups.
  *
  *   release/PsyDossier/
  *     Demarrer PsyDossier.bat   ← double-click to start
@@ -9,12 +14,14 @@
  *     app/dist/                 ← built frontend
  *     data/                     ← created on first start (psydossier.db, backups/)
  *
- *   release/PsyDossier-win-x64.zip
+ *   release/PsyDossier-<ref>.zip
+ *   release/PsyDossier-<ref>.json   ← licence record to keep (not shipped)
  */
 import { execSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { parseArgs } from 'node:util';
 import zlib from 'node:zlib';
 import { build } from 'esbuild';
 
@@ -24,6 +31,38 @@ const RELEASE = path.join(ROOT, 'release');
 const OUT = path.join(RELEASE, 'PsyDossier');
 const APP = path.join(OUT, 'app');
 const NODE_MAJOR = 24;
+
+function readLicence() {
+  const { values } = parseArgs({
+    options: {
+      titulaire: { type: 'string' },
+      lieu: { type: 'string', default: '' },
+      comptes: { type: 'string', default: '1' },
+      ref: { type: 'string' },
+    },
+  });
+  const holder = values.titulaire?.trim();
+  if (!holder) {
+    console.error('Nom du titulaire de la licence requis, par exemple :');
+    console.error('  npm run package:win -- --titulaire "Dr Prénom Nom" --lieu "Cabinet de psychiatrie"');
+    process.exit(1);
+  }
+  const maxUsers = Number(values.comptes);
+  if (!Number.isInteger(maxUsers) || maxUsers < 1) {
+    console.error('--comptes doit être un nombre entier ≥ 1.');
+    process.exit(1);
+  }
+  const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  const suffix = Array.from(crypto.randomBytes(4), (b) => alphabet[b % alphabet.length]).join('');
+  const issued = new Date().toISOString().slice(0, 10);
+  return {
+    id: values.ref?.trim() || `PSD-${issued.slice(0, 4)}-${suffix}`,
+    holder,
+    place: values.lieu.trim(),
+    issued,
+    maxUsers,
+  };
+}
 
 const run = (cmd) => execSync(cmd, { cwd: ROOT, stdio: 'inherit' });
 const crlf = (text) => text.replace(/\r?\n/g, '\r\n');
@@ -138,8 +177,14 @@ echo   PsyDossier s'est arrete.
 pause
 `;
 
-const README = (nodeVersion) => `PsyDossier — installation locale (Windows)
+const README = (nodeVersion, licence) => `PsyDossier — installation locale (Windows)
 ===========================================
+
+LICENCE
+  Licence personnelle de ${licence.holder}${licence.place ? ` (${licence.place})` : ''}.
+  Référence : ${licence.id} — délivrée le ${licence.issued}.
+  Usage personnel exclusif, ${licence.maxUsers === 1 ? 'un seul compte' : `${licence.maxUsers} comptes au maximum`}.
+  Ce logiciel ne peut être ni copié, ni cédé, ni revendu.
 
 INSTALLATION
   1. Avant de décompresser le fichier zip téléchargé : clic droit sur le
@@ -164,10 +209,14 @@ PREMIER DÉMARRAGE
   2. Vous êtes le médecin titulaire : vous gérez aussi les listes (CIM-10,
      religions, ethnies…) et les sauvegardes.
   - La session se verrouille après 2 heures d'inactivité.
-  - Plus tard, pour ajouter un(e) collaborateur(trice) (secrétariat,
-    psychologue…) : Ctrl+K > « Gérer les comptes ». Un code d'activation
-    lui permet de choisir son mot de passe.
-
+${
+  licence.maxUsers > 1
+    ? `  - Pour ajouter un(e) collaborateur(trice) (${licence.maxUsers} comptes au maximum) :
+    Ctrl+K > « Gérer les comptes ». Un code d'activation lui permet de
+    choisir son mot de passe.
+`
+    : ''
+}
 SAUVEGARDE SUR CLÉ USB (au moins une fois par semaine)
   1. Brancher la clé USB.
   2. Menu « Sauvegarde » > « Télécharger la sauvegarde ».
@@ -210,6 +259,9 @@ Technique : Node.js ${nodeVersion} (inclus), base SQLite, aucun accès Internet 
 `;
 
 async function main() {
+  const licence = readLicence();
+  console.log(`→ Licence ${licence.id} : ${licence.holder}${licence.place ? ` (${licence.place})` : ''}`);
+
   console.log('→ Build du frontend');
   run('npx vite build');
 
@@ -228,6 +280,7 @@ async function main() {
     minify: true,
     legalComments: 'none',
     logLevel: 'warning',
+    define: { __PSYDOSSIER_LICENCE__: JSON.stringify(licence) },
   });
 
   fs.cpSync(path.join(ROOT, 'dist'), path.join(APP, 'dist'), { recursive: true });
@@ -236,15 +289,20 @@ async function main() {
   fs.copyFileSync(exePath, path.join(APP, 'node.exe'));
 
   fs.writeFileSync(path.join(OUT, 'Demarrer PsyDossier.bat'), crlf(LAUNCHER));
-  fs.writeFileSync(path.join(OUT, 'LISEZMOI.txt'), '\ufeff' + crlf(README(version)));
+  fs.writeFileSync(path.join(OUT, 'LISEZMOI.txt'), '\ufeff' + crlf(README(version, licence)));
 
   console.log('→ Archive zip');
-  const zipPath = path.join(RELEASE, 'PsyDossier-win-x64.zip');
+  const zipPath = path.join(RELEASE, `PsyDossier-${licence.id}.zip`);
   fs.rmSync(zipPath, { force: true });
   zipDirectory(OUT, zipPath);
 
+  const sha256 = crypto.createHash('sha256').update(fs.readFileSync(zipPath)).digest('hex');
+  const recordPath = path.join(RELEASE, `PsyDossier-${licence.id}.json`);
+  fs.writeFileSync(recordPath, JSON.stringify({ ...licence, node: version, zip: path.basename(zipPath), sha256 }, null, 2) + '\n');
+
   const mb = (fs.statSync(zipPath).size / 1024 / 1024).toFixed(1);
   console.log(`\n✓ ${path.relative(ROOT, zipPath)} (${mb} Mo)`);
+  console.log(`  Fiche de licence à conserver : ${path.relative(ROOT, recordPath)}`);
 }
 
 main().catch((err) => {

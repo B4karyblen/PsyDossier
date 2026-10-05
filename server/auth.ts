@@ -14,6 +14,7 @@ import type { Express, NextFunction, Request, Response } from 'express';
 import { UserAccount, UserRole } from '../src/types';
 import { DATA_IN_ONEDRIVE, db, transaction } from './db';
 import { Actor, writeAudit } from './audit';
+import { LICENCE } from './licence';
 
 const COOKIE = 'psyd_session';
 const IDLE_MS = 2 * 60 * 60 * 1000;
@@ -332,7 +333,12 @@ const str = (v: unknown, max = 200) => (typeof v === 'string' ? v.trim().slice(0
 export function registerAuthRoutes(app: Express) {
   app.get('/api/auth/status', (req, res) => {
     const user = sessionUser(req);
-    res.json({ setupRequired: !usersExist(), user, dataInOneDrive: DATA_IN_ONEDRIVE });
+    res.json({
+      setupRequired: !usersExist(),
+      user,
+      dataInOneDrive: DATA_IN_ONEDRIVE,
+      licence: LICENCE && { id: LICENCE.id, holder: LICENCE.holder, place: LICENCE.place },
+    });
   });
 
   // First start: create the doctor's own account (owner). Only possible while no account exists.
@@ -483,6 +489,13 @@ export function registerAuthRoutes(app: Express) {
     }
     if (q.userByLogin.get(login)) {
       res.status(409).json({ error: `L’identifiant « ${login} » est déjà utilisé.` });
+      return;
+    }
+    if (LICENCE && q.allUsers.all().length >= LICENCE.maxUsers) {
+      const n = LICENCE.maxUsers;
+      res.status(403).json({
+        error: `Votre licence personnelle est limitée à ${n} compte${n > 1 ? 's' : ''}. Contactez l’éditeur de PsyDossier pour en ajouter.`,
+      });
       return;
     }
     const id = `user-${crypto.randomUUID()}`;

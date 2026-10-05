@@ -25,11 +25,19 @@ export interface SessionUser {
 /** Manages lists, accounts and backups. */
 export const canManage = (u: Pick<SessionUser, 'role' | 'isOwner'>) => u.role === 'ADMIN' || u.isOwner;
 
+/** The client licence baked into a release; null in development. */
+export interface Licence {
+  id: string;
+  holder: string;
+  place: string;
+}
+
 export interface AuthStatus {
   setupRequired: boolean;
   user: SessionUser | null;
   /** The data folder is synced by OneDrive, which can corrupt the live database. */
   dataInOneDrive?: boolean;
+  licence?: Licence | null;
 }
 
 export interface DossierWriteResult {

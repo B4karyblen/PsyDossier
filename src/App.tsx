@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState } from 'react';
 import {
   DossierPsychiatrique,
@@ -33,7 +28,8 @@ import { getRubriqueCompleteness, getRubriquePermission, RUBRIQUES_CONFIG } from
 import { RubriqueStateCard } from './components/rubriques/RubriqueStateCard';
 import { ROLES_CAN_CREATE_DOSSIER, ROLES_CAN_EXPORT, ROLES_CAN_READ_AUDIT } from './utils/emptyDossier';
 import { AlertTriangle, HeartPulse } from 'lucide-react';
-import { api, ApiError, canManage, SessionUser } from './lib/api';
+import { api, ApiError, canManage, Licence, SessionUser } from './lib/api';
+import { LicenceContext } from './lib/licence';
 import { BackupDialog } from './components/BackupDialog';
 import { useServerSync } from './lib/useServerSync';
 import { confirmDiscard } from './lib/dirtyGuard';
@@ -102,6 +98,7 @@ export default function App() {
     { status: 'checking' } | { status: 'unreachable' } | { status: 'setup' } | { status: 'signin' } | { status: 'ready'; user: SessionUser }
   >({ status: 'checking' });
   const [dataInOneDrive, setDataInOneDrive] = useState(false);
+  const [licence, setLicence] = useState<Licence | null>(null);
 
   const check = React.useCallback(() => {
     setAuth({ status: 'checking' });
@@ -109,6 +106,7 @@ export default function App() {
       .status()
       .then((s) => {
         setDataInOneDrive(!!s.dataInOneDrive);
+        setLicence(s.licence ?? null);
         setAuth(s.user ? { status: 'ready', user: s.user } : s.setupRequired ? { status: 'setup' } : { status: 'signin' });
       })
       .catch(() => setAuth({ status: 'unreachable' }));
@@ -146,10 +144,10 @@ export default function App() {
   })();
 
   return (
-    <>
+    <LicenceContext.Provider value={licence}>
       {dataInOneDrive && <OneDriveWarning />}
       {screen}
-    </>
+    </LicenceContext.Provider>
   );
 }
 

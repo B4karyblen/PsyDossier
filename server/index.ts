@@ -32,6 +32,7 @@ import {
   requireManager,
 } from './auth';
 import { allDossiers, createDossier, getDossier, HttpError, redactForRole, updateDossier } from './dossiers';
+import { LICENCE } from './licence';
 import { seedDemo } from './seed';
 
 const HOST = '127.0.0.1';
@@ -49,6 +50,14 @@ const settings = {
     ON CONFLICT(key) DO UPDATE SET value = excluded.value
   `),
 };
+
+// Every licence that has opened this database, kept in the database (and so in its backups):
+// a copied data folder or backup still shows which client release it came from.
+if (LICENCE) {
+  const row = settings.get.get('licences') as { value: string } | undefined;
+  const seen: string[] = row ? JSON.parse(row.value) : [];
+  if (!seen.includes(LICENCE.id)) settings.set.run('licences', JSON.stringify([...seen, LICENCE.id]));
+}
 /** Values referenced by at least one dossier, per list (F-24: these can only be deactivated). */
 function referentielsUsage() {
   const dossiers = allDossiers();
@@ -281,6 +290,7 @@ const server = app.listen(PORT, HOST, () => {
   console.log('  PsyDossier est prêt');
   console.log(`  Adresse : ${APP_URL}`);
   console.log(`  Données : ${DATA_DIR}`);
+  if (LICENCE) console.log(`  Licence : ${LICENCE.holder} — réf. ${LICENCE.id} (usage personnel, non cessible)`);
   console.log('');
   if (DATA_IN_ONEDRIVE) {
     console.log('  ATTENTION : PsyDossier est dans un dossier OneDrive.');
