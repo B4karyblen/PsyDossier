@@ -20,7 +20,7 @@ import { exec } from 'node:child_process';
 import { DossierPsychiatrique, ReferenceLists } from '../src/types';
 import { ROLES_CAN_EXPORT, ROLES_CAN_READ_AUDIT } from '../src/utils/emptyDossier';
 import { getRubriquePermission } from '../src/utils/rules';
-import { BACKUP_DIR, DATA_DIR, db, runDailyBackup, transaction } from './db';
+import { BACKUP_DIR, DATA_DIR, DATA_IN_ONEDRIVE, db, runDailyBackup, transaction } from './db';
 import { listAudit, writeAudit } from './audit';
 import {
   canManage,
@@ -282,6 +282,12 @@ const server = app.listen(PORT, HOST, () => {
   console.log(`  Adresse : ${APP_URL}`);
   console.log(`  Données : ${DATA_DIR}`);
   console.log('');
+  if (DATA_IN_ONEDRIVE) {
+    console.log('  ATTENTION : PsyDossier est dans un dossier OneDrive.');
+    console.log('  La synchronisation peut endommager la base de données.');
+    console.log('  Fermez cette fenêtre et déplacez le dossier « PsyDossier » vers C:\\PsyDossier.');
+    console.log('');
+  }
   console.log('  Laissez cette fenêtre ouverte pendant l’utilisation.');
   openBrowser();
 });

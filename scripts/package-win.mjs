@@ -142,10 +142,17 @@ const README = (nodeVersion) => `PsyDossier — installation locale (Windows)
 ===========================================
 
 INSTALLATION
-  1. Copier le dossier « PsyDossier » où vous voulez (ex. C:\\PsyDossier).
-     Ne le placez pas dans « Program Files » (droits d'écriture requis).
-  2. Double-cliquer sur « Demarrer PsyDossier.bat ».
-  3. Le navigateur s'ouvre sur http://127.0.0.1:3210
+  1. Avant de décompresser le fichier zip téléchargé : clic droit sur le
+     zip > Propriétés > cocher « Débloquer » (en bas) > OK.
+  2. Décompresser, puis copier le dossier « PsyDossier » dans C:\\PsyDossier.
+     - Pas dans « Program Files » (droits d'écriture requis).
+     - Pas sur le Bureau ni dans « Documents » s'ils sont synchronisés par
+       OneDrive : la synchronisation peut endommager les données.
+       PsyDossier affiche un avertissement si c'est le cas.
+  3. Double-cliquer sur « Demarrer PsyDossier.bat ».
+     Si une fenêtre bleue « Windows a protégé votre ordinateur » apparaît :
+     cliquer sur « Informations complémentaires », puis « Exécuter quand même ».
+  4. Le navigateur s'ouvre sur http://127.0.0.1:3210
 
   Astuce : clic droit sur « Demarrer PsyDossier.bat » > Envoyer vers >
   Bureau (créer un raccourci).

@@ -12,7 +12,7 @@
 import crypto from 'node:crypto';
 import type { Express, NextFunction, Request, Response } from 'express';
 import { UserAccount, UserRole } from '../src/types';
-import { db, transaction } from './db';
+import { DATA_IN_ONEDRIVE, db, transaction } from './db';
 import { Actor, writeAudit } from './audit';
 
 const COOKIE = 'psyd_session';
@@ -332,7 +332,7 @@ const str = (v: unknown, max = 200) => (typeof v === 'string' ? v.trim().slice(0
 export function registerAuthRoutes(app: Express) {
   app.get('/api/auth/status', (req, res) => {
     const user = sessionUser(req);
-    res.json({ setupRequired: !usersExist(), user });
+    res.json({ setupRequired: !usersExist(), user, dataInOneDrive: DATA_IN_ONEDRIVE });
   });
 
   // First start: create the doctor's own account (owner). Only possible while no account exists.

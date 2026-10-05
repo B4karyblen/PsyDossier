@@ -28,6 +28,8 @@ export const canManage = (u: Pick<SessionUser, 'role' | 'isOwner'>) => u.role ==
 export interface AuthStatus {
   setupRequired: boolean;
   user: SessionUser | null;
+  /** The data folder is synced by OneDrive, which can corrupt the live database. */
+  dataInOneDrive?: boolean;
 }
 
 export interface DossierWriteResult {

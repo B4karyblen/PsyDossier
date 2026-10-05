@@ -85,19 +85,32 @@ const SplashCard: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </div>
 );
 
+const OneDriveWarning: React.FC = () => (
+  <div role="alert" className="flex items-start gap-3 px-4 py-3 bg-amber-50 border-b border-amber-200 font-sans">
+    <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+    <p className="text-base text-amber-900">
+      <strong className="font-semibold">PsyDossier est dans un dossier OneDrive.</strong>{' '}
+      La synchronisation peut endommager vos données. Fermez la fenêtre « PsyDossier », déplacez le dossier
+      « PsyDossier » vers C:\PsyDossier, puis relancez « Demarrer PsyDossier ».
+    </p>
+  </div>
+);
+
 /** Resolves the session before anything else is shown (PRD F-00). */
 export default function App() {
   const [auth, setAuth] = useState<
     { status: 'checking' } | { status: 'unreachable' } | { status: 'setup' } | { status: 'signin' } | { status: 'ready'; user: SessionUser }
   >({ status: 'checking' });
+  const [dataInOneDrive, setDataInOneDrive] = useState(false);
 
   const check = React.useCallback(() => {
     setAuth({ status: 'checking' });
     api
       .status()
-      .then((s) =>
-        setAuth(s.user ? { status: 'ready', user: s.user } : s.setupRequired ? { status: 'setup' } : { status: 'signin' })
-      )
+      .then((s) => {
+        setDataInOneDrive(!!s.dataInOneDrive);
+        setAuth(s.user ? { status: 'ready', user: s.user } : s.setupRequired ? { status: 'setup' } : { status: 'signin' });
+      })
       .catch(() => setAuth({ status: 'unreachable' }));
   }, []);
 
@@ -105,30 +118,39 @@ export default function App() {
 
   const onAuth = (user: SessionUser) => setAuth({ status: 'ready', user });
 
-  switch (auth.status) {
-    case 'checking':
-      return (
-        <SplashCard>
-          <p className="mt-5 text-base font-semibold text-ink-600" role="status">Chargement…</p>
-        </SplashCard>
-      );
-    case 'unreachable':
-      return (
-        <SplashCard>
-          <h1 className="mt-5 text-lg font-bold text-ink-900">Serveur local injoignable</h1>
-          <p className="mt-2 text-base text-ink-600">
-            Vérifiez que la fenêtre « PsyDossier » est toujours ouverte, ou relancez « Demarrer PsyDossier ».
-          </p>
-          <button type="button" onClick={check} className="btn-primary mt-6">Réessayer</button>
-        </SplashCard>
-      );
-    case 'setup':
-      return <SetupScreen onAuth={onAuth} />;
-    case 'signin':
-      return <SignInScreen onAuth={onAuth} />;
-    case 'ready':
-      return <Workspace key={auth.user.id} user={auth.user} onSignedOut={() => setAuth({ status: 'signin' })} />;
-  }
+  const screen = (() => {
+    switch (auth.status) {
+      case 'checking':
+        return (
+          <SplashCard>
+            <p className="mt-5 text-base font-semibold text-ink-600" role="status">Chargement…</p>
+          </SplashCard>
+        );
+      case 'unreachable':
+        return (
+          <SplashCard>
+            <h1 className="mt-5 text-lg font-bold text-ink-900">Serveur local injoignable</h1>
+            <p className="mt-2 text-base text-ink-600">
+              Vérifiez que la fenêtre « PsyDossier » est toujours ouverte, ou relancez « Demarrer PsyDossier ».
+            </p>
+            <button type="button" onClick={check} className="btn-primary mt-6">Réessayer</button>
+          </SplashCard>
+        );
+      case 'setup':
+        return <SetupScreen onAuth={onAuth} />;
+      case 'signin':
+        return <SignInScreen onAuth={onAuth} />;
+      case 'ready':
+        return <Workspace key={auth.user.id} user={auth.user} onSignedOut={() => setAuth({ status: 'signin' })} />;
+    }
+  })();
+
+  return (
+    <>
+      {dataInOneDrive && <OneDriveWarning />}
+      {screen}
+    </>
+  );
 }
 
 function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () => void }) {
