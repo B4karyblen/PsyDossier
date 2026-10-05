@@ -7,11 +7,11 @@
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "node -e \"for (const p of ['dist', 'server.js']) require('fs').rmSync(p, { recursive: true, force: true })\"",
     "lint": "tsc --noEmit",
     "server": "tsx watch server/index.ts",
     "package:win": "node scripts/package-win.mjs",
-    "server:demo": "PSYDOSSIER_DEMO=1 PSYDOSSIER_DATA=data-demo tsx watch server/index.ts"
+    "server:demo": "node scripts/server-demo.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

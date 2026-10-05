@@ -15,6 +15,7 @@ import { execSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import zlib from 'node:zlib';
 import { build } from 'esbuild';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -27,37 +28,99 @@ const NODE_MAJOR = 24;
 const run = (cmd) => execSync(cmd, { cwd: ROOT, stdio: 'inherit' });
 const crlf = (text) => text.replace(/\r?\n/g, '\r\n');
 
-async function download(url, file) {
+async function download(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Téléchargement impossible : ${url} (${res.status})`);
-  fs.writeFileSync(file, Buffer.from(await res.arrayBuffer()));
+  return Buffer.from(await res.arrayBuffer());
 }
 
 async function getWindowsNode() {
   const index = await (await fetch('https://nodejs.org/dist/index.json')).json();
-  const release = index.find((r) => r.version.startsWith(`v${NODE_MAJOR}.`) && r.files.includes('win-x64-zip'));
+  const release = index.find((r) => r.version.startsWith(`v${NODE_MAJOR}.`) && r.files.includes('win-x64-exe'));
   if (!release) throw new Error(`Aucune version Node ${NODE_MAJOR} pour win-x64`);
   const { version } = release;
-  const zipName = `node-${version}-win-x64.zip`;
-  const zipPath = path.join(CACHE, zipName);
   const exePath = path.join(CACHE, `node-${version}-win-x64.exe`);
 
   fs.mkdirSync(CACHE, { recursive: true });
   if (!fs.existsSync(exePath)) {
     console.log(`→ Téléchargement de Node.js ${version} (win-x64)`);
     const base = `https://nodejs.org/dist/${version}`;
-    const sums = await (await fetch(`${base}/SHASUMS256.txt`)).text();
-    const expected = sums.split('\n').find((l) => l.endsWith(`  ${zipName}`))?.split(/\s+/)[0];
-    if (!expected) throw new Error(`Somme de contrôle introuvable pour ${zipName}`);
+    const sums = (await download(`${base}/SHASUMS256.txt`)).toString();
+    const expected = sums.split('\n').find((l) => l.endsWith('  win-x64/node.exe'))?.split(/\s+/)[0];
+    if (!expected) throw new Error('Somme de contrôle introuvable pour win-x64/node.exe');
 
-    await download(`${base}/${zipName}`, zipPath);
-    const actual = crypto.createHash('sha256').update(fs.readFileSync(zipPath)).digest('hex');
-    if (actual !== expected) throw new Error(`Somme SHA-256 invalide pour ${zipName}`);
-
-    execSync(`unzip -p "${zipPath}" "node-${version}-win-x64/node.exe" > "${exePath}"`);
-    fs.rmSync(zipPath);
+    const exe = await download(`${base}/win-x64/node.exe`);
+    const actual = crypto.createHash('sha256').update(exe).digest('hex');
+    if (actual !== expected) throw new Error('Somme SHA-256 invalide pour win-x64/node.exe');
+    fs.writeFileSync(exePath, exe);
   }
   return { version, exePath };
+}
+
+// Minimal ZIP writer (deflate, no zip64), so packaging needs no `zip` tool and runs on Windows too.
+function zipDirectory(srcDir, zipPath) {
+  const base = path.dirname(srcDir);
+  const files = fs
+    .readdirSync(srcDir, { recursive: true, withFileTypes: true })
+    .filter((e) => e.isFile())
+    .map((e) => path.join(e.parentPath, e.name))
+    .sort();
+
+  const d = new Date();
+  const time = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1);
+  const date = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+
+  const fd = fs.openSync(zipPath, 'w');
+  const central = [];
+  let offset = 0;
+  const write = (buf) => {
+    fs.writeSync(fd, buf);
+    offset += buf.length;
+  };
+
+  for (const file of files) {
+    const name = Buffer.from(path.relative(base, file).split(path.sep).join('/'));
+    const data = fs.readFileSync(file);
+    const deflated = zlib.deflateRawSync(data, { level: 9 });
+    const stored = deflated.length >= data.length;
+    const body = stored ? data : deflated;
+    const crc = zlib.crc32(data);
+
+    const local = Buffer.alloc(30);
+    local.writeUInt32LE(0x04034b50, 0);
+    local.writeUInt16LE(20, 4); // version needed
+    local.writeUInt16LE(0x0800, 6); // UTF-8 names
+    local.writeUInt16LE(stored ? 0 : 8, 8);
+    local.writeUInt16LE(time, 10);
+    local.writeUInt16LE(date, 12);
+    local.writeUInt32LE(crc, 14);
+    local.writeUInt32LE(body.length, 18);
+    local.writeUInt32LE(data.length, 22);
+    local.writeUInt16LE(name.length, 26);
+
+    const header = Buffer.alloc(46);
+    header.writeUInt32LE(0x02014b50, 0);
+    header.writeUInt16LE(20, 4); // version made by
+    local.copy(header, 6, 4, 30); // shared fields: needed version … name length
+    header.writeUInt32LE(offset, 42);
+    central.push(header, name);
+
+    write(local);
+    write(name);
+    write(body);
+    if (offset > 0xffffffff) throw new Error('Archive trop volumineuse (> 4 Go)');
+  }
+
+  const cdOffset = offset;
+  central.forEach(write);
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(files.length, 8);
+  end.writeUInt16LE(files.length, 10);
+  end.writeUInt32LE(offset - cdOffset, 12);
+  end.writeUInt32LE(cdOffset, 16);
+  write(end);
+  fs.closeSync(fd);
 }
 
 const LAUNCHER = `@echo off
@@ -171,7 +234,7 @@ async function main() {
   console.log('→ Archive zip');
   const zipPath = path.join(RELEASE, 'PsyDossier-win-x64.zip');
   fs.rmSync(zipPath, { force: true });
-  execSync(`zip -qr "${zipPath}" PsyDossier`, { cwd: RELEASE });
+  zipDirectory(OUT, zipPath);
 
   const mb = (fs.statSync(zipPath).size / 1024 / 1024).toFixed(1);
   console.log(`\n✓ ${path.relative(ROOT, zipPath)} (${mb} Mo)`);
