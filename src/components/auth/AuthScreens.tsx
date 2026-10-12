@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Eye, EyeOff, HeartPulse, KeyRound, Lock, LogIn, ShieldCheck } from 'lucide-react';
-import { api, ApiError, SessionUser } from '../../lib/api';
-import { LicenceNotice } from '../../lib/licence';
+import { AlertTriangle, Check, Copy, Eye, EyeOff, HeartPulse, KeyRound, Lock, LogIn, ShieldCheck } from 'lucide-react';
+import { ActivationInfo, api, ApiError, SessionUser } from '../../lib/api';
+import { LicenceContext, LicenceNotice, PUBLISHER } from '../../lib/licence';
 
 type OnAuth = (user: SessionUser) => void;
 
@@ -223,6 +223,103 @@ export const SignInScreen: React.FC<{ onAuth: OnAuth }> = ({ onAuth }) => {
   ) : (
     <AuthCard title="Activer mon compte" subtitle="Définissez votre mot de passe avec le code reçu.">
       <ActivateForm onAuth={onAuth} onBack={() => setMode('login')} />
+    </AuthCard>
+  );
+};
+
+// ── Activation of a licensed release on this computer ───────
+
+export const ActivationScreen: React.FC<{
+  info: ActivationInfo;
+  onActivated: () => void;
+  /** Present when the app is still usable (trial): lets the user go back. */
+  onCancel?: () => void;
+}> = ({ info, onActivated, onCancel }) => {
+  const licence = React.useContext(LicenceContext);
+  const [key, setKey] = useState('');
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(info.machineCode ?? '');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard unavailable: the code stays selectable.
+    }
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError('');
+    try {
+      await api.activateLicence(key);
+      onActivated();
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const [title, subtitle] = info.expired
+    ? ['Période d’essai terminée', 'Vos dossiers sont intacts. Saisissez votre clé définitive pour continuer.']
+    : onCancel
+      ? ['Clé définitive', 'Remplacez votre clé d’essai par votre clé définitive.']
+      : ['Activer PsyDossier', 'PsyDossier s’active une seule fois sur cet ordinateur.'];
+
+  return (
+    <AuthCard title={title} subtitle={subtitle}>
+      <form onSubmit={submit} className="space-y-5">
+        {error && <ErrorBox message={error} />}
+        <div>
+          <span className="field-label">1. Envoyez ce code machine à l’éditeur</span>
+          <div className="flex items-center gap-2 mt-1">
+            <output
+              aria-label="Code machine"
+              className="flex-1 px-3 py-2.5 rounded-lg bg-ink-50 border border-ink-150 font-mono text-lg font-bold tracking-widest text-ink-900 text-center select-all"
+            >
+              {info.machineCode}
+            </output>
+            <button type="button" onClick={copy} className="btn-secondary" aria-label="Copier le code machine">
+              {copied ? <Check className="w-4 h-4 text-emerald-700" /> : <Copy className="w-4 h-4" />}
+              <span>{copied ? 'Copié' : 'Copier'}</span>
+            </button>
+          </div>
+          <p className="field-hint">
+            {PUBLISHER.name} · {PUBLISHER.phone}
+            {licence && <> · licence {licence.id}</>}
+          </p>
+        </div>
+        <div>
+          <label htmlFor="activation-key" className="field-label">2. Collez la clé d’activation reçue</label>
+          <textarea
+            id="activation-key"
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+            rows={4}
+            required
+            spellCheck={false}
+            autoFocus
+            placeholder="AEAAAA-…"
+            className="clinical-input font-mono text-sm break-all"
+          />
+        </div>
+        <button type="submit" disabled={busy || !key.trim()} className="btn-primary btn-lg w-full">
+          <KeyRound className="w-4 h-4" />
+          {busy ? 'Vérification…' : 'Activer'}
+        </button>
+        {onCancel && (
+          <p className="text-sm text-ink-600 text-center">
+            <button type="button" onClick={onCancel} className="font-semibold text-primary-700 hover:underline !min-h-0 !min-w-0">
+              Plus tard
+            </button>
+          </p>
+        )}
+      </form>
     </AuthCard>
   );
 };

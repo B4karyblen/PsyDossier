@@ -12,3 +12,6 @@ data/
 data-demo/
 release/
 .cache/
+
+# Licence signing key: must stay on the publisher's computer
+*-private.pem

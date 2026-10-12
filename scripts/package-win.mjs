@@ -4,7 +4,10 @@
  *   npm run package:win -- --titulaire "Dr Prénom Nom" --lieu "Cabinet de psychiatrie" [--comptes 1] [--ref PSD-…]
  *
  * The licence (holder, place, reference, number of accounts) is compiled into the server,
- * shown in the app and recorded in the client's database and backups.
+ * shown in the app and recorded in the client's database and backups, together with the
+ * public key from licence/public-key.pem (npm run licence:init). The release opens only
+ * once activated on the client's computer with a key from npm run licence:key.
+ * For an update, rebuild with the same --ref: the client's activation stays valid.
  *
  *   release/PsyDossier/
  *     Demarrer PsyDossier.bat   ← double-click to start
@@ -202,6 +205,15 @@ INSTALLATION
   Astuce : clic droit sur « Demarrer PsyDossier.bat » > Envoyer vers >
   Bureau (créer un raccourci).
 
+ACTIVATION (une seule fois)
+  1. Au premier lancement, PsyDossier affiche un code machine
+     (ex. : ABCD-EFGH-JKLM-NPQR), propre à cet ordinateur.
+  2. Envoyez ce code à l'éditeur de PsyDossier, qui vous remet votre
+     clé d'activation.
+  3. Collez la clé dans PsyDossier et cliquez sur « Activer ».
+  La clé ne fonctionne que sur cet ordinateur. Après une réinstallation
+  de Windows ou un changement d'ordinateur, demandez une nouvelle clé.
+
 PREMIER DÉMARRAGE
   1. Au premier lancement, créer votre compte : nom, identifiant et mot de
      passe (8 caractères minimum). Notez le mot de passe en lieu sûr :
@@ -260,6 +272,14 @@ Technique : Node.js ${nodeVersion} (inclus), base SQLite, aucun accès Internet 
 
 async function main() {
   const licence = readLicence();
+  const publicKeyPath = path.join(ROOT, 'licence', 'public-key.pem');
+  if (!fs.existsSync(publicKeyPath)) {
+    console.error('Clé publique de licence absente (licence/public-key.pem).');
+    console.error('Lancez d’abord, sur votre PC : npm run licence:init');
+    process.exit(1);
+  }
+  const publicKey = fs.readFileSync(publicKeyPath, 'utf8');
+  crypto.createPublicKey(publicKey); // fails early on a damaged file
   console.log(`→ Licence ${licence.id} : ${licence.holder}${licence.place ? ` (${licence.place})` : ''}`);
 
   console.log('→ Build du frontend');
@@ -280,7 +300,10 @@ async function main() {
     minify: true,
     legalComments: 'none',
     logLevel: 'warning',
-    define: { __PSYDOSSIER_LICENCE__: JSON.stringify(licence) },
+    define: {
+      __PSYDOSSIER_LICENCE__: JSON.stringify(licence),
+      __PSYDOSSIER_PUBLIC_KEY__: JSON.stringify(publicKey),
+    },
   });
 
   fs.cpSync(path.join(ROOT, 'dist'), path.join(APP, 'dist'), { recursive: true });
@@ -303,6 +326,8 @@ async function main() {
   const mb = (fs.statSync(zipPath).size / 1024 / 1024).toFixed(1);
   console.log(`\n✓ ${path.relative(ROOT, zipPath)} (${mb} Mo)`);
   console.log(`  Fiche de licence à conserver : ${path.relative(ROOT, recordPath)}`);
+  console.log('  Clé d’activation, avec le code machine affiché chez le client :');
+  console.log(`  npm run licence:key -- --ref ${licence.id} --machine XXXX-XXXX-XXXX-XXXX [--jours 30]`);
 }
 
 main().catch((err) => {

@@ -28,12 +28,12 @@ import { getRubriqueCompleteness, getRubriquePermission, RUBRIQUES_CONFIG } from
 import { RubriqueStateCard } from './components/rubriques/RubriqueStateCard';
 import { ROLES_CAN_CREATE_DOSSIER, ROLES_CAN_EXPORT, ROLES_CAN_READ_AUDIT } from './utils/emptyDossier';
 import { AlertTriangle, HeartPulse } from 'lucide-react';
-import { api, ApiError, canManage, Licence, SessionUser } from './lib/api';
+import { ActivationInfo, api, ApiError, canManage, Licence, SessionUser } from './lib/api';
 import { LicenceContext } from './lib/licence';
 import { BackupDialog } from './components/BackupDialog';
 import { useServerSync } from './lib/useServerSync';
 import { confirmDiscard } from './lib/dirtyGuard';
-import { SessionExpiredDialog, SetupScreen, SignInScreen } from './components/auth/AuthScreens';
+import { ActivationScreen, SessionExpiredDialog, SetupScreen, SignInScreen } from './components/auth/AuthScreens';
 import { UsersView, ChangePasswordDialog } from './components/UsersView';
 import { useToast } from './components/ui/Toaster';
 import { AppSkeleton } from './components/ui/AppSkeleton';
@@ -92,22 +92,47 @@ const OneDriveWarning: React.FC = () => (
   </div>
 );
 
+const frenchDate = (iso: string) =>
+  new Date(`${iso}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+const TrialBanner: React.FC<{ expires: string; onEnterKey: () => void }> = ({ expires, onEnterKey }) => (
+  <div role="status" className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-2 bg-ink-50 border-b border-ink-150 font-sans text-sm text-ink-700">
+    <span>
+      <strong className="font-semibold text-ink-900">Version d’essai</strong> · PsyDossier fonctionne jusqu’au {frenchDate(expires)}.
+    </span>
+    <button type="button" onClick={onEnterKey} className="font-semibold text-primary-700 hover:underline !min-h-0 !min-w-0">
+      Saisir ma clé définitive
+    </button>
+  </div>
+);
+
 /** Resolves the session before anything else is shown (PRD F-00). */
 export default function App() {
   const [auth, setAuth] = useState<
-    { status: 'checking' } | { status: 'unreachable' } | { status: 'setup' } | { status: 'signin' } | { status: 'ready'; user: SessionUser }
+    | { status: 'checking' }
+    | { status: 'unreachable' }
+    | { status: 'activation' }
+    | { status: 'setup' }
+    | { status: 'signin' }
+    | { status: 'ready'; user: SessionUser }
   >({ status: 'checking' });
   const [dataInOneDrive, setDataInOneDrive] = useState(false);
   const [licence, setLicence] = useState<Licence | null>(null);
+  const [activation, setActivation] = useState<ActivationInfo | null>(null);
+  /** The trial user chose to enter a permanent key. */
+  const [enteringKey, setEnteringKey] = useState(false);
 
   const check = React.useCallback(() => {
     setAuth({ status: 'checking' });
+    setEnteringKey(false);
     api
       .status()
       .then((s) => {
         setDataInOneDrive(!!s.dataInOneDrive);
         setLicence(s.licence ?? null);
-        setAuth(s.user ? { status: 'ready', user: s.user } : s.setupRequired ? { status: 'setup' } : { status: 'signin' });
+        setActivation(s.activation ?? null);
+        if (s.activation && !s.activation.active) setAuth({ status: 'activation' });
+        else setAuth(s.user ? { status: 'ready', user: s.user } : s.setupRequired ? { status: 'setup' } : { status: 'signin' });
       })
       .catch(() => setAuth({ status: 'unreachable' }));
   }, []);
@@ -117,6 +142,9 @@ export default function App() {
   const onAuth = (user: SessionUser) => setAuth({ status: 'ready', user });
 
   const screen = (() => {
+    if (enteringKey && activation) {
+      return <ActivationScreen info={activation} onActivated={check} onCancel={() => setEnteringKey(false)} />;
+    }
     switch (auth.status) {
       case 'checking':
         return (
@@ -134,6 +162,8 @@ export default function App() {
             <button type="button" onClick={check} className="btn-primary mt-6">Réessayer</button>
           </SplashCard>
         );
+      case 'activation':
+        return activation && <ActivationScreen info={activation} onActivated={check} />;
       case 'setup':
         return <SetupScreen onAuth={onAuth} />;
       case 'signin':
@@ -146,6 +176,9 @@ export default function App() {
   return (
     <LicenceContext.Provider value={licence}>
       {dataInOneDrive && <OneDriveWarning />}
+      {activation?.active && activation.expires && !enteringKey && (
+        <TrialBanner expires={activation.expires} onEnterKey={() => setEnteringKey(true)} />
+      )}
       {screen}
     </LicenceContext.Provider>
   );

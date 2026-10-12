@@ -12,6 +12,8 @@
     "lint": "tsc --noEmit",
     "server": "tsx watch server/index.ts",
     "package:win": "node scripts/package-win.mjs",
+    "licence:init": "node scripts/licence.mjs init",
+    "licence:key": "node scripts/licence.mjs key",
     "server:demo": "node scripts/server-demo.mjs"
   },
   "dependencies": {

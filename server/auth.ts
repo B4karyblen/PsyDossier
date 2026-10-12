@@ -15,6 +15,7 @@ import { UserAccount, UserRole } from '../src/types';
 import { DATA_IN_ONEDRIVE, db, transaction } from './db';
 import { Actor, writeAudit } from './audit';
 import { LICENCE } from './licence';
+import { activationInfo } from './activation';
 
 const COOKIE = 'psyd_session';
 const IDLE_MS = 2 * 60 * 60 * 1000;
@@ -338,6 +339,7 @@ export function registerAuthRoutes(app: Express) {
       user,
       dataInOneDrive: DATA_IN_ONEDRIVE,
       licence: LICENCE && { id: LICENCE.id, holder: LICENCE.holder, place: LICENCE.place },
+      activation: activationInfo(),
     });
   });
 

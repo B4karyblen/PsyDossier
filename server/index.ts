@@ -33,6 +33,7 @@ import {
 } from './auth';
 import { allDossiers, createDossier, getDossier, HttpError, redactForRole, updateDossier } from './dossiers';
 import { LICENCE } from './licence';
+import { activate, activationInfo } from './activation';
 import { seedDemo } from './seed';
 
 const HOST = '127.0.0.1';
@@ -106,6 +107,31 @@ app.use('/api', (_req, res, next) => {
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, app: 'psydossier' });
+});
+
+// A licensed release stays closed until it is activated on this computer.
+app.get('/api/activation', (_req, res) => {
+  res.json(activationInfo());
+});
+
+app.post('/api/activation', (req, res) => {
+  const key = typeof req.body?.key === 'string' ? req.body.key.slice(0, 400) : '';
+  const result = activate(key);
+  if (!result.ok) {
+    res.status(400).json({ error: result.error });
+    return;
+  }
+  res.json(activationInfo());
+});
+
+app.use('/api', (req, res, next) => {
+  if (req.path === '/auth/status') return next();
+  const a = activationInfo();
+  if (a.active) return next();
+  res.status(403).json({
+    error: a.expired ? 'La période d’essai de PsyDossier est terminée.' : 'PsyDossier n’est pas activé sur ce poste.',
+    activationRequired: true,
+  });
 });
 
 registerAuthRoutes(app);
@@ -290,7 +316,14 @@ const server = app.listen(PORT, HOST, () => {
   console.log('  PsyDossier est prêt');
   console.log(`  Adresse : ${APP_URL}`);
   console.log(`  Données : ${DATA_DIR}`);
-  if (LICENCE) console.log(`  Licence : ${LICENCE.holder} — réf. ${LICENCE.id} (usage personnel, non cessible)`);
+  if (LICENCE) {
+    console.log(`  Licence : ${LICENCE.holder} — réf. ${LICENCE.id} (usage personnel, non cessible)`);
+    const a = activationInfo();
+    if (!a.active) {
+      console.log(`  ${a.expired ? 'Période d’essai terminée' : 'Activation requise'} — code machine : ${a.machineCode}`);
+    }
+    else if (a.expires) console.log(`  Version d’essai jusqu’au ${a.expires}`);
+  }
   console.log('');
   if (DATA_IN_ONEDRIVE) {
     console.log('  ATTENTION : PsyDossier est dans un dossier OneDrive.');

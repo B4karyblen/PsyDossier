@@ -3,6 +3,9 @@ import type { Licence } from './api';
 
 export const LicenceContext = React.createContext<Licence | null>(null);
 
+/** Who issues activation keys, shown on the activation screen. */
+export const PUBLISHER = { name: 'Aboubacar Togola', phone: '+223 71 41 47 74' };
+
 /** "Licence personnelle de Dr X (Lieu) · réf. PSD-…" — nothing in development builds. */
 export const LicenceNotice: React.FC<{ className?: string }> = ({ className = '' }) => {
   const licence = React.useContext(LicenceContext);
