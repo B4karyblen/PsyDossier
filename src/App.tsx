@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState } from 'react';
 import {
   DossierPsychiatrique,
@@ -33,11 +28,12 @@ import { getRubriqueCompleteness, getRubriquePermission, RUBRIQUES_CONFIG } from
 import { RubriqueStateCard } from './components/rubriques/RubriqueStateCard';
 import { ROLES_CAN_CREATE_DOSSIER, ROLES_CAN_EXPORT, ROLES_CAN_READ_AUDIT } from './utils/emptyDossier';
 import { AlertTriangle, HeartPulse } from 'lucide-react';
-import { api, ApiError, canManage, SessionUser } from './lib/api';
+import { ActivationInfo, api, ApiError, canManage, Licence, SessionUser } from './lib/api';
+import { LicenceContext } from './lib/licence';
 import { BackupDialog } from './components/BackupDialog';
 import { useServerSync } from './lib/useServerSync';
 import { confirmDiscard } from './lib/dirtyGuard';
-import { SessionExpiredDialog, SetupScreen, SignInScreen } from './components/auth/AuthScreens';
+import { ActivationScreen, SessionExpiredDialog, SetupScreen, SignInScreen } from './components/auth/AuthScreens';
 import { UsersView, ChangePasswordDialog } from './components/UsersView';
 import { useToast } from './components/ui/Toaster';
 import { AppSkeleton } from './components/ui/AppSkeleton';
@@ -85,19 +81,59 @@ const SplashCard: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </div>
 );
 
+const OneDriveWarning: React.FC = () => (
+  <div role="alert" className="flex items-start gap-3 px-4 py-3 bg-amber-50 border-b border-amber-200 font-sans">
+    <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+    <p className="text-base text-amber-900">
+      <strong className="font-semibold">PsyDossier est dans un dossier OneDrive.</strong>{' '}
+      La synchronisation peut endommager vos données. Fermez la fenêtre « PsyDossier », déplacez le dossier
+      « PsyDossier » vers C:\PsyDossier, puis relancez « Demarrer PsyDossier ».
+    </p>
+  </div>
+);
+
+const frenchDate = (iso: string) =>
+  new Date(`${iso}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+const TrialBanner: React.FC<{ expires: string; onEnterKey: () => void }> = ({ expires, onEnterKey }) => (
+  <div role="status" className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-2 bg-ink-50 border-b border-ink-150 font-sans text-sm text-ink-700">
+    <span>
+      <strong className="font-semibold text-ink-900">Version d’essai</strong> · PsyDossier fonctionne jusqu’au {frenchDate(expires)}.
+    </span>
+    <button type="button" onClick={onEnterKey} className="font-semibold text-primary-700 hover:underline !min-h-0 !min-w-0">
+      Saisir ma clé définitive
+    </button>
+  </div>
+);
+
 /** Resolves the session before anything else is shown (PRD F-00). */
 export default function App() {
   const [auth, setAuth] = useState<
-    { status: 'checking' } | { status: 'unreachable' } | { status: 'setup' } | { status: 'signin' } | { status: 'ready'; user: SessionUser }
+    | { status: 'checking' }
+    | { status: 'unreachable' }
+    | { status: 'activation' }
+    | { status: 'setup' }
+    | { status: 'signin' }
+    | { status: 'ready'; user: SessionUser }
   >({ status: 'checking' });
+  const [dataInOneDrive, setDataInOneDrive] = useState(false);
+  const [licence, setLicence] = useState<Licence | null>(null);
+  const [activation, setActivation] = useState<ActivationInfo | null>(null);
+  /** The trial user chose to enter a permanent key. */
+  const [enteringKey, setEnteringKey] = useState(false);
 
   const check = React.useCallback(() => {
     setAuth({ status: 'checking' });
+    setEnteringKey(false);
     api
       .status()
-      .then((s) =>
-        setAuth(s.user ? { status: 'ready', user: s.user } : s.setupRequired ? { status: 'setup' } : { status: 'signin' })
-      )
+      .then((s) => {
+        setDataInOneDrive(!!s.dataInOneDrive);
+        setLicence(s.licence ?? null);
+        setActivation(s.activation ?? null);
+        if (s.activation && !s.activation.active) setAuth({ status: 'activation' });
+        else setAuth(s.user ? { status: 'ready', user: s.user } : s.setupRequired ? { status: 'setup' } : { status: 'signin' });
+      })
       .catch(() => setAuth({ status: 'unreachable' }));
   }, []);
 
@@ -105,30 +141,47 @@ export default function App() {
 
   const onAuth = (user: SessionUser) => setAuth({ status: 'ready', user });
 
-  switch (auth.status) {
-    case 'checking':
-      return (
-        <SplashCard>
-          <p className="mt-5 text-base font-semibold text-ink-600" role="status">Chargement…</p>
-        </SplashCard>
-      );
-    case 'unreachable':
-      return (
-        <SplashCard>
-          <h1 className="mt-5 text-lg font-bold text-ink-900">Serveur local injoignable</h1>
-          <p className="mt-2 text-base text-ink-600">
-            Vérifiez que la fenêtre « PsyDossier » est toujours ouverte, ou relancez « Demarrer PsyDossier ».
-          </p>
-          <button type="button" onClick={check} className="btn-primary mt-6">Réessayer</button>
-        </SplashCard>
-      );
-    case 'setup':
-      return <SetupScreen onAuth={onAuth} />;
-    case 'signin':
-      return <SignInScreen onAuth={onAuth} />;
-    case 'ready':
-      return <Workspace key={auth.user.id} user={auth.user} onSignedOut={() => setAuth({ status: 'signin' })} />;
-  }
+  const screen = (() => {
+    if (enteringKey && activation) {
+      return <ActivationScreen info={activation} onActivated={check} onCancel={() => setEnteringKey(false)} />;
+    }
+    switch (auth.status) {
+      case 'checking':
+        return (
+          <SplashCard>
+            <p className="mt-5 text-base font-semibold text-ink-600" role="status">Chargement…</p>
+          </SplashCard>
+        );
+      case 'unreachable':
+        return (
+          <SplashCard>
+            <h1 className="mt-5 text-lg font-bold text-ink-900">Serveur local injoignable</h1>
+            <p className="mt-2 text-base text-ink-600">
+              Vérifiez que la fenêtre « PsyDossier » est toujours ouverte, ou relancez « Demarrer PsyDossier ».
+            </p>
+            <button type="button" onClick={check} className="btn-primary mt-6">Réessayer</button>
+          </SplashCard>
+        );
+      case 'activation':
+        return activation && <ActivationScreen info={activation} onActivated={check} />;
+      case 'setup':
+        return <SetupScreen onAuth={onAuth} />;
+      case 'signin':
+        return <SignInScreen onAuth={onAuth} />;
+      case 'ready':
+        return <Workspace key={auth.user.id} user={auth.user} onSignedOut={() => setAuth({ status: 'signin' })} />;
+    }
+  })();
+
+  return (
+    <LicenceContext.Provider value={licence}>
+      {dataInOneDrive && <OneDriveWarning />}
+      {activation?.active && activation.expires && !enteringKey && (
+        <TrialBanner expires={activation.expires} onEnterKey={() => setEnteringKey(true)} />
+      )}
+      {screen}
+    </LicenceContext.Provider>
+  );
 }
 
 function Workspace({ user, onSignedOut }: { user: SessionUser; onSignedOut: () => void }) {

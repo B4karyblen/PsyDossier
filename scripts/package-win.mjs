@@ -1,5 +1,13 @@
 /**
- * Builds a portable Windows release:
+ * Builds a portable Windows release, licensed to one client:
+ *
+ *   npm run package:win -- --titulaire "Dr Prénom Nom" --lieu "Cabinet de psychiatrie" [--comptes 1] [--ref PSD-…]
+ *
+ * The licence (holder, place, reference, number of accounts) is compiled into the server,
+ * shown in the app and recorded in the client's database and backups, together with the
+ * public key from licence/public-key.pem (npm run licence:init). The release opens only
+ * once activated on the client's computer with a key from npm run licence:key.
+ * For an update, rebuild with the same --ref: the client's activation stays valid.
  *
  *   release/PsyDossier/
  *     Demarrer PsyDossier.bat   ← double-click to start
@@ -9,12 +17,14 @@
  *     app/dist/                 ← built frontend
  *     data/                     ← created on first start (psydossier.db, backups/)
  *
- *   release/PsyDossier-win-x64.zip
+ *   release/PsyDossier-<ref>.zip
+ *   release/PsyDossier-<ref>.json   ← licence record to keep (not shipped)
  */
 import { execSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { parseArgs } from 'node:util';
 import zlib from 'node:zlib';
 import { build } from 'esbuild';
 
@@ -24,6 +34,38 @@ const RELEASE = path.join(ROOT, 'release');
 const OUT = path.join(RELEASE, 'PsyDossier');
 const APP = path.join(OUT, 'app');
 const NODE_MAJOR = 24;
+
+function readLicence() {
+  const { values } = parseArgs({
+    options: {
+      titulaire: { type: 'string' },
+      lieu: { type: 'string', default: '' },
+      comptes: { type: 'string', default: '1' },
+      ref: { type: 'string' },
+    },
+  });
+  const holder = values.titulaire?.trim();
+  if (!holder) {
+    console.error('Nom du titulaire de la licence requis, par exemple :');
+    console.error('  npm run package:win -- --titulaire "Dr Prénom Nom" --lieu "Cabinet de psychiatrie"');
+    process.exit(1);
+  }
+  const maxUsers = Number(values.comptes);
+  if (!Number.isInteger(maxUsers) || maxUsers < 1) {
+    console.error('--comptes doit être un nombre entier ≥ 1.');
+    process.exit(1);
+  }
+  const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  const suffix = Array.from(crypto.randomBytes(4), (b) => alphabet[b % alphabet.length]).join('');
+  const issued = new Date().toISOString().slice(0, 10);
+  return {
+    id: values.ref?.trim() || `PSD-${issued.slice(0, 4)}-${suffix}`,
+    holder,
+    place: values.lieu.trim(),
+    issued,
+    maxUsers,
+  };
+}
 
 const run = (cmd) => execSync(cmd, { cwd: ROOT, stdio: 'inherit' });
 const crlf = (text) => text.replace(/\r?\n/g, '\r\n');
@@ -138,17 +180,39 @@ echo   PsyDossier s'est arrete.
 pause
 `;
 
-const README = (nodeVersion) => `PsyDossier — installation locale (Windows)
+const README = (nodeVersion, licence) => `PsyDossier — installation locale (Windows)
 ===========================================
 
+LICENCE
+  Licence personnelle de ${licence.holder}${licence.place ? ` (${licence.place})` : ''}.
+  Référence : ${licence.id} — délivrée le ${licence.issued}.
+  Usage personnel exclusif, ${licence.maxUsers === 1 ? 'un seul compte' : `${licence.maxUsers} comptes au maximum`}.
+  Ce logiciel ne peut être ni copié, ni cédé, ni revendu.
+
 INSTALLATION
-  1. Copier le dossier « PsyDossier » où vous voulez (ex. C:\\PsyDossier).
-     Ne le placez pas dans « Program Files » (droits d'écriture requis).
-  2. Double-cliquer sur « Demarrer PsyDossier.bat ».
-  3. Le navigateur s'ouvre sur http://127.0.0.1:3210
+  1. Avant de décompresser le fichier zip téléchargé : clic droit sur le
+     zip > Propriétés > cocher « Débloquer » (en bas) > OK.
+  2. Décompresser, puis copier le dossier « PsyDossier » dans C:\\PsyDossier.
+     - Pas dans « Program Files » (droits d'écriture requis).
+     - Pas sur le Bureau ni dans « Documents » s'ils sont synchronisés par
+       OneDrive : la synchronisation peut endommager les données.
+       PsyDossier affiche un avertissement si c'est le cas.
+  3. Double-cliquer sur « Demarrer PsyDossier.bat ».
+     Si une fenêtre bleue « Windows a protégé votre ordinateur » apparaît :
+     cliquer sur « Informations complémentaires », puis « Exécuter quand même ».
+  4. Le navigateur s'ouvre sur http://127.0.0.1:3210
 
   Astuce : clic droit sur « Demarrer PsyDossier.bat » > Envoyer vers >
   Bureau (créer un raccourci).
+
+ACTIVATION (une seule fois)
+  1. Au premier lancement, PsyDossier affiche un code machine
+     (ex. : ABCD-EFGH-JKLM-NPQR), propre à cet ordinateur.
+  2. Envoyez ce code à l'éditeur de PsyDossier, qui vous remet votre
+     clé d'activation.
+  3. Collez la clé dans PsyDossier et cliquez sur « Activer ».
+  La clé ne fonctionne que sur cet ordinateur. Après une réinstallation
+  de Windows ou un changement d'ordinateur, demandez une nouvelle clé.
 
 PREMIER DÉMARRAGE
   1. Au premier lancement, créer votre compte : nom, identifiant et mot de
@@ -157,10 +221,14 @@ PREMIER DÉMARRAGE
   2. Vous êtes le médecin titulaire : vous gérez aussi les listes (CIM-10,
      religions, ethnies…) et les sauvegardes.
   - La session se verrouille après 2 heures d'inactivité.
-  - Plus tard, pour ajouter un(e) collaborateur(trice) (secrétariat,
-    psychologue…) : Ctrl+K > « Gérer les comptes ». Un code d'activation
-    lui permet de choisir son mot de passe.
-
+${
+  licence.maxUsers > 1
+    ? `  - Pour ajouter un(e) collaborateur(trice) (${licence.maxUsers} comptes au maximum) :
+    Ctrl+K > « Gérer les comptes ». Un code d'activation lui permet de
+    choisir son mot de passe.
+`
+    : ''
+}
 SAUVEGARDE SUR CLÉ USB (au moins une fois par semaine)
   1. Brancher la clé USB.
   2. Menu « Sauvegarde » > « Télécharger la sauvegarde ».
@@ -203,6 +271,17 @@ Technique : Node.js ${nodeVersion} (inclus), base SQLite, aucun accès Internet 
 `;
 
 async function main() {
+  const licence = readLicence();
+  const publicKeyPath = path.join(ROOT, 'licence', 'public-key.pem');
+  if (!fs.existsSync(publicKeyPath)) {
+    console.error('Clé publique de licence absente (licence/public-key.pem).');
+    console.error('Lancez d’abord, sur votre PC : npm run licence:init');
+    process.exit(1);
+  }
+  const publicKey = fs.readFileSync(publicKeyPath, 'utf8');
+  crypto.createPublicKey(publicKey); // fails early on a damaged file
+  console.log(`→ Licence ${licence.id} : ${licence.holder}${licence.place ? ` (${licence.place})` : ''}`);
+
   console.log('→ Build du frontend');
   run('npx vite build');
 
@@ -221,6 +300,10 @@ async function main() {
     minify: true,
     legalComments: 'none',
     logLevel: 'warning',
+    define: {
+      __PSYDOSSIER_LICENCE__: JSON.stringify(licence),
+      __PSYDOSSIER_PUBLIC_KEY__: JSON.stringify(publicKey),
+    },
   });
 
   fs.cpSync(path.join(ROOT, 'dist'), path.join(APP, 'dist'), { recursive: true });
@@ -229,15 +312,22 @@ async function main() {
   fs.copyFileSync(exePath, path.join(APP, 'node.exe'));
 
   fs.writeFileSync(path.join(OUT, 'Demarrer PsyDossier.bat'), crlf(LAUNCHER));
-  fs.writeFileSync(path.join(OUT, 'LISEZMOI.txt'), '\ufeff' + crlf(README(version)));
+  fs.writeFileSync(path.join(OUT, 'LISEZMOI.txt'), '\ufeff' + crlf(README(version, licence)));
 
   console.log('→ Archive zip');
-  const zipPath = path.join(RELEASE, 'PsyDossier-win-x64.zip');
+  const zipPath = path.join(RELEASE, `PsyDossier-${licence.id}.zip`);
   fs.rmSync(zipPath, { force: true });
   zipDirectory(OUT, zipPath);
 
+  const sha256 = crypto.createHash('sha256').update(fs.readFileSync(zipPath)).digest('hex');
+  const recordPath = path.join(RELEASE, `PsyDossier-${licence.id}.json`);
+  fs.writeFileSync(recordPath, JSON.stringify({ ...licence, node: version, zip: path.basename(zipPath), sha256 }, null, 2) + '\n');
+
   const mb = (fs.statSync(zipPath).size / 1024 / 1024).toFixed(1);
   console.log(`\n✓ ${path.relative(ROOT, zipPath)} (${mb} Mo)`);
+  console.log(`  Fiche de licence à conserver : ${path.relative(ROOT, recordPath)}`);
+  console.log('  Clé d’activation, avec le code machine affiché chez le client :');
+  console.log(`  npm run licence:key -- --ref ${licence.id} --machine XXXX-XXXX-XXXX-XXXX [--jours 30]`);
 }
 
 main().catch((err) => {

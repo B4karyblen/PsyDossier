@@ -20,7 +20,7 @@ import { exec } from 'node:child_process';
 import { DossierPsychiatrique, ReferenceLists } from '../src/types';
 import { ROLES_CAN_EXPORT, ROLES_CAN_READ_AUDIT } from '../src/utils/emptyDossier';
 import { getRubriquePermission } from '../src/utils/rules';
-import { BACKUP_DIR, DATA_DIR, db, runDailyBackup, transaction } from './db';
+import { BACKUP_DIR, DATA_DIR, DATA_IN_ONEDRIVE, db, runDailyBackup, transaction } from './db';
 import { listAudit, writeAudit } from './audit';
 import {
   canManage,
@@ -32,6 +32,8 @@ import {
   requireManager,
 } from './auth';
 import { allDossiers, createDossier, getDossier, HttpError, redactForRole, updateDossier } from './dossiers';
+import { LICENCE } from './licence';
+import { activate, activationInfo } from './activation';
 import { seedDemo } from './seed';
 
 const HOST = '127.0.0.1';
@@ -49,6 +51,14 @@ const settings = {
     ON CONFLICT(key) DO UPDATE SET value = excluded.value
   `),
 };
+
+// Every licence that has opened this database, kept in the database (and so in its backups):
+// a copied data folder or backup still shows which client release it came from.
+if (LICENCE) {
+  const row = settings.get.get('licences') as { value: string } | undefined;
+  const seen: string[] = row ? JSON.parse(row.value) : [];
+  if (!seen.includes(LICENCE.id)) settings.set.run('licences', JSON.stringify([...seen, LICENCE.id]));
+}
 /** Values referenced by at least one dossier, per list (F-24: these can only be deactivated). */
 function referentielsUsage() {
   const dossiers = allDossiers();
@@ -97,6 +107,31 @@ app.use('/api', (_req, res, next) => {
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, app: 'psydossier' });
+});
+
+// A licensed release stays closed until it is activated on this computer.
+app.get('/api/activation', (_req, res) => {
+  res.json(activationInfo());
+});
+
+app.post('/api/activation', (req, res) => {
+  const key = typeof req.body?.key === 'string' ? req.body.key.slice(0, 400) : '';
+  const result = activate(key);
+  if (!result.ok) {
+    res.status(400).json({ error: result.error });
+    return;
+  }
+  res.json(activationInfo());
+});
+
+app.use('/api', (req, res, next) => {
+  if (req.path === '/auth/status') return next();
+  const a = activationInfo();
+  if (a.active) return next();
+  res.status(403).json({
+    error: a.expired ? 'La période d’essai de PsyDossier est terminée.' : 'PsyDossier n’est pas activé sur ce poste.',
+    activationRequired: true,
+  });
 });
 
 registerAuthRoutes(app);
@@ -281,7 +316,21 @@ const server = app.listen(PORT, HOST, () => {
   console.log('  PsyDossier est prêt');
   console.log(`  Adresse : ${APP_URL}`);
   console.log(`  Données : ${DATA_DIR}`);
+  if (LICENCE) {
+    console.log(`  Licence : ${LICENCE.holder} — réf. ${LICENCE.id} (usage personnel, non cessible)`);
+    const a = activationInfo();
+    if (!a.active) {
+      console.log(`  ${a.expired ? 'Période d’essai terminée' : 'Activation requise'} — code machine : ${a.machineCode}`);
+    }
+    else if (a.expires) console.log(`  Version d’essai jusqu’au ${a.expires}`);
+  }
   console.log('');
+  if (DATA_IN_ONEDRIVE) {
+    console.log('  ATTENTION : PsyDossier est dans un dossier OneDrive.');
+    console.log('  La synchronisation peut endommager la base de données.');
+    console.log('  Fermez cette fenêtre et déplacez le dossier « PsyDossier » vers C:\\PsyDossier.');
+    console.log('');
+  }
   console.log('  Laissez cette fenêtre ouverte pendant l’utilisation.');
   openBrowser();
 });

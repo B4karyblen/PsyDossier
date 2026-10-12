@@ -7,6 +7,18 @@ export const BACKUP_DIR = path.join(DATA_DIR, 'backups');
 const DB_FILE = path.join(DATA_DIR, 'psydossier.db');
 const BACKUPS_TO_KEEP = 30;
 
+// OneDrive syncing the live database files (.db, -wal, -shm) can lock or corrupt them.
+function isInOneDrive(dir: string): boolean {
+  const norm = (p: string) => {
+    const full = path.resolve(p) + path.sep;
+    return process.platform === 'win32' ? full.toLowerCase() : full;
+  };
+  const roots = [process.env.OneDrive, process.env.OneDriveConsumer, process.env.OneDriveCommercial];
+  if (roots.some((r) => r && norm(dir).startsWith(norm(r)))) return true;
+  return dir.split(/[\\/]/).some((part) => /^onedrive( - .+)?$/i.test(part));
+}
+export const DATA_IN_ONEDRIVE = isInOneDrive(DATA_DIR);
+
 fs.mkdirSync(BACKUP_DIR, { recursive: true });
 
 export const db = new DatabaseSync(DB_FILE);

@@ -2,6 +2,7 @@ import React from 'react';
 import { DossierPsychiatrique, UserProfile, UserRole, AppView } from '../types';
 import { ROLE_LABELS } from './UsersView';
 import { calculateDossierStats } from '../utils/rules';
+import { LicenceNotice } from '../lib/licence';
 import {
   LayoutGrid,
   Users,
@@ -412,6 +413,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <LogOut className="w-4 h-4 text-ink-500" />
                 Déconnexion
               </button>
+              <LicenceNotice className="col-span-2 mt-1 leading-snug" />
             </div>
           ) : (
             <button

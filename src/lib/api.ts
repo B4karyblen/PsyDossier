@@ -25,9 +25,32 @@ export interface SessionUser {
 /** Manages lists, accounts and backups. */
 export const canManage = (u: Pick<SessionUser, 'role' | 'isOwner'>) => u.role === 'ADMIN' || u.isOwner;
 
+/** The client licence baked into a release; null in development. */
+export interface Licence {
+  id: string;
+  holder: string;
+  place: string;
+}
+
+/** Activation of a licensed release on this computer (always active in development). */
+export interface ActivationInfo {
+  required: boolean;
+  active: boolean;
+  /** A trial key was entered and has expired. */
+  expired: boolean;
+  /** Code the client sends to the publisher to receive a key. */
+  machineCode?: string;
+  /** Last day of a trial key (YYYY-MM-DD), null for a permanent key. */
+  expires?: string | null;
+}
+
 export interface AuthStatus {
   setupRequired: boolean;
   user: SessionUser | null;
+  /** The data folder is synced by OneDrive, which can corrupt the live database. */
+  dataInOneDrive?: boolean;
+  licence?: Licence | null;
+  activation?: ActivationInfo;
 }
 
 export interface DossierWriteResult {
@@ -53,6 +76,10 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
     throw new ApiError(0, 'Serveur local injoignable.');
   }
   const body = await res.json().catch(() => ({}));
+  // A trial key expired while the app was open: reload to show the activation screen.
+  if (res.status === 403 && (body as { activationRequired?: boolean }).activationRequired) {
+    window.location.reload();
+  }
   if (!res.ok) {
     throw new ApiError(res.status, (body as { error?: string }).error || `Erreur ${res.status}`, body);
   }
@@ -65,6 +92,7 @@ const post = <T>(url: string, body?: unknown) =>
 export const api = {
   // Session
   status: () => request<AuthStatus>('/api/auth/status'),
+  activateLicence: (key: string) => post<ActivationInfo>('/api/activation', { key }),
   setup: (b: { name: string; login: string; password: string; title?: string; service?: string }) =>
     post<{ user: SessionUser }>('/api/auth/setup', b),
   login: (login: string, password: string) => post<{ user: SessionUser }>('/api/auth/login', { login, password }),
