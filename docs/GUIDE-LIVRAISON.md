@@ -155,6 +155,25 @@ L'activation n'a pas encore été testée sur un vrai PC Windows. Dix minutes ch
 - la clé USB avec le zip ;
 - le contrat imprimé en **deux exemplaires**.
 
+### 6.0 Vérifier le PC du docteur *(5 minutes, avant tout le reste)*
+
+Si possible, faites ces vérifications **quelques jours avant**, par téléphone ou lors d'une visite. Un problème découvert le jour J vous fait perdre le rendez-vous.
+
+| Vérification | Comment | Attendu | Si ce n'est pas le cas |
+|---|---|---|---|
+| **Version de Windows** | Menu Démarrer → tapez `winver` → Entrée | **Windows 10 ou 11** | Sous Windows 7 ou 8, PsyDossier **ne démarre pas**. Il faut un PC plus récent, ou une mise à niveau de Windows. |
+| **Windows 64 bits** | Paramètres → Système → **Informations système** → « Type du système » | « Système d'exploitation **64 bits** » | Une version 32 bits ne peut pas faire tourner PsyDossier. |
+| **Date et heure** | Regardez l'horloge en bas à droite de l'écran | Date et heure **exactes** | Corrigez-les **avant** l'activation : Paramètres → Heure et langue → « Régler l'heure automatiquement ». |
+| **Espace disque** | Explorateur → Ce PC → disque C: | Au moins **1 Go libre** | Libérez de la place avant d'installer. |
+| **Antivirus** | Notez lequel est installé | — | S'il bloque l'application, voir le tableau de dépannage. |
+
+> [!WARNING]
+> **Pourquoi la date compte.** PsyDossier retient la date la plus récente qu'il a vue, pour qu'on ne puisse pas prolonger un essai en reculant l'horloge.
+>
+> Si le PC est en avance au moment de l'activation (par exemple en 2027) puis corrigé ensuite, la clé d'essai peut se bloquer trop tôt. Une clé définitive n'est pas concernée.
+>
+> **Vérifiez donc toujours la date avant d'activer.**
+
 ### 6.1 Installer
 
 1. **Débloquer.** Copiez le zip sur le PC du docteur. Faites un clic droit sur le zip → **Propriétés** → cochez **« Débloquer »** → **OK**.
@@ -259,6 +278,9 @@ Le code machine change, il faut donc une nouvelle clé. Pendant les 12 mois d'as
 | Chez le docteur : « Cette clé n'a pas été émise pour ce poste… » | Erreur dans le code machine ou dans la référence | Relisez le code machine à l'écran et vérifiez `--ref` |
 | « Windows a protégé votre ordinateur » | Le logiciel n'est pas signé numériquement | Informations complémentaires → Exécuter quand même |
 | Le navigateur ne s'ouvre pas | — | Ouvrez `http://127.0.0.1:3210` à la main |
+| La fenêtre noire s'ouvre et se ferme aussitôt, ou rien ne se passe | Windows 7 ou 8, ou Windows 32 bits | Vérifiez la version (étape 6.0). Il faut Windows 10 ou 11, 64 bits. |
+| L'antivirus signale ou supprime `node.exe` ou le `.bat` | Faux positif sur un programme non signé | Dans l'antivirus, restaurez le fichier et ajoutez une **exclusion** pour le dossier `C:\PsyDossier`. Si un fichier a été supprimé, redécompressez le zip. |
+| La clé d'essai indique « période d'essai terminée » bien trop tôt | L'horloge du PC était en avance au moment de l'activation | Corrigez la date, puis donnez une **clé définitive** : une nouvelle clé d'essai serait bloquée de la même façon |
 | « Le port 3210 est utilisé par une autre application » | Un autre logiciel occupe ce port | Fermez cet autre logiciel, ou redémarrez le PC |
 
 ---
